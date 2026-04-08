@@ -2,43 +2,141 @@
  * Clinic resolution for logged-in users.
  * Uses GET /app/me (no direct clinic_users or clinics queries; no .single()/.maybeSingle()).
  */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000';
-const SESSION_KEY = 'signalcare_app_session';
+if (!process.env.NEXT_PUBLIC_API_URL) {
+  throw new Error('NEXT_PUBLIC_API_URL is not set');
+}
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const SESSION_KEY = 'signalcare_app_session';
+const CURRENT_CLINIC_ID_KEY = 'current_clinic_id';
+
+export function getCurrentClinicId(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  const v = localStorage.getItem('current_clinic_id');
+  console.log('Reading clinic_id:', v);
+
+  return v && v.trim() ? v.trim() : null;
+}
+
+export function setCurrentClinicId(id: string): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(CURRENT_CLINIC_ID_KEY, id);
+}
+
+/** GET /app/my-clinics; if ≥1 clinic, stores first id (temporary default when multiple). */
+export async function syncClinicSelectionFromApi(
+  accessToken: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const res = await fetch(`${API_URL}/app/my-clinics`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: typeof body?.error === 'string' ? body.error : res.statusText || 'my_clinics_failed',
+    };
+  }
+  const clinics = Array.isArray(body?.clinics) ? body.clinics : [];
+  if (clinics.length === 0) {
+    return { ok: false, error: 'no_clinics' };
+  }
+  const first = clinics[0] as { id?: string };
+  if (!first?.id) {
+    return { ok: false, error: 'no_clinics' };
+  }
+  // Multiple clinics: still first only (temporary); non-empty list guarantees an id above.
+  setCurrentClinicId(first.id);
+  return { ok: true };
+}
+
+/** Persisted app session; localStorage current_clinic_id is set in initAppSession. */
 export type ClinicInfo = {
   user_id: string;
-  clinic_id: string;
   role: string;
+  clinic?: { id: string; name: string | null } | null;
+  clinic_id?: string;
+  access_token?: string;
 };
 
 export async function getClinicForUser(accessToken: string): Promise<{ ok: true; data: ClinicInfo } | { ok: false; error: string }> {
+  console.log('getClinicForUser called with token:', accessToken?.slice(0, 20));
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+  };
+  const clinicId = getCurrentClinicId();
+  if (clinicId) {
+    headers['X-Clinic-Id'] = clinicId;
+  }
   const res = await fetch(`${API_URL}/app/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
+    headers,
   });
+  console.log('GET /app/me status:', res.status);
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     return { ok: false, error: body.error || res.statusText || 'clinic_resolution_failed' };
   }
   const data = await res.json();
-  const userId = data?.user?.id;
-  const clinicId = data?.clinic?.id;
-  if (!userId || !clinicId) {
+  console.log('GET /app/me raw JSON:', data);
+  const userId = data?.user?.user_id || data?.user?.id || null;
+  const resolvedClinicId =
+    data?.clinic?.id ||
+    data?.user?.clinic_id ||
+    null;
+
+  console.log('Parsed values:', {
+    userId,
+    resolvedClinicId,
+    clinicObject: data?.clinic,
+    userObject: data?.user
+  });
+
+  console.log('Parsed userId:', userId);
+  console.log('Parsed clinicId:', resolvedClinicId);
+  console.log('Raw /app/me response:', data);
+
+  const role = data?.user?.role || 'staff';
+  if (!userId || !resolvedClinicId) {
+    console.log('Returning failure:', {
+      userId,
+      resolvedClinicId
+    });
+    console.error('Clinic resolution failed', { userId, resolvedClinicId });
     return { ok: false, error: 'no_clinic_resolved' };
   }
+
+  const clinicIdStr = String(resolvedClinicId);
+  setCurrentClinicId(clinicIdStr);
+  console.log('Clinic resolved:', resolvedClinicId);
   return {
     ok: true,
     data: {
       user_id: userId,
-      clinic_id: clinicId,
-      role: data?.user?.role || 'staff',
+      role,
+      clinic: data?.clinic ?? null,
+      access_token: accessToken,
     },
   };
 }
 
-/** Initialize app session from GET /app/me response. Call after Supabase auth. */
+/** Persist user context in sessionStorage and clinic id in localStorage. */
 export function initAppSession(data: ClinicInfo): void {
   if (typeof window !== 'undefined') {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    const clinicId = data.clinic?.id || data.clinic_id;
+
+    console.log('Persisting clinic_id:', clinicId);
+
+    if (clinicId) {
+      localStorage.setItem('current_clinic_id', String(clinicId));
+    }
+    const payload: ClinicInfo = {
+      user_id: data.user_id,
+      role: data.role,
+      clinic: data.clinic,
+      access_token: data.access_token,
+    };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
   }
 }
 
@@ -47,8 +145,15 @@ export function getAppSession(): ClinicInfo | null {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
-    const data = JSON.parse(raw) as ClinicInfo;
-    return data?.user_id && data?.clinic_id ? data : null;
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const user_id = typeof parsed.user_id === 'string' ? parsed.user_id : '';
+    if (!user_id) return null;
+    return {
+      user_id,
+      role: typeof parsed.role === 'string' ? parsed.role : 'staff',
+      clinic: parsed.clinic as ClinicInfo['clinic'],
+      access_token: typeof parsed.access_token === 'string' ? parsed.access_token : undefined,
+    };
   } catch {
     return null;
   }

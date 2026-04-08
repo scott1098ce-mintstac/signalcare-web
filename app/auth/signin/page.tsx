@@ -13,6 +13,7 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
 
   async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
+    console.log('HANDLE SIGN IN TRIGGERED');
     e.preventDefault();
     setErr(null);
     setLoading(true);
@@ -22,6 +23,8 @@ export default function SignInPage() {
         data: { session },
         error,
       } = await supabase.auth.signInWithPassword({ email, password });
+
+      console.log('Supabase response:', { session, error });
 
       if (error) {
         setErr(error.message);
@@ -39,6 +42,7 @@ export default function SignInPage() {
         return;
       }
 
+      console.log('Login success, clinic:', clinicResult.data.clinic?.id);
       initAppSession(clinicResult.data);
       router.replace('/');
       router.refresh();
@@ -79,7 +83,13 @@ export default function SignInPage() {
           Sign in to access the clinic dashboard.
         </p>
 
-        <form onSubmit={handleSignIn}>
+        <form
+          onSubmit={(e) => {
+            console.log('INLINE SUBMIT FIRED');
+            e.preventDefault();
+            handleSignIn(e);
+          }}
+        >
           <label
             htmlFor="email"
             style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 6 }}

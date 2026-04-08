@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAppSession } from './lib/clinic';
+import {
+  getAppSession,
+  getCurrentClinicId,
+  getClinicForUser,
+  initAppSession,
+} from './lib/clinic';
 import { appApiFetch } from './lib/api';
+import { supabase } from './lib/supabase';
 
 type AlertListItem = {
   id: string;
@@ -104,13 +110,55 @@ export default function DashboardPage() {
   const [monitoringError, setMonitoringError] = useState<string | null>(null);
 
   useEffect(() => {
-    const session = getAppSession();
-    if (!session) {
-      router.replace('/auth/signin');
-      return;
-    }
-    loadAlerts();
-    loadMonitoring();
+    let cancelled = false;
+    (async () => {
+      const session = getAppSession();
+
+      if (!session) {
+        router.replace('/auth/signin');
+        return;
+      }
+
+      console.log('Dashboard load - session exists:', !!session);
+
+      const { data: sb } = await supabase.auth.getSession();
+      const token = sb.session?.access_token;
+
+      if (!token) {
+        router.replace('/auth/signin');
+        return;
+      }
+
+      // 🔥 FIXED: Always resolve clinic if missing
+      if (!getCurrentClinicId()) {
+        const clinicResult = await getClinicForUser(token);
+
+        if (!clinicResult.ok) {
+          if (!cancelled) {
+            setErr(clinicResult.error);
+          }
+          return;
+        }
+
+        initAppSession(clinicResult.data);
+      }
+
+      if (cancelled) return;
+
+      // Final guard
+      if (!getCurrentClinicId()) {
+        if (!cancelled) {
+          setErr('No clinic access. Please contact support.');
+        }
+        return;
+      }
+
+      loadAlerts();
+      loadMonitoring();
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   useEffect(() => {
@@ -273,6 +321,9 @@ export default function DashboardPage() {
 
   return (
     <div style={{ fontFamily: 'system-ui', padding: 24, maxWidth: 900 }}>
+      <div style={{ marginBottom: 16 }}>
+        <a href="/protocols" style={{ marginRight: 16 }}>Protocols</a>
+      </div>
       {/* ACTIVE RECOVERY MONITORING */}
       <section style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: '#333' }}>

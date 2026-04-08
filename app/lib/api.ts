@@ -1,7 +1,11 @@
 import { supabase } from './supabase';
-import { getAppSession } from './clinic';
+import { getCurrentClinicId } from './clinic';
 
-const API_URL = 'http://127.0.0.1:3001';
+if (!process.env.NEXT_PUBLIC_API_URL) {
+  throw new Error('NEXT_PUBLIC_API_URL is not set');
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type AppApiFetchOptions = {
   method?: string;
@@ -18,7 +22,7 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
 
   const { data } = await supabase.auth.getSession();
   const accessToken = data.session?.access_token;
-  const appSession = getAppSession();
+  const currentClinicId = getCurrentClinicId();
 
   const finalHeaders: Record<string, string> = {
     Accept: 'application/json',
@@ -29,7 +33,11 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
     finalHeaders.Authorization = `Bearer ${accessToken}`;
   }
 
-  finalHeaders['X-Clinic-Id'] = 'ace9dd0a-dec8-4d34-93cd-481b9216f8a9';
+  if (currentClinicId) {
+    finalHeaders['X-Clinic-Id'] = currentClinicId;
+  } else {
+    console.warn('No clinic selected');
+  }
 
   const hasBody = body !== undefined;
   if (hasBody) {
