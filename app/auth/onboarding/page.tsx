@@ -93,7 +93,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-xl font-semibold mb-4">Clinic onboarding</h1>
+        <h1 className="text-xl font-semibold mb-4">Clinic onboarding v2</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
