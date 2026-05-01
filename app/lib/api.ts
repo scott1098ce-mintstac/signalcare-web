@@ -33,7 +33,7 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
     finalHeaders.Authorization = `Bearer ${accessToken}`;
   }
 
-  if (currentClinicId) {
+  if (!path.includes('/app/me') && currentClinicId) {
     finalHeaders['X-Clinic-Id'] = currentClinicId;
   } else {
     console.warn('No clinic selected');

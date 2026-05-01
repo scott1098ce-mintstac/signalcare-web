@@ -24,6 +24,8 @@ export default function SignInPage() {
         error,
       } = await supabase.auth.signInWithPassword({ email, password });
 
+      console.log('AFTER SUPABASE LOGIN');
+
       console.log('Supabase response:', { session, error });
 
       if (error) {
@@ -36,8 +38,21 @@ export default function SignInPage() {
         return;
       }
 
-      const clinicResult = await getClinicForUser(session.access_token);
-      if (!clinicResult.ok) {
+      let clinicResult;
+      try {
+        clinicResult = await getClinicForUser(session.access_token);
+      } catch (e) {
+        console.error('getClinicForUser threw:', e);
+        clinicResult = { error: 'no_clinic_resolved' };
+      }
+      console.log('clinicResult RAW:', clinicResult);
+      console.log('clinicResult AFTER AWAIT:', clinicResult);
+      if (clinicResult?.error === 'no_clinic_resolved') {
+        window.location.href = '/auth/onboarding';
+        return;
+      }
+
+      if (clinicResult?.error) {
         setErr(clinicResult.error);
         return;
       }
@@ -159,11 +174,7 @@ export default function SignInPage() {
           </button>
         </form>
 
-        {err ? (
-          <p style={{ marginTop: 14, color: '#dc2626', fontSize: 14 }}>
-            {err}
-          </p>
-        ) : null}
+        {err && err !== 'no_clinic_resolved' && <div>{err}</div>}
       </div>
     </div>
   );

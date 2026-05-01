@@ -60,64 +60,17 @@ export type ClinicInfo = {
   access_token?: string;
 };
 
-export async function getClinicForUser(accessToken: string): Promise<{ ok: true; data: ClinicInfo } | { ok: false; error: string }> {
+export async function getClinicForUser(accessToken: string): Promise<any> {
   console.log('getClinicForUser called with token:', accessToken?.slice(0, 20));
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
   };
-  const clinicId = getCurrentClinicId();
-  if (clinicId) {
-    headers['X-Clinic-Id'] = clinicId;
-  }
-  const res = await fetch(`${API_URL}/app/me`, {
-    headers,
-  });
+  const res = await fetch(`${API_URL}/app/me`, { headers });
+
   console.log('GET /app/me status:', res.status);
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    return { ok: false, error: body.error || res.statusText || 'clinic_resolution_failed' };
-  }
-  const data = await res.json();
-  console.log('GET /app/me raw JSON:', data);
-  const userId = data?.user?.user_id || data?.user?.id || null;
-  const resolvedClinicId =
-    data?.clinic?.id ||
-    data?.user?.clinic_id ||
-    null;
 
-  console.log('Parsed values:', {
-    userId,
-    resolvedClinicId,
-    clinicObject: data?.clinic,
-    userObject: data?.user
-  });
-
-  console.log('Parsed userId:', userId);
-  console.log('Parsed clinicId:', resolvedClinicId);
-  console.log('Raw /app/me response:', data);
-
-  const role = data?.user?.role || 'staff';
-  if (!userId || !resolvedClinicId) {
-    console.log('Returning failure:', {
-      userId,
-      resolvedClinicId
-    });
-    console.error('Clinic resolution failed', { userId, resolvedClinicId });
-    return { ok: false, error: 'no_clinic_resolved' };
-  }
-
-  const clinicIdStr = String(resolvedClinicId);
-  setCurrentClinicId(clinicIdStr);
-  console.log('Clinic resolved:', resolvedClinicId);
-  return {
-    ok: true,
-    data: {
-      user_id: userId,
-      role,
-      clinic: data?.clinic ?? null,
-      access_token: accessToken,
-    },
-  };
+  const data = await res.json().catch(() => ({}));
+  return data;
 }
 
 /** Persist user context in sessionStorage and clinic id in localStorage. */
