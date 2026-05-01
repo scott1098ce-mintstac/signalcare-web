@@ -91,36 +91,60 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div>
-      <h1>Clinic onboarding</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Clinic name
-            <input value={name} onChange={(e) => setName(e.target.value)} required />
-          </label>
-        </div>
-        <div>
-          <label>
-            Clinic type
-            <select value={clinicType} onChange={(e) => setClinicType(e.target.value as ClinicType)}>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-xl font-semibold mb-4">Clinic onboarding</h1>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Clinic name
+            </label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Clinic type
+            </label>
+            <select
+              className="w-full border rounded px-3 py-2"
+              value={clinicType}
+              onChange={(e) => setClinicType(e.target.value as ClinicType)}
+            >
               <option value="cosmetic">cosmetic</option>
               <option value="dental">dental</option>
               <option value="surgical">surgical</option>
             </select>
-          </label>
-        </div>
-        <div>
-          <label>
-            Phone (optional)
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} />
-          </label>
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating…' : 'Create clinic'}
-        </button>
-      </form>
-      {err ? <p>{err}</p> : null}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Phone (optional)
+            </label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="w-full bg-black text-white py-2 rounded"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? 'Creating…' : 'Create clinic'}
+          </button>
+
+          {err && <p className="text-red-500 text-sm">{err}</p>}
+        </form>
+      </div>
     </div>
   );
 }

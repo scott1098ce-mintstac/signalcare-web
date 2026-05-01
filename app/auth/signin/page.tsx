@@ -45,7 +45,8 @@ export default function SignInPage() {
         console.error('getClinicForUser threw:', e);
         clinicResult = { error: 'no_clinic_resolved' };
       }
-      console.log('clinicResult RAW:', clinicResult);
+      console.log('clinicResult FULL:', JSON.stringify(clinicResult));
+      console.log('TYPE:', typeof clinicResult);
       console.log('clinicResult AFTER AWAIT:', clinicResult);
       if (clinicResult?.error === 'no_clinic_resolved') {
         window.location.href = '/auth/onboarding';
