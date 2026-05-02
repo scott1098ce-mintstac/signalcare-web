@@ -75,11 +75,11 @@ export default function OnboardingPage() {
       }
 
       const clinicResult = await getClinicForUser(accessToken);
-      if (!clinicResult.ok) {
+      if (clinicResult?.error) {
         setErr(clinicResult.error);
         return;
       }
-      initAppSession(clinicResult.data);
+      initAppSession(clinicResult);
 
       router.replace('/');
       router.refresh();
