@@ -64,7 +64,6 @@ export default function SignInPage() {
       }
 
       console.log('Login success, clinic:', clinicResult.clinic?.id);
-      initAppSession(clinicResult);
       router.replace('/');
       router.refresh();
     } catch (e) {
