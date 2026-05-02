@@ -58,8 +58,8 @@ export default function SignInPage() {
         return;
       }
 
-      console.log('Login success, clinic:', clinicResult.data.clinic?.id);
-      initAppSession(clinicResult.data);
+      console.log('Login success, clinic:', clinicResult.clinic?.id);
+      initAppSession(clinicResult);
       router.replace('/');
       router.refresh();
     } catch (e) {
