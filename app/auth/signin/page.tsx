@@ -48,6 +48,7 @@ export default function SignInPage() {
       initAppSession({
         user_id: session.user.id,
         clinic: clinicResult?.clinic || null,
+        role: clinicResult?.role || 'staff',
         access_token: session.access_token,
       });
       console.log('clinicResult FULL:', JSON.stringify(clinicResult));
