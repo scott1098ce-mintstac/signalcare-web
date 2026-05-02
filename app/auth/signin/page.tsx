@@ -45,6 +45,11 @@ export default function SignInPage() {
         console.error('getClinicForUser threw:', e);
         clinicResult = { error: 'no_clinic_resolved' };
       }
+      initAppSession({
+        user_id: session.user.id,
+        clinic: clinicResult?.clinic || null,
+        access_token: session.access_token,
+      });
       console.log('clinicResult FULL:', JSON.stringify(clinicResult));
       console.log('TYPE:', typeof clinicResult);
       console.log('clinicResult AFTER AWAIT:', clinicResult);
