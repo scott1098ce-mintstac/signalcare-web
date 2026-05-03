@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   getAppSession,
@@ -42,29 +43,21 @@ function formatDate(iso: string | null): string {
   }
 }
 
-function MonitoringListRow({ m }: { m: MonitoringRow }) {
+function MonitoringListRow({ row }: { row: MonitoringRow }) {
   return (
-    <div
-      key={m.enrolment_id}
-      style={{
-        padding: 12,
-        border: '1px solid #ddd',
-        borderRadius: 8,
-        background: '#fff',
-      }}
-    >
+    <>
       <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>
-        {m.patient_name ?? '—'}
+        {row.patient_name ?? '—'}
       </div>
 
       <div style={{ fontSize: 14, color: '#333', marginBottom: 4 }}>
-        {m.procedure ?? '—'}
+        {row.procedure ?? '—'}
       </div>
 
       <div style={{ fontSize: 13, color: '#666' }}>
-        Status: {m.v2_status} · Recovery day: {m.recovery_day ?? '—'} · Last check-in: {formatDate(m.last_checkin_at)} · Score: {m.latest_score != null ? m.latest_score : '—'} · Started: {formatDate(m.started_at)}
+        Status: {row.v2_status} · Recovery day: {row.recovery_day ?? '—'} · Last check-in: {formatDate(row.last_checkin_at)} · Score: {row.latest_score != null ? row.latest_score : '—'} · Started: {formatDate(row.started_at)}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -165,7 +158,15 @@ export default function DashboardPage() {
   );
 
   return (
-    <div style={{ fontFamily: 'system-ui', padding: 24, maxWidth: 900 }}>
+    <div
+      onClick={() => {
+        console.log('PAGE CLICK WORKS');
+      }}
+      style={{ fontFamily: 'system-ui', padding: 24, maxWidth: 900 }}
+    >
+      <div style={{ background: 'red', color: 'white', padding: '10px', fontWeight: 'bold' }}>
+        TEST BUILD - SCOTT
+      </div>
       <div style={{ marginBottom: 16 }}>
         <a href="/protocols" style={{ marginRight: 16 }}>Protocols</a>
       </div>
@@ -193,8 +194,20 @@ export default function DashboardPage() {
                   ATTENTION REQUIRED ({attentionRequired.length})
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {attentionRequired.map((m) => (
-                    <MonitoringListRow key={m.enrolment_id} m={m} />
+                  {attentionRequired.map((row) => (
+                    <Link href={`/patient/${row.enrolment_id}`} key={row.enrolment_id}>
+                      <div
+                        style={{
+                          cursor: 'pointer',
+                          border: '1px solid #ddd',
+                          padding: '16px',
+                          borderRadius: '8px',
+                          background: 'white',
+                        }}
+                      >
+                        <MonitoringListRow row={row} />
+                      </div>
+                    </Link>
                   ))}
                 </div>
               </section>
@@ -206,8 +219,20 @@ export default function DashboardPage() {
                   AWAITING RESPONSE ({awaitingResponse.length})
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {awaitingResponse.map((m) => (
-                    <MonitoringListRow key={m.enrolment_id} m={m} />
+                  {awaitingResponse.map((row) => (
+                    <Link href={`/patient/${row.enrolment_id}`} key={row.enrolment_id}>
+                      <div
+                        style={{
+                          cursor: 'pointer',
+                          border: '1px solid #ddd',
+                          padding: '16px',
+                          borderRadius: '8px',
+                          background: 'white',
+                        }}
+                      >
+                        <MonitoringListRow row={row} />
+                      </div>
+                    </Link>
                   ))}
                 </div>
               </section>
@@ -219,8 +244,20 @@ export default function DashboardPage() {
                   STABLE ({stable.length})
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {stable.map((m) => (
-                    <MonitoringListRow key={m.enrolment_id} m={m} />
+                  {stable.map((row) => (
+                    <Link href={`/patient/${row.enrolment_id}`} key={row.enrolment_id}>
+                      <div
+                        style={{
+                          cursor: 'pointer',
+                          border: '1px solid #ddd',
+                          padding: '16px',
+                          borderRadius: '8px',
+                          background: 'white',
+                        }}
+                      >
+                        <MonitoringListRow row={row} />
+                      </div>
+                    </Link>
                   ))}
                 </div>
               </section>
