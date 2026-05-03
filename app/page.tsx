@@ -195,7 +195,7 @@ export default function DashboardPage() {
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {attentionRequired.map((row) => (
-                    <Link href={`/patient/${row.enrolment_id}`} key={row.enrolment_id}>
+                    <Link href={`/enrolments/${row.enrolment_id}`} key={row.enrolment_id}>
                       <div
                         style={{
                           cursor: 'pointer',
@@ -220,7 +220,7 @@ export default function DashboardPage() {
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {awaitingResponse.map((row) => (
-                    <Link href={`/patient/${row.enrolment_id}`} key={row.enrolment_id}>
+                    <Link href={`/enrolments/${row.enrolment_id}`} key={row.enrolment_id}>
                       <div
                         style={{
                           cursor: 'pointer',
@@ -245,7 +245,7 @@ export default function DashboardPage() {
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {stable.map((row) => (
-                    <Link href={`/patient/${row.enrolment_id}`} key={row.enrolment_id}>
+                    <Link href={`/enrolments/${row.enrolment_id}`} key={row.enrolment_id}>
                       <div
                         style={{
                           cursor: 'pointer',
