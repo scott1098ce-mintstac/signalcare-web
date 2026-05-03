@@ -97,11 +97,26 @@ export default function EnrolmentDetailPage() {
 
             <div><strong>Time:</strong> {e.last_checkin_at || e.started_at}</div>
 
-            <div><strong>Status:</strong> {e.v2_status}</div>
+            <div>
+              <strong>Event:</strong>
+              {' '}
+              {
+                e.v2_status === 'awaiting_response' ? 'Check-in sent — awaiting patient response' :
+                e.v2_status === 'alert_open' ? 'Alert triggered — requires action' :
+                e.v2_status === 'alert_acknowledged' ? 'Alert acknowledged — under review' :
+                e.v2_status === 'review_required' ? 'Requires clinical review' :
+                e.v2_status === 'stable' ? 'Stable — no action required' :
+                e.v2_status
+              }
+            </div>
 
-            <div><strong>Score:</strong> {e.latest_score ?? '-'}</div>
+            {e.latest_score && (
+              <div><strong>Score:</strong> {e.latest_score}</div>
+            )}
 
-            <div><strong>Risk:</strong> {e.risk_level}</div>
+            {e.risk_level && (
+              <div><strong>Risk:</strong> {e.risk_level}</div>
+            )}
 
           </div>
         ))}
