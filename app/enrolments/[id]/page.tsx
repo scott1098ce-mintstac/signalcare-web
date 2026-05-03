@@ -13,6 +13,7 @@ type MonitoringRow = {
   latest_score: number | null;
   last_checkin_at: string | null;
   started_at: string | null;
+  open_alert_id: string | null;
 };
 
 export default function EnrolmentDetailPage() {
@@ -57,6 +58,34 @@ export default function EnrolmentDetailPage() {
     return <div>Loading...</div>;
   }
 
+  const handleAcknowledge = async () => {
+    if (!row?.open_alert_id) return
+
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    window.location.reload()
+  }
+
+  const handleResolve = async () => {
+    if (!row?.open_alert_id) return
+
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    window.location.reload()
+  }
+
   return (
     <div style={{ padding: 20 }}>
 
@@ -85,12 +114,8 @@ export default function EnrolmentDetailPage() {
 
       {/* ACTION */}
       <div style={{ marginBottom: 20 }}>
-        <button style={{ padding: 10, marginRight: 10 }}>
-          Acknowledge
-        </button>
-        <button style={{ padding: 10 }}>
-          Resolve
-        </button>
+        <button onClick={handleAcknowledge}>Acknowledge</button>
+        <button onClick={handleResolve}>Resolve</button>
       </div>
 
       {/* CONTEXT */}
