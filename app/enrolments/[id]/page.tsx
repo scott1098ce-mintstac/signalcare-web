@@ -68,7 +68,19 @@ export default function EnrolmentDetailPage() {
         marginBottom: 20
       }}>
         <strong>PROBLEM</strong><br />
-        {row.v2_status} — {row.risk_level}
+        {
+          row.v2_status === 'awaiting_response'
+            ? 'Patient has not responded to check-in'
+            : row.v2_status === 'alert_open'
+            ? 'High-risk alert — immediate attention required'
+            : row.v2_status === 'alert_acknowledged'
+            ? 'Alert acknowledged — under clinical review'
+            : row.v2_status === 'review_required'
+            ? 'Patient requires clinical review'
+            : row.v2_status === 'stable'
+            ? 'Patient stable — no action required'
+            : row.v2_status
+        }
       </div>
 
       {/* ACTION */}
