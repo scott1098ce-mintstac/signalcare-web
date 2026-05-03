@@ -11,12 +11,15 @@ type MonitoringRow = {
   v2_status: string;
   risk_level: string;
   latest_score: number | null;
+  last_checkin_at: string | null;
+  started_at: string | null;
 };
 
 export default function EnrolmentDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const [row, setRow] = useState<MonitoringRow | null>(null);
+  const [events, setEvents] = useState<MonitoringRow[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,14 +28,24 @@ export default function EnrolmentDetailPage() {
         const res = await appApiFetch('/app/monitoring?limit=100');
         const json = await res.json();
         if (!res.ok) {
-          if (!cancelled) setRow(null);
+          if (!cancelled) {
+            setRow(null);
+            setEvents([]);
+          }
           return;
         }
         const list: MonitoringRow[] = json.monitoring || [];
         const found = list.find((r) => r.enrolment_id === id) ?? null;
-        if (!cancelled) setRow(found);
+        const timelineEvents = list.filter((e) => e.enrolment_id === id);
+        if (!cancelled) {
+          setRow(found);
+          setEvents(timelineEvents);
+        }
       } catch {
-        if (!cancelled) setRow(null);
+        if (!cancelled) {
+          setRow(null);
+          setEvents([]);
+        }
       }
     })();
     return () => {
@@ -78,7 +91,20 @@ export default function EnrolmentDetailPage() {
       {/* TIMELINE PLACEHOLDER */}
       <div>
         <strong>Timeline</strong>
-        <div>Coming next…</div>
+
+        {events.map((e, i) => (
+          <div key={i} style={{ marginTop: 10, padding: 10, border: '1px solid #ddd' }}>
+
+            <div><strong>Time:</strong> {e.last_checkin_at || e.started_at}</div>
+
+            <div><strong>Status:</strong> {e.v2_status}</div>
+
+            <div><strong>Score:</strong> {e.latest_score ?? '-'}</div>
+
+            <div><strong>Risk:</strong> {e.risk_level}</div>
+
+          </div>
+        ))}
       </div>
 
     </div>
