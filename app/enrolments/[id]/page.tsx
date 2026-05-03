@@ -45,12 +45,42 @@ export default function EnrolmentDetailPage() {
   }
 
   return (
-    <div>
-      <h1>{row.patient_name}</h1>
-      <p>Procedure: {row.procedure}</p>
-      <p>Status: {row.v2_status}</p>
-      <p>Risk: {row.risk_level}</p>
-      <p>Score: {row.latest_score}</p>
+    <div style={{ padding: 20 }}>
+
+      {/* PROBLEM */}
+      <div style={{
+        border: '2px solid red',
+        padding: 16,
+        borderRadius: 8,
+        marginBottom: 20
+      }}>
+        <strong>PROBLEM</strong><br />
+        {row.v2_status} — {row.risk_level}
+      </div>
+
+      {/* ACTION */}
+      <div style={{ marginBottom: 20 }}>
+        <button style={{ padding: 10, marginRight: 10 }}>
+          Acknowledge
+        </button>
+        <button style={{ padding: 10 }}>
+          Resolve
+        </button>
+      </div>
+
+      {/* CONTEXT */}
+      <div style={{ marginBottom: 20 }}>
+        <strong>Patient:</strong> {row.patient_name}<br />
+        <strong>Procedure:</strong> {row.procedure}<br />
+        <strong>Score:</strong> {row.latest_score}
+      </div>
+
+      {/* TIMELINE PLACEHOLDER */}
+      <div>
+        <strong>Timeline</strong>
+        <div>Coming next…</div>
+      </div>
+
     </div>
   );
 }
