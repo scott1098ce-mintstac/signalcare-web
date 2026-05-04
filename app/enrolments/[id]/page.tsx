@@ -88,26 +88,29 @@ export default function EnrolmentDetailPage() {
   }
 
   const handleAcknowledge = async () => {
+    console.log('ACK CLICKED', row);
+
     if (!row?.open_alert_id) {
-      console.log('No alert id');
+      console.log('NO ALERT ID');
       return;
     }
 
-    console.log('ACK CLICKED', row);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
+      const text = await res.text();
 
-    const data = await res.text();
-
-    console.log('ACK RESPONSE', res.status, data);
-
-    location.reload();
+      console.log('ACK RESPONSE STATUS:', res.status);
+      console.log('ACK RESPONSE BODY:', text);
+    } catch (err) {
+      console.error('ACK ERROR:', err);
+    }
   };
 
   const handleResolve = async () => {
