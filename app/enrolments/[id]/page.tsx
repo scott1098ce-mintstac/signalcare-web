@@ -2,7 +2,26 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { appApiFetch } from '../../lib/api';
+import { getCurrentClinicId } from '../../lib/clinic';
+import { supabase } from '../../lib/supabase';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+async function buildAppHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  const currentClinicId = getCurrentClinicId();
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  };
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+  if (currentClinicId) {
+    headers['X-Clinic-Id'] = currentClinicId;
+  }
+  return headers;
+}
 
 type MonitoringRow = {
   enrolment_id: string;
@@ -26,20 +45,30 @@ export default function EnrolmentDetailPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await appApiFetch('/app/monitoring?limit=100');
-        const json = await res.json();
-        if (!res.ok) {
+        if (!API_URL) {
           if (!cancelled) {
             setRow(null);
             setEvents([]);
           }
           return;
         }
-        const list: MonitoringRow[] = json.monitoring || [];
-        const found = list.find((r) => r.enrolment_id === id) ?? null;
-        const timelineEvents = list.filter((e) => e.enrolment_id === id);
+        const enrolmentId = id;
+        const headers = await buildAppHeaders();
+        const monitoringRes = await fetch(`${API_URL}/app/monitoring?limit=100`, { headers });
+        const monitoringJson = await monitoringRes.json();
+        if (!monitoringRes.ok) {
+          if (!cancelled) {
+            setRow(null);
+            setEvents([]);
+          }
+          return;
+        }
+        const list: MonitoringRow[] = monitoringJson.monitoring || [];
+        const row = list.find((r) => r.enrolment_id === enrolmentId) ?? null;
+        console.log(row);
+        const timelineEvents = list.filter((e) => e.enrolment_id === enrolmentId);
         if (!cancelled) {
-          setRow(found);
+          setRow(row);
           setEvents(timelineEvents);
         }
       } catch {
@@ -59,32 +88,48 @@ export default function EnrolmentDetailPage() {
   }
 
   const handleAcknowledge = async () => {
-    if (!row?.open_alert_id) return
+    if (!row?.open_alert_id) {
+      console.log('No alert id');
+      return;
+    }
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
+    console.log('ACK CLICKED', row);
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        'Content-Type': 'application/json'
-      }
-    })
+        'Content-Type': 'application/json',
+      },
+    });
 
-    window.location.reload()
-  }
+    const data = await res.text();
+
+    console.log('ACK RESPONSE', res.status, data);
+
+    location.reload();
+  };
 
   const handleResolve = async () => {
-    if (!row?.open_alert_id) return
+    console.log(row);
+    if (!row?.open_alert_id) {
+      console.log('No alert id');
+      return;
+    }
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
+    if (!API_URL) return;
+    const headers = {
+      ...(await buildAppHeaders()),
+      'Content-Type': 'application/json',
+    };
+
+    await fetch(`${API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        'Content-Type': 'application/json'
-      }
-    })
+      headers,
+    });
 
-    window.location.reload()
-  }
+    location.reload();
+  };
 
   return (
     <div style={{ padding: 20 }}>
