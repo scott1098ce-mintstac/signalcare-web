@@ -2,26 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getCurrentClinicId } from '../../lib/clinic';
-import { supabase } from '../../lib/supabase';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-async function buildAppHeaders(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const accessToken = data.session?.access_token;
-  const currentClinicId = getCurrentClinicId();
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-  };
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
-  if (currentClinicId) {
-    headers['X-Clinic-Id'] = currentClinicId;
-  }
-  return headers;
-}
 
 type MonitoringRow = {
   enrolment_id: string;
@@ -33,90 +13,67 @@ type MonitoringRow = {
   last_checkin_at: string | null;
   started_at: string | null;
   open_alert_id: string | null;
+  attention_reason: string | null;
 };
 
 export default function EnrolmentDetailPage() {
   const params = useParams();
-  const id = params.id as string;
   const [row, setRow] = useState<MonitoringRow | null>(null);
-  const [events, setEvents] = useState<MonitoringRow[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        if (!API_URL) {
-          if (!cancelled) {
-            setRow(null);
-            setEvents([]);
-          }
-          return;
-        }
-        const enrolmentId = id;
-        const headers = await buildAppHeaders();
-        const monitoringRes = await fetch(`${API_URL}/app/monitoring?limit=100`, { headers });
-        const monitoringJson = await monitoringRes.json();
-        if (!monitoringRes.ok) {
-          if (!cancelled) {
-            setRow(null);
-            setEvents([]);
-          }
-          return;
-        }
-        const list: MonitoringRow[] = monitoringJson.monitoring || [];
-        const row = list.find((r) => r.enrolment_id === enrolmentId) ?? null;
-        console.log(row);
-        const timelineEvents = list.filter((e) => e.enrolment_id === enrolmentId);
-        if (!cancelled) {
-          setRow(row);
-          setEvents(timelineEvents);
-        }
-      } catch {
-        if (!cancelled) {
-          setRow(null);
-          setEvents([]);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+    const load = async () => {
+      const clinicId = localStorage.getItem('current_clinic_id');
+      const token = localStorage.getItem('access_token');
 
-  if (!row) {
-    return <div>Loading...</div>;
-  }
-
-  const handleAcknowledge = async () => {
-    console.log('ACK CLICKED', row);
-
-    if (!row?.open_alert_id) {
-      console.log('NO ALERT ID');
-      return;
-    }
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
-        method: 'POST',
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/monitoring`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'X-Clinic-Id': clinicId ?? '',
         },
       });
 
-      const text = await res.text();
+      const json = await res.json();
 
-      console.log('ACK RESPONSE STATUS:', res.status);
-      console.log('ACK RESPONSE BODY:', text);
-    } catch (err) {
-      console.error('ACK ERROR:', err);
-    }
+      const enrolmentId = typeof params.id === 'string' ? params.id : params.id?.[0];
+      const found = (json.monitoring || []).find(
+        (r: MonitoringRow) => r.enrolment_id === enrolmentId,
+      );
+
+      setRow(found ?? null);
+      setLoaded(true);
+    };
+
+    load();
+  }, [params.id]);
+
+  if (!loaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (!row) {
+    return <div>No monitoring row for this enrolment.</div>;
+  }
+
+  const clinicId = localStorage.getItem('current_clinic_id');
+
+  const handleAcknowledge = async () => {
+    if (!row?.open_alert_id) return;
+
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json',
+        'X-Clinic-Id': clinicId ?? '',
+      },
+    });
+
+    window.location.reload();
   };
 
   const handleResolve = async () => {
     if (!row?.open_alert_id) return;
-
-    const clinicId = getCurrentClinicId();
 
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
       method: 'POST',
@@ -130,6 +87,8 @@ export default function EnrolmentDetailPage() {
     window.location.reload();
   };
 
+  const events = row ? [row] : [];
+
   return (
     <div style={{ padding: 20 }}>
 
@@ -138,54 +97,46 @@ export default function EnrolmentDetailPage() {
         border: '2px solid red',
         padding: 16,
         borderRadius: 8,
-        marginBottom: 20
+        marginBottom: 20,
       }}>
         <strong>PROBLEM</strong><br />
-        {
-          row.v2_status === 'awaiting_response'
-            ? 'Patient has not responded to check-in'
-            : row.v2_status === 'alert_open'
-            ? 'High-risk alert — immediate attention required'
-            : row.v2_status === 'alert_acknowledged'
-            ? 'Alert acknowledged — under clinical review'
-            : row.v2_status === 'review_required'
-            ? 'Patient requires clinical review'
-            : row.v2_status === 'stable'
-            ? 'Patient stable — no action required'
-            : row.v2_status
-        }
+        <strong>Status:</strong> {row?.v2_status}<br />
+        <strong>Risk:</strong> {row?.risk_level}<br />
+        <strong>Reason:</strong> {row?.attention_reason}
       </div>
 
       {/* ACTION */}
-      <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-        <button
-          onClick={handleAcknowledge}
-          style={{
-            padding: '10px 16px',
-            backgroundColor: '#2563eb',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-          }}
-        >
-          Acknowledge
-        </button>
+      {row?.open_alert_id && (
+        <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+          <button
+            onClick={handleAcknowledge}
+            style={{
+              padding: '10px 16px',
+              backgroundColor: '#2563eb',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
+          >
+            Acknowledge
+          </button>
 
-        <button
-          onClick={handleResolve}
-          style={{
-            padding: '10px 16px',
-            backgroundColor: '#16a34a',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-          }}
-        >
-          Resolve
-        </button>
-      </div>
+          <button
+            onClick={handleResolve}
+            style={{
+              padding: '10px 16px',
+              backgroundColor: '#16a34a',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
+          >
+            Resolve
+          </button>
+        </div>
+      )}
 
       {/* CONTEXT */}
       <div style={{ marginBottom: 20 }}>
