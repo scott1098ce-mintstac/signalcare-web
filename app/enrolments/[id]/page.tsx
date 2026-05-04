@@ -114,24 +114,20 @@ export default function EnrolmentDetailPage() {
   };
 
   const handleResolve = async () => {
-    console.log(row);
-    if (!row?.open_alert_id) {
-      console.log('No alert id');
-      return;
-    }
+    if (!row?.open_alert_id) return;
 
-    if (!API_URL) return;
-    const headers = {
-      ...(await buildAppHeaders()),
-      'Content-Type': 'application/json',
-    };
+    const clinicId = getCurrentClinicId();
 
-    await fetch(`${API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
       method: 'POST',
-      headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json',
+        'X-Clinic-Id': clinicId ?? '',
+      },
     });
 
-    location.reload();
+    window.location.reload();
   };
 
   return (
@@ -161,9 +157,34 @@ export default function EnrolmentDetailPage() {
       </div>
 
       {/* ACTION */}
-      <div style={{ marginBottom: 20 }}>
-        <button onClick={handleAcknowledge}>Acknowledge</button>
-        <button onClick={handleResolve}>Resolve</button>
+      <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+        <button
+          onClick={handleAcknowledge}
+          style={{
+            padding: '10px 16px',
+            backgroundColor: '#2563eb',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+          }}
+        >
+          Acknowledge
+        </button>
+
+        <button
+          onClick={handleResolve}
+          style={{
+            padding: '10px 16px',
+            backgroundColor: '#16a34a',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+          }}
+        >
+          Resolve
+        </button>
       </div>
 
       {/* CONTEXT */}
