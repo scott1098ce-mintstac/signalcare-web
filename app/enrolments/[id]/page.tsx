@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase';
 
 type MonitoringRow = {
   enrolment_id: string;
@@ -29,7 +30,11 @@ export default function EnrolmentDetailPage() {
 
     const load = async () => {
       const clinicId = localStorage.getItem('current_clinic_id');
-      const token = localStorage.getItem('access_token');
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+
+      console.log('TOKEN:', token);
+      console.log('CLINIC ID:', clinicId);
 
       console.log('ENROLMENT ID USED:', enrolmentId);
 
