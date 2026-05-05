@@ -26,7 +26,7 @@ export default function EnrolmentDetailPage() {
       const clinicId = localStorage.getItem('current_clinic_id');
       const token = localStorage.getItem('access_token');
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/monitoring`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/monitoring?limit=100`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'X-Clinic-Id': clinicId ?? '',
