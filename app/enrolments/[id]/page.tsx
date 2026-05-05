@@ -25,8 +25,9 @@ export default function EnrolmentDetailPage() {
     const load = async () => {
       const clinicId = localStorage.getItem('current_clinic_id');
       const token = localStorage.getItem('access_token');
+      const enrolmentId = typeof params.id === 'string' ? params.id : params.id?.[0];
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/monitoring?limit=100`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/monitoring?enrolment_id=${enrolmentId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'X-Clinic-Id': clinicId ?? '',
@@ -35,7 +36,6 @@ export default function EnrolmentDetailPage() {
 
       const json = await res.json();
 
-      const enrolmentId = typeof params.id === 'string' ? params.id : params.id?.[0];
       const found = (json.monitoring || []).find(
         (r: MonitoringRow) => r.enrolment_id === enrolmentId,
       );
