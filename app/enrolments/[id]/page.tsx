@@ -73,6 +73,13 @@ export default function EnrolmentDetailPage() {
 
   const events = row ? [row] : [];
 
+  const displayRisk =
+    row?.v2_status === 'alert_open'
+      ? 'high'
+      : row?.v2_status === 'alert_acknowledged'
+        ? 'high (under review)'
+        : row?.risk_level;
+
   return (
     <div style={{ padding: 20 }}>
 
@@ -85,7 +92,15 @@ export default function EnrolmentDetailPage() {
       }}>
         <strong>PROBLEM</strong><br />
         <strong>Status:</strong> {row?.v2_status}<br />
-        <strong>Risk:</strong> {row?.risk_level}<br />
+        <strong>Risk:</strong>{' '}
+        {displayRisk != null && String(displayRisk).includes('high') ? (
+          <span style={{ color: '#b91c1c', fontWeight: 700 }}>
+            {displayRisk}
+          </span>
+        ) : (
+          displayRisk
+        )}
+        <br />
         <strong>Reason:</strong> {row?.attention_reason}
       </div>
 
@@ -191,10 +206,6 @@ export default function EnrolmentDetailPage() {
 
             {e.latest_score && (
               <div><strong>Score:</strong> {e.latest_score}</div>
-            )}
-
-            {e.risk_level && (
-              <div><strong>Risk:</strong> {e.risk_level}</div>
             )}
 
           </div>
