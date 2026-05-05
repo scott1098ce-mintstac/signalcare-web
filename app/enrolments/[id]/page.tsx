@@ -18,26 +18,33 @@ type MonitoringRow = {
 
 export default function EnrolmentDetailPage() {
   const params = useParams();
+  const enrolmentId = Array.isArray(params?.id)
+    ? params.id[0]
+    : params?.id;
   const [row, setRow] = useState<MonitoringRow | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (!enrolmentId) return;
+
     const load = async () => {
       const clinicId = localStorage.getItem('current_clinic_id');
       const token = localStorage.getItem('access_token');
-      const enrolmentId = typeof params.id === 'string' ? params.id : params.id?.[0];
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/monitoring?enrolment_id=${enrolmentId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'X-Clinic-Id': clinicId ?? '',
-        },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/app/monitoring?enrolment_id=${enrolmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-Clinic-Id': clinicId ?? '',
+          },
+        }
+      );
 
       const json = await res.json();
 
       const found = (json.monitoring || []).find(
-        (r: MonitoringRow) => r.enrolment_id === enrolmentId,
+        (r: MonitoringRow) => r.enrolment_id === enrolmentId
       );
 
       setRow(found ?? null);
@@ -45,7 +52,7 @@ export default function EnrolmentDetailPage() {
     };
 
     load();
-  }, [params.id]);
+  }, [enrolmentId]);
 
   if (!loaded) {
     return <div>Loading...</div>;
