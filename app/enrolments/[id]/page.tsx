@@ -31,6 +31,8 @@ export default function EnrolmentDetailPage() {
       const clinicId = localStorage.getItem('current_clinic_id');
       const token = localStorage.getItem('access_token');
 
+      console.log('ENROLMENT ID USED:', enrolmentId);
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/app/monitoring?enrolment_id=${enrolmentId}`,
         {
@@ -42,6 +44,8 @@ export default function EnrolmentDetailPage() {
       );
 
       const json = await res.json();
+
+      console.log('API RESPONSE:', json);
 
       const found = (json.monitoring || []).find(
         (r: MonitoringRow) => r.enrolment_id === enrolmentId
