@@ -71,38 +71,6 @@ export default function EnrolmentDetailPage() {
     return <div>No monitoring row for this enrolment.</div>;
   }
 
-  const clinicId = localStorage.getItem('current_clinic_id');
-
-  const handleAcknowledge = async () => {
-    if (!row?.open_alert_id) return;
-
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        'Content-Type': 'application/json',
-        'X-Clinic-Id': clinicId ?? '',
-      },
-    });
-
-    window.location.reload();
-  };
-
-  const handleResolve = async () => {
-    if (!row?.open_alert_id) return;
-
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        'Content-Type': 'application/json',
-        'X-Clinic-Id': clinicId ?? '',
-      },
-    });
-
-    window.location.reload();
-  };
-
   const events = row ? [row] : [];
 
   return (
@@ -125,7 +93,26 @@ export default function EnrolmentDetailPage() {
       {row?.open_alert_id && (
         <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
           <button
-            onClick={handleAcknowledge}
+            onClick={async () => {
+              if (!row?.open_alert_id) return;
+
+              const clinicId = localStorage.getItem('current_clinic_id');
+              const { data } = await supabase.auth.getSession();
+              const token = data.session?.access_token;
+
+              await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`,
+                {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'X-Clinic-Id': clinicId ?? '',
+                  },
+                }
+              );
+
+              window.location.reload();
+            }}
             style={{
               padding: '10px 16px',
               backgroundColor: '#2563eb',
@@ -139,7 +126,26 @@ export default function EnrolmentDetailPage() {
           </button>
 
           <button
-            onClick={handleResolve}
+            onClick={async () => {
+              if (!row?.open_alert_id) return;
+
+              const clinicId = localStorage.getItem('current_clinic_id');
+              const { data } = await supabase.auth.getSession();
+              const token = data.session?.access_token;
+
+              await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`,
+                {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'X-Clinic-Id': clinicId ?? '',
+                  },
+                }
+              );
+
+              window.location.reload();
+            }}
             style={{
               padding: '10px 16px',
               backgroundColor: '#16a34a',
