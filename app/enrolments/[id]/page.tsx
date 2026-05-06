@@ -80,6 +80,48 @@ export default function EnrolmentDetailPage() {
         ? 'high (under review)'
         : row?.risk_level;
 
+  const handleAcknowledge = async () => {
+    if (!row?.open_alert_id) return;
+
+    const clinicId = localStorage.getItem('current_clinic_id');
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Clinic-Id': clinicId ?? '',
+        },
+      }
+    );
+
+    window.location.reload();
+  };
+
+  const handleResolve = async () => {
+    if (!row?.open_alert_id) return;
+
+    const clinicId = localStorage.getItem('current_clinic_id');
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Clinic-Id': clinicId ?? '',
+        },
+      }
+    );
+
+    window.location.reload();
+  };
+
   return (
     <div style={{ padding: 20 }}>
 
@@ -105,73 +147,20 @@ export default function EnrolmentDetailPage() {
       </div>
 
       {/* ACTION */}
-      {row?.open_alert_id && (
+      {(row?.v2_status === 'alert_open' || row?.v2_status === 'alert_acknowledged') && (
         <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-          <button
-            onClick={async () => {
-              if (!row?.open_alert_id) return;
 
-              const clinicId = localStorage.getItem('current_clinic_id');
-              const { data } = await supabase.auth.getSession();
-              const token = data.session?.access_token;
+          {row?.v2_status === 'alert_open' && (
+            <>
+              <button onClick={handleAcknowledge}>Acknowledge</button>
+              <button onClick={handleResolve}>Resolve</button>
+            </>
+          )}
 
-              await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/acknowledge`,
-                {
-                  method: 'POST',
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    'X-Clinic-Id': clinicId ?? '',
-                  },
-                }
-              );
+          {row?.v2_status === 'alert_acknowledged' && (
+            <button onClick={handleResolve}>Resolve</button>
+          )}
 
-              window.location.reload();
-            }}
-            style={{
-              padding: '10px 16px',
-              backgroundColor: '#2563eb',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
-          >
-            Acknowledge
-          </button>
-
-          <button
-            onClick={async () => {
-              if (!row?.open_alert_id) return;
-
-              const clinicId = localStorage.getItem('current_clinic_id');
-              const { data } = await supabase.auth.getSession();
-              const token = data.session?.access_token;
-
-              await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/app/alerts/${row.open_alert_id}/resolve`,
-                {
-                  method: 'POST',
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    'X-Clinic-Id': clinicId ?? '',
-                  },
-                }
-              );
-
-              window.location.reload();
-            }}
-            style={{
-              padding: '10px 16px',
-              backgroundColor: '#16a34a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
-          >
-            Resolve
-          </button>
         </div>
       )}
 
