@@ -127,28 +127,48 @@ export default function EnrolmentDetailPage() {
 
       {/* PROBLEM */}
       <div style={{
-        border: '2px solid red',
-        padding: 16,
-        borderRadius: 8,
-        marginBottom: 20,
+        border: '2px solid #dc2626',
+        borderRadius: '8px',
+        padding: '16px',
+        marginBottom: '20px',
+        background: '#fff',
       }}>
-        <strong>PROBLEM</strong><br />
-        <strong>Status:</strong> {row?.v2_status}<br />
-        <strong>Risk:</strong>{' '}
-        {displayRisk != null && String(displayRisk).includes('high') ? (
-          <span style={{ color: '#b91c1c', fontWeight: 700 }}>
+        <div style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>
+          PROBLEM
+        </div>
+
+        <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>
+          {row?.v2_status === 'alert_open' && '⚠️ ALERT — ACTION REQUIRED'}
+          {row?.v2_status === 'alert_acknowledged' && '🟡 UNDER REVIEW'}
+          {row?.v2_status === 'review_required' && '🔍 REVIEW REQUIRED'}
+          {row?.v2_status === 'awaiting_response' && '⏳ AWAITING RESPONSE'}
+          {row?.v2_status === 'stable' && '✅ STABLE'}
+          {!row?.v2_status && '—'}
+          {!['alert_open','alert_acknowledged','review_required','awaiting_response','stable'].includes(row?.v2_status) && row?.v2_status}
+        </div>
+
+        <div style={{ fontSize: '16px', marginBottom: '4px' }}>
+          <strong>Risk:</strong>{' '}
+          <span style={{
+            color: displayRisk?.includes('high') ? '#b91c1c'
+              : displayRisk?.includes('medium') ? '#d97706'
+              : '#374151',
+            fontWeight: 700,
+          }}>
             {displayRisk}
           </span>
-        ) : (
-          displayRisk
+        </div>
+
+        {row?.attention_reason && (
+          <div style={{ color: '#6b7280' }}>
+            {row.attention_reason}
+          </div>
         )}
-        <br />
-        <strong>Reason:</strong> {row?.attention_reason}
       </div>
 
       {/* ACTION */}
       {(row?.v2_status === 'alert_open' || row?.v2_status === 'alert_acknowledged') && (
-        <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
 
           {row?.v2_status === 'alert_open' && (
             <>
@@ -164,19 +184,35 @@ export default function EnrolmentDetailPage() {
         </div>
       )}
 
-      {/* CONTEXT */}
-      <div style={{ marginBottom: 20 }}>
-        <strong>Patient:</strong> {row.patient_name}<br />
-        <strong>Procedure:</strong> {row.procedure}<br />
-        <strong>Score:</strong> {row.latest_score}
+      {/* PATIENT */}
+      <div style={{
+        marginBottom: '20px',
+        padding: '12px',
+        background: '#f9fafb',
+        borderRadius: '6px',
+      }}>
+        <div><strong>Patient:</strong> {row?.patient_name}</div>
+        <div><strong>Procedure:</strong> {row?.procedure}</div>
       </div>
 
-      {/* TIMELINE PLACEHOLDER */}
-      <div>
-        <strong>Timeline</strong>
+      {/* TIMELINE */}
+      <div style={{
+        border: '1px solid #e5e7eb',
+        borderRadius: '8px',
+        padding: '16px',
+      }}>
+        <div style={{ fontWeight: 700, marginBottom: 10, fontSize: 16 }}>
+          Timeline
+        </div>
 
         {events.map((e, i) => (
-          <div key={i} style={{ marginTop: 10, padding: 10, border: '1px solid #ddd' }}>
+          <div key={i} style={{
+            marginTop: 12,
+            padding: 12,
+            borderRadius: 6,
+            background: '#f9fafb',
+            border: '1px solid #e5e7eb',
+          }}>
 
             <div><strong>Time:</strong> {e.last_checkin_at || e.started_at}</div>
 
