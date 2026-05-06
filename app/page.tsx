@@ -11,8 +11,15 @@ type MonitoringRow = {
 
 export default function Page() {
   const [rows, setRows] = useState<MonitoringRow[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      window.location.href = '/auth/signin';
+      return;
+    }
+
     const load = async () => {
       const token = localStorage.getItem('access_token');
       const clinicId = localStorage.getItem('current_clinic_id');
@@ -29,10 +36,13 @@ export default function Page() {
 
       const json = await res.json();
       setRows(json.monitoring ?? []);
+      setReady(true);
     };
 
     load();
   }, []);
+
+  if (!ready) return <div style={{ padding: 20 }}>Loading...</div>;
 
   return (
     <div style={{ padding: 20 }}>

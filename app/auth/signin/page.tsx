@@ -38,6 +38,8 @@ export default function SignInPage() {
         return;
       }
 
+      localStorage.setItem('access_token', session.access_token);
+
       let clinicResult;
       try {
         clinicResult = await getClinicForUser(session.access_token);
@@ -51,6 +53,10 @@ export default function SignInPage() {
         role: clinicResult?.role || 'staff',
         access_token: session.access_token,
       });
+      const resolvedClinicId = clinicResult?.clinic_id ?? clinicResult?.clinic?.id;
+      if (resolvedClinicId) {
+        localStorage.setItem('current_clinic_id', String(resolvedClinicId));
+      }
       console.log('clinicResult FULL:', JSON.stringify(clinicResult));
       console.log('TYPE:', typeof clinicResult);
       console.log('clinicResult AFTER AWAIT:', clinicResult);
