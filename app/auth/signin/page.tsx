@@ -19,10 +19,11 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      const session = data?.session ?? null;
 
       console.log('AFTER SUPABASE LOGIN');
 
@@ -38,8 +39,6 @@ export default function SignInPage() {
         return;
       }
 
-      localStorage.setItem('access_token', session.access_token);
-
       let clinicResult;
       try {
         clinicResult = await getClinicForUser(session.access_token);
@@ -53,9 +52,11 @@ export default function SignInPage() {
         role: clinicResult?.role || 'staff',
         access_token: session.access_token,
       });
-      const resolvedClinicId = clinicResult?.clinic_id ?? clinicResult?.clinic?.id;
-      if (resolvedClinicId) {
-        localStorage.setItem('current_clinic_id', String(resolvedClinicId));
+      localStorage.setItem('access_token', session.access_token);
+      console.log('FINAL STORED TOKEN:', localStorage.getItem('access_token'));
+      const clinic = clinicResult?.clinic;
+      if (clinic) {
+        localStorage.setItem('current_clinic_id', clinic.id);
       }
       console.log('clinicResult FULL:', JSON.stringify(clinicResult));
       console.log('TYPE:', typeof clinicResult);
@@ -71,8 +72,7 @@ export default function SignInPage() {
       }
 
       console.log('Login success, clinic:', clinicResult.clinic?.id);
-      router.replace('/');
-      router.refresh();
+      router.push('/');
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Sign in failed');
     } finally {
