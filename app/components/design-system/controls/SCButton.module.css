@@ -1,0 +1,109 @@
+@import '../tokens/tokens.css';
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  border: none;
+  font-family: var(--ds-font-family);
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Figma 243:4615 — Button Primary */
+.primary {
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-interactive-default);
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-text-inverse);
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* Figma 284:3785 — compact filled */
+.primarySm {
+  height: 32px;
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-interactive-default);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: var(--ds-line-height-normal);
+  color: var(--ds-text-inverse);
+}
+
+/* Figma 284:4337 — outline primary (py 8 → ~35px) */
+.outline {
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border: 1px solid var(--ds-interactive-default);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-base);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 1.6;
+  color: var(--ds-interactive-default);
+}
+
+/* Figma 284:4438 — Button Secondary (py 8 → ~35px) */
+.secondary {
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border: 1px solid var(--ds-border-default);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-base);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 1.6;
+  color: var(--ds-text-secondary);
+}
+
+/* Figma 307:9802 — ghost with icon slot */
+.ghost {
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: transparent;
+  font-size: var(--ds-font-size-body-lg);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-interactive-default);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--ds-interactive-selected-bg);
+}
+
+/* Figma 267:3049 — Clear All text button */
+.text {
+  height: var(--ds-queue-clear-all-height, 38px);
+  padding: 8px 16px;
+  border-radius: var(--ds-radius-md);
+  background: transparent;
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-interactive-default);
+}
+
+.text:hover:not(:disabled) {
+  background: var(--ds-interactive-selected-bg);
+}
+
+.iconSlot {
+  display: flex;
+  width: var(--ds-icon-size-sm);
+  height: var(--ds-icon-size-sm);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}

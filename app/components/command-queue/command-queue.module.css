@@ -1,0 +1,100 @@
+/**
+ * Command Queue pane layout — filter bar shell and panel chrome only.
+ * Measurements: Figma 267:3047 (76px header), 267:2610 (filter group), 267:3049 (Clear All).
+ */
+@import '../design-system/tokens/tokens.css';
+
+.panel {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--ds-surface-base);
+}
+
+.filterBar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--ds-queue-filter-bar-height);
+  min-height: var(--ds-queue-filter-bar-height);
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+}
+
+.filterControls {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--ds-queue-filter-gap);
+  padding: var(--ds-queue-filter-padding-y) var(--ds-queue-filter-padding-x);
+  box-sizing: border-box;
+}
+
+.filterControls > * {
+  flex-shrink: 0;
+}
+
+.filterClearButton {
+  flex: 0 0 auto;
+  margin-right: var(--ds-queue-filter-padding-x);
+}
+
+.listScroll {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow-y: auto;
+  background: var(--ds-surface-base);
+}
+
+/* Figma 230:17052 — empty state centered in queue pane */
+.emptyStateWrap {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.loadingLabel {
+  padding: var(--ds-space-6);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  color: var(--ds-text-secondary);
+}
+
+.errorWrap {
+  padding: var(--ds-space-6);
+}
+
+.errorText {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  color: var(--ds-alert-danger-icon);
+}
+
+.emptyFilter {
+  padding: var(--ds-space-6) var(--ds-space-4);
+  text-align: center;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  color: var(--ds-text-secondary);
+}
+
+.allClear {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: 1px solid var(--ds-alert-success-border);
+  background: var(--ds-alert-success-bg);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  line-height: var(--ds-line-height-body);
+  color: var(--ds-alert-success-text);
+}

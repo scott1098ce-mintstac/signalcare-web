@@ -1,0 +1,99 @@
+@import '../design-system/tokens/tokens.css';
+
+.noteList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.noteCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  padding: var(--ds-card-padding);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: 5px;
+  background: var(--ds-surface-base);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: var(--ds-space-3);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-md);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-text-primary);
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: 2px solid var(--ds-interactive-default);
+  outline-offset: 1px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.composeLabel {
+  display: block;
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-text-secondary);
+}
+
+.error {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  color: var(--ds-alert-danger-text);
+}
+
+.history {
+  margin-top: var(--ds-space-1);
+}
+
+.historySummary {
+  cursor: pointer;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-interactive-default);
+}
+
+.historyList {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.historyItem {
+  list-style: decimal;
+}
+
+.historyMeta {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  color: var(--ds-text-secondary);
+}
+
+.historyBody {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-text-primary);
+  white-space: pre-wrap;
+}

@@ -1,0 +1,90 @@
+@import '../tokens/tokens.css';
+@import '../tokens/icon-sizes.css';
+
+/* Figma 249:345 — Empty State Card */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-icon-size-empty);
+  height: var(--ds-icon-size-empty);
+  margin-bottom: var(--ds-space-6);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-interactive-subtle-bg);
+  flex-shrink: 0;
+}
+
+.icon {
+  display: flex;
+  width: var(--ds-icon-size-xl);
+  height: var(--ds-icon-size-xl);
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-interactive-default);
+}
+
+.titleWrap {
+  padding-bottom: var(--ds-space-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-display-3);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-display);
+  color: var(--ds-text-primary);
+}
+
+.descriptionBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-6);
+  width: 100%;
+  max-width: 480px;
+}
+
+.description {
+  margin: 0;
+  max-width: 480px;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-lg);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: var(--ds-line-height-empty);
+  color: var(--ds-text-secondary);
+}
+
+.footer {
+  padding-top: var(--ds-space-4);
+  width: 100%;
+}
+
+.footerText {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: var(--ds-line-height-step);
+  color: var(--ds-text-secondary);
+}
+
+.footerText a {
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-interactive-default);
+  text-decoration: none;
+}
+
+.footerText a:hover {
+  text-decoration: underline;
+}

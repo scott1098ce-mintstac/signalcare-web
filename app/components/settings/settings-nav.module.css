@@ -1,0 +1,98 @@
+@import '../design-system/tokens/tokens.css';
+
+/**
+ * Settings navigation — Figma 284:9810 Primary Tab Group, 284:9820 Secondary Tab Group.
+ */
+
+.nav {
+  margin: 0 calc(-1 * var(--settings-content-padding-x, 24px)) var(--settings-header-gap, 40px);
+  border-bottom: 1px solid var(--ds-border-subtle);
+  background: var(--ds-surface-base);
+}
+
+.navInner {
+  padding: 0 var(--settings-content-padding-x, 24px);
+}
+
+.primaryRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  min-height: 45px;
+  border-bottom: 1px solid var(--ds-border-subtle);
+}
+
+.secondaryRow {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 48px;
+  padding: var(--ds-space-2) 0;
+}
+
+.primaryTab,
+.secondaryTab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+  font-family: var(--ds-font-family);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.primaryTab {
+  margin-bottom: -1px;
+  padding: 10px 16px;
+  border-bottom: 2px solid transparent;
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: var(--ds-line-height-body);
+  color: var(--ds-text-secondary);
+}
+
+.primaryTab:hover {
+  color: var(--ds-text-primary);
+}
+
+.primaryTabActive {
+  border-bottom-color: var(--ds-border-brand);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+
+.primaryTabDisabled {
+  cursor: not-allowed;
+  color: var(--ds-text-disabled);
+}
+
+.secondaryTab {
+  padding: 6px 12px;
+  border-radius: var(--ds-radius-md);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.secondaryTab:hover {
+  background: var(--ds-surface-subtle);
+  color: var(--ds-text-primary);
+}
+
+.secondaryTabActive {
+  background: var(--ds-interactive-selected-bg);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+
+.secondaryTabDisabled {
+  cursor: not-allowed;
+  color: var(--ds-text-disabled);
+}

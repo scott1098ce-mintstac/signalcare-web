@@ -1,0 +1,614 @@
+/* Split-panel auth layout — Page/Login, Page/Forgot Password (Figma MCP) */
+
+.page {
+  display: flex;
+  width: 100%;
+  min-width: 1512px;
+  min-height: 900px;
+  height: 900px;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  background: #ffffff;
+  position: relative;
+}
+
+.branding {
+  position: relative;
+  flex: 0 0 756px;
+  width: 756px;
+  height: 900px;
+  overflow: hidden;
+  background: linear-gradient(
+    130.0302592718897deg,
+    rgb(4, 107, 107) 0%,
+    rgb(10, 88, 88) 50%,
+    rgb(23, 40, 41) 100%
+  );
+}
+
+.brandingOverlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Branding Layer (230:1974): logo 41px + item-spacing/395_3 gap + hero (230:1992 at y=484.3) */
+.brandingInner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 41px 395.29998779296875px auto;
+  align-content: start;
+  height: 100%;
+  padding: 48px;
+  box-sizing: border-box;
+}
+
+.logoWrap {
+  grid-row: 1;
+  position: relative;
+  width: 166px;
+  height: 41px;
+}
+
+.logoImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: left center;
+  pointer-events: none;
+}
+
+.heroCopy {
+  grid-row: 3;
+  width: 448px;
+  max-width: 448px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.heroTitle {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.heroTitleLine {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 45px;
+  color: #ffffff;
+}
+
+.heroSubtitle {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.heroSubtitleLine {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 29.25px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.formSide {
+  flex: 0 0 756px;
+  width: 756px;
+  height: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  box-sizing: border-box;
+  background: #f9f9fb;
+}
+
+.formColumn {
+  width: 400px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  position: relative;
+  width: 400px;
+  background: #ffffff;
+  border: 1px solid #dce4e8;
+  border-radius: 8px;
+  padding: 33px;
+  box-sizing: border-box;
+}
+
+.cardShadow {
+  position: absolute;
+  inset: -1px;
+  background: #ffffff;
+  border: 1px solid #ecebed;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cardContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cardHeaderForgot {
+  display: flex;
+  flex-direction: column;
+  gap: 6.875px;
+  width: 100%;
+}
+
+.cardDescriptionForgotGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 0.625px;
+}
+
+.cardDescriptionForgot {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+  color: #706f82;
+}
+
+.backLinkGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Email Check (230:18757) — Verification Header Group + card shadow inset */
+.cardShadowEmailCheck {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -0.13px;
+  left: -1px;
+  background: #ffffff;
+  border: 1px solid #ecebed;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.verificationHeaderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6.875px;
+  width: 100%;
+}
+
+.cardTitleCentered {
+  margin: 0;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #181722;
+  text-align: center;
+}
+
+.verificationDescription {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 73px;
+  padding-bottom: 0.625px;
+  box-sizing: border-box;
+}
+
+.verificationDescriptionText {
+  margin: 0;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+  color: #706f82;
+  text-align: center;
+}
+
+.verificationEmailHighlight {
+  font-weight: 500;
+  color: #181722;
+}
+
+.resendWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 0.625px;
+}
+
+.resendPromptText {
+  margin: 0;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+  color: #706f82;
+  text-align: center;
+}
+
+.resendAction {
+  color: #398487;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.cardHeaderCentered {
+  display: flex;
+  flex-direction: column;
+  gap: 6.875px;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #181722;
+}
+
+.cardDescription {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #706f82;
+}
+
+.cardDescriptionGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.cardDescriptionCentered {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+  color: #706f82;
+  text-align: center;
+}
+
+.emailHighlight {
+  font-weight: 500;
+  color: #181722;
+}
+
+.resendText {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+  color: #706f82;
+  text-align: center;
+}
+
+.resendLink {
+  color: #398487;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 8px;
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabelMedium {
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #706f82;
+  text-transform: uppercase;
+}
+
+.fieldLabelBold {
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  color: #706f82;
+  text-transform: uppercase;
+}
+
+.textInput {
+  width: 100%;
+  height: 49px;
+  box-sizing: border-box;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #181722;
+  background: #ffffff;
+  border: 1px solid #dedde6;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin: 0;
+}
+
+.textInput::placeholder {
+  color: #bab9c9;
+  opacity: 1;
+}
+
+.passwordField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 49px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #dedde6;
+  border-radius: 4px;
+  padding: 16px 20px;
+}
+
+.passwordField input {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #181722;
+  background: transparent;
+}
+
+.passwordField input::placeholder {
+  color: #bab9c9;
+  opacity: 1;
+}
+
+.passwordFieldBoldPlaceholder input {
+  font-weight: 700;
+}
+
+.passwordFieldBoldPlaceholder input::placeholder {
+  font-weight: 700;
+}
+
+.eyeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.eyeIcon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  max-width: none;
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxBox {
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border: 1px solid #dedde6;
+  border-radius: 4px;
+  background: #ffffff;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.checkboxInput {
+  position: absolute;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #706f82;
+  white-space: nowrap;
+}
+
+.forgotLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #398487;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 46px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 8px;
+  background: #398487;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #398487;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.backLinkFullWidth {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #398487;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.backIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.error {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #b42318;
+}
+
+.footer {
+  margin: 0;
+  width: 400px;
+  text-align: center;
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  color: #5a6b7a;
+}
+
+.footerLine {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.footerSecurity {
+  color: #706f82;
+}
+
+.footerLink {
+  color: #398487;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.footerLinkLine2 {
+  display: block;
+  color: #398487;
+  text-decoration: none;
+  cursor: pointer;
+}

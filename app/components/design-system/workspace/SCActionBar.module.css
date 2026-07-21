@@ -1,0 +1,32 @@
+@import '../tokens/tokens.css';
+
+.bar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  padding: var(--ds-action-bar-padding-y) var(--ds-action-bar-padding-x);
+  border-top: 1px solid var(--ds-border-subtle);
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+}
+
+.start {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-width: 0;
+}
+
+.end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ds-space-3);
+  flex-shrink: 0;
+}
+
+.endAlignEnd {
+  margin-left: auto;
+}

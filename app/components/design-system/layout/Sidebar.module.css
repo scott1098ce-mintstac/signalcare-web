@@ -1,0 +1,131 @@
+@import '../tokens/tokens.css';
+@import '../tokens/icon-sizes.css';
+
+.sidebar {
+  display: flex;
+  width: var(--ds-sidebar-width);
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-shell-nav-gap);
+  padding: var(--ds-shell-nav-padding);
+  background: var(--ds-surface-inverse);
+}
+
+.top {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--ds-shell-nav-section-gap);
+  width: 100%;
+  min-height: 0;
+}
+
+.menuWrap {
+  display: flex;
+  width: 100%;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--ds-shell-menu-padding-y) var(--ds-shell-menu-padding-x);
+  min-height: calc((var(--ds-shell-menu-padding-y) * 2) + var(--ds-icon-size-md));
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  border: none;
+  margin: 0;
+  background: transparent;
+  background-image: url('/images/cq/icon-sidebar-divider.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 1px;
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.bottom {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.navButton {
+  display: flex;
+  width: var(--ds-shell-nav-button-width);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-shell-nav-icon-label-gap);
+  padding: var(--ds-shell-nav-button-padding);
+  border: none;
+  background: transparent;
+  text-decoration: none;
+  color: var(--ds-border-strong);
+  cursor: pointer;
+}
+
+.navButton:hover {
+  color: var(--ds-text-inverse);
+}
+
+.navButtonActive {
+  color: var(--ds-text-inverse);
+}
+
+.navIcon {
+  width: var(--ds-icon-size-md);
+  height: var(--ds-icon-size-md);
+  flex-shrink: 0;
+}
+
+.navLabel {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-4);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ds-text-inverse);
+  cursor: pointer;
+}
+
+.menuIcon {
+  width: var(--ds-icon-size-md);
+  height: var(--ds-icon-size-md);
+}
+
+/* Menu toggles icon-only compact mode while retaining the 80px Figma rail width. */
+.sidebarCollapsed .navLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sidebarCollapsed .navButton {
+  gap: 0;
+}

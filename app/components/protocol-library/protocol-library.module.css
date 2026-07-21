@@ -1,0 +1,28 @@
+@import '../design-system/tokens/tokens.css';
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-page-section-gap);
+  min-height: 100%;
+  padding: var(--ds-page-content-padding);
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+}
+
+.pageIntro {
+  margin: 0;
+  max-width: 560px;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: var(--ds-line-height-body);
+  color: var(--ds-text-secondary);
+}
+
+.loadingLabel {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  color: var(--ds-text-secondary);
+}

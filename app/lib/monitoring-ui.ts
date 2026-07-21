@@ -43,3 +43,36 @@ export const reviewRequiredBadgeStyle = {
   padding: '2px 6px',
   lineHeight: 1.3,
 } as const;
+
+/** Human-readable AU mobile for Command Centre / enrolment headers. */
+export function formatPatientMobileDisplay(mobile: string | null | undefined): string | null {
+  const raw = String(mobile ?? '').trim();
+  if (!raw) return null;
+
+  const normalized = raw.replace(/[^\d+]/g, '');
+  let local = normalized;
+  if (normalized.startsWith('+61')) {
+    local = `0${normalized.slice(3)}`;
+  } else if (normalized.startsWith('61') && normalized.length === 11) {
+    local = `0${normalized.slice(2)}`;
+  }
+
+  if (/^04\d{8}$/.test(local)) {
+    return `${local.slice(0, 4)} ${local.slice(4, 7)} ${local.slice(7)}`;
+  }
+
+  return raw;
+}
+
+/** E.164-style href for tel: links. */
+export function patientMobileTelHref(mobile: string | null | undefined): string | null {
+  const raw = String(mobile ?? '').trim();
+  if (!raw) return null;
+
+  const digits = raw.replace(/[^\d+]/g, '');
+  if (digits.startsWith('+')) return digits;
+  if (digits.startsWith('61')) return `+${digits}`;
+  if (digits.startsWith('04') && digits.length === 10) return `+61${digits.slice(1)}`;
+  if (digits.startsWith('4') && digits.length === 9) return `+61${digits}`;
+  return digits ? `+${digits.replace(/^\+/, '')}` : null;
+}

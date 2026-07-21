@@ -1,0 +1,54 @@
+@import '../tokens/tokens.css';
+@import '../tokens/icon-sizes.css';
+
+.header {
+  display: flex;
+  height: var(--ds-header-height);
+  flex-shrink: 0;
+  align-items: center;
+  padding: var(--ds-shell-header-padding-y) var(--ds-shell-header-padding-x);
+  background: var(--ds-surface-base);
+  border-bottom: 1px solid var(--ds-surface-muted);
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-shell-header-icon-gap);
+  min-width: 0;
+  flex: 1;
+}
+
+.aside {
+  flex-shrink: 0;
+}
+
+.icon {
+  width: var(--ds-icon-size-lg);
+  height: var(--ds-icon-size-lg);
+  flex-shrink: 0;
+  color: var(--ds-text-primary-header);
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-display-3);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-header);
+  letter-spacing: 0;
+  color: var(--ds-text-primary-header);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

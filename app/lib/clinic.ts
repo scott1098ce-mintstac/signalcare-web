@@ -2,27 +2,47 @@
  * Clinic resolution for logged-in users.
  * Uses GET /app/me (no direct clinic_users or clinics queries; no .single()/.maybeSingle()).
  */
+import {
+  clearAppSession,
+  getAppSession,
+  getCurrentClinicId,
+  initAppSession,
+  setCurrentClinicId,
+  type AppSession,
+  type ClinicInfo,
+} from './auth/session';
+import { parseAppMeResponse, type AppMeParsed } from './app-me';
+
 if (!process.env.NEXT_PUBLIC_API_URL) {
   throw new Error('NEXT_PUBLIC_API_URL is not set');
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const SESSION_KEY = 'signalcare_app_session';
-const CURRENT_CLINIC_ID_KEY = 'current_clinic_id';
 
-export function getCurrentClinicId(): string | null {
-  if (typeof window === 'undefined') return null;
+export {
+  getAppSession,
+  getCurrentClinicId,
+  initAppSession,
+  setCurrentClinicId,
+  type AppSession,
+  type ClinicInfo,
+};
 
-  const v = localStorage.getItem('current_clinic_id');
-  console.log('Reading clinic_id:', v);
-
-  return v && v.trim() ? v.trim() : null;
-}
-
-export function setCurrentClinicId(id: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(CURRENT_CLINIC_ID_KEY, id);
-}
+/** @deprecated Prefer parseAppMeResponse — kept for call sites that imported this name. */
+export type MeResponse = {
+  error?: string;
+  user_id?: string;
+  role?: string;
+  clinic?: { id: string; name: string | null } | null;
+  clinic_id?: string;
+  ok?: boolean;
+  permission?: string;
+  user?: {
+    user_id?: string;
+    clinic_id?: string;
+    role?: string | null;
+  };
+};
 
 /** GET /app/my-clinics; if ≥1 clinic, stores first id (temporary default when multiple). */
 export async function syncClinicSelectionFromApi(
@@ -46,68 +66,46 @@ export async function syncClinicSelectionFromApi(
   if (!first?.id) {
     return { ok: false, error: 'no_clinics' };
   }
-  // Multiple clinics: still first only (temporary); non-empty list guarantees an id above.
   setCurrentClinicId(first.id);
   return { ok: true };
 }
 
-/** Persisted app session; localStorage current_clinic_id is set in initAppSession. */
-export type ClinicInfo = {
-  user_id: string;
-  role: string;
-  clinic?: { id: string; name: string | null } | null;
-  clinic_id?: string;
-  access_token?: string;
-};
+function toMeResponse(parsed: AppMeParsed): MeResponse {
+  if ('ok' in parsed && parsed.ok === true) {
+    return {
+      ok: true,
+      user_id: parsed.user_id,
+      role: parsed.role,
+      clinic_id: parsed.clinic_id,
+      clinic: parsed.clinic,
+      user: parsed.user,
+    };
+  }
+  return {
+    error: parsed.error,
+    permission: parsed.permission,
+    clinic: null,
+  };
+}
 
-export async function getClinicForUser(accessToken: string): Promise<any> {
-  console.log('getClinicForUser called with token:', accessToken?.slice(0, 20));
+/**
+ * Fetch and validate GET /app/me for session bootstrap.
+ * 401 clears local app session (fail closed). Does not invent roles.
+ */
+export async function getClinicForUser(accessToken: string, preferredClinicId?: string | null): Promise<MeResponse> {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
   };
+  if (preferredClinicId) {
+    headers['X-Clinic-Id'] = preferredClinicId;
+  }
   const res = await fetch(`${API_URL}/app/me`, { headers });
+  const body = (await res.json().catch(() => ({}))) as MeResponse;
+  const parsed = parseAppMeResponse(res.status, body);
 
-  console.log('GET /app/me status:', res.status);
-
-  const data = await res.json().catch(() => ({}));
-  return data;
-}
-
-/** Persist user context in sessionStorage and clinic id in localStorage. */
-export function initAppSession(data: ClinicInfo): void {
-  if (typeof window !== 'undefined') {
-    const clinicId = data.clinic?.id || data.clinic_id;
-
-    console.log('Persisting clinic_id:', clinicId);
-
-    if (clinicId) {
-      localStorage.setItem('current_clinic_id', String(clinicId));
-    }
-    const payload: ClinicInfo = {
-      user_id: data.user_id,
-      role: data.role,
-      clinic: data.clinic,
-      access_token: data.access_token,
-    };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
+  if (res.status === 401) {
+    clearAppSession();
   }
-}
 
-export function getAppSession(): ClinicInfo | null {
-  if (typeof window === 'undefined') return null;
-  const raw = sessionStorage.getItem(SESSION_KEY);
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const user_id = typeof parsed.user_id === 'string' ? parsed.user_id : '';
-    if (!user_id) return null;
-    return {
-      user_id,
-      role: typeof parsed.role === 'string' ? parsed.role : 'staff',
-      clinic: parsed.clinic as ClinicInfo['clinic'],
-      access_token: typeof parsed.access_token === 'string' ? parsed.access_token : undefined,
-    };
-  } catch {
-    return null;
-  }
+  return toMeResponse(parsed);
 }

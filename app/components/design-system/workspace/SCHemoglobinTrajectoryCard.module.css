@@ -1,0 +1,133 @@
+@import '../tokens/tokens.css';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1378px;
+  min-height: 489px;
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.3125px;
+  color: var(--ds-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--ds-alert-danger-bg);
+  font-family: var(--ds-font-family);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 10px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--ds-alert-danger-icon);
+}
+
+.statusBadgeStable {
+  background: var(--ds-interactive-selected-bg);
+  color: var(--ds-interactive-default);
+}
+
+.statusBadgeResolved {
+  background: #f1f2f4;
+  color: #424757;
+}
+
+.statusDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.chartWrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+}
+
+.chartImage {
+  display: block;
+  width: 100%;
+  height: 280px;
+  object-fit: fill;
+}
+
+.summary {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.summaryLabel {
+  font-family: var(--ds-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+  text-transform: uppercase;
+}
+
+.summaryValue {
+  font-family: var(--ds-font-family);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: -0.4492px;
+  color: var(--ds-text-primary);
+}
+
+.summaryValueDanger {
+  color: var(--ds-alert-danger-text);
+}

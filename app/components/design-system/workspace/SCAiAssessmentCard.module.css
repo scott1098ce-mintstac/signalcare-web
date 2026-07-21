@@ -1,0 +1,101 @@
+@import '../tokens/tokens.css';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+  padding: var(--ds-card-padding);
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
+
+.headerMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-2);
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 24px;
+  letter-spacing: -0.3125px;
+  color: var(--ds-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-8);
+  padding-top: var(--ds-space-6);
+  border-top: 1px solid #e5e5e5;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+}
+
+.summaryLabel {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+  text-transform: uppercase;
+}
+
+.summaryValue {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-1);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 28px;
+  letter-spacing: -0.4492px;
+  color: var(--ds-text-primary);
+}
+
+.summaryValueDanger {
+  color: var(--ds-alert-danger-icon);
+}
+
+.interpretation {
+  margin: 0;
+  padding: var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-subtle);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-text-secondary);
+}
+
+@media (max-width: 720px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-4);
+  }
+}

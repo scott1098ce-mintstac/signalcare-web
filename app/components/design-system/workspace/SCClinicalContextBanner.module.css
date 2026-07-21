@@ -1,0 +1,238 @@
+@import '../tokens/tokens.css';
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+  padding: var(--ds-card-padding);
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.bannerDanger {
+  border: 2px solid var(--ds-alert-danger-icon);
+  background: linear-gradient(to top, #fff0ee 102.9%, #ffffff 50%);
+  box-shadow: 0 4px 2px rgba(150, 0, 7, 0.07);
+}
+
+.bannerNeutral {
+  border: 1px solid var(--ds-border-subtle);
+  background: var(--ds-surface-base);
+}
+
+.bannerMuted {
+  border: 1px solid var(--ds-border-subtle);
+  background: var(--ds-surface-base);
+  box-shadow: none;
+}
+
+.alertSectionMuted .headline,
+.alertSectionMuted .description,
+.alertSectionMuted .triggered {
+  color: var(--ds-text-secondary);
+}
+
+.alertSectionMuted .iconDanger {
+  background: var(--ds-alert-danger-bg);
+  color: var(--ds-alert-danger-icon);
+}
+
+.bannerCompact {
+  gap: 0;
+}
+
+.alertSection {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.iconCircle {
+  display: flex;
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ds-radius-pill);
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.iconDanger {
+  background: var(--ds-alert-danger-icon);
+  color: var(--ds-text-inverse);
+}
+
+.iconDangerSubtle {
+  background: var(--ds-alert-danger-bg);
+  color: var(--ds-alert-danger-icon);
+}
+
+.iconBrandSubtle {
+  background: var(--ds-interactive-subtle-bg);
+  color: var(--ds-interactive-default);
+}
+
+.iconWarning {
+  background: var(--ds-alert-warning-bg);
+  color: var(--ds-alert-warning-icon);
+}
+
+.iconSuccess {
+  background: var(--ds-alert-success-bg);
+  color: var(--ds-alert-success-border);
+}
+
+.alertMain {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.triggered {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 12px;
+  font-weight: var(--ds-font-weight-regular);
+  line-height: 16px;
+  color: var(--ds-alert-danger-text);
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 24px;
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 19.956px;
+  letter-spacing: -0.1501px;
+  color: var(--ds-alert-danger-text);
+}
+
+.headlineNeutral {
+  color: var(--ds-text-primary);
+}
+
+.description {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 14px;
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 15.965px;
+  color: var(--ds-alert-danger-text);
+}
+
+.descriptionNeutral {
+  color: var(--ds-text-secondary);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-regular);
+}
+
+.divider {
+  height: 1px;
+  background: var(--ds-border-subtle);
+}
+
+.actionSection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+}
+
+.actionMain {
+  display: flex;
+  flex-shrink: 0;
+  gap: 14px;
+  align-items: center;
+}
+
+.actionCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actionTitle {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 20px;
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 19.956px;
+  letter-spacing: -0.1501px;
+  color: var(--ds-text-primary);
+}
+
+.actionGuidance {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 12px;
+  font-weight: var(--ds-font-weight-regular);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.actionGuidance strong {
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+
+.ownershipRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ds-font-family);
+  font-size: 14px;
+  line-height: 15.965px;
+  color: var(--ds-text-primary);
+}
+
+.ownershipIcon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.ownershipLabel {
+  font-weight: var(--ds-font-weight-medium);
+}
+
+.ownershipValue {
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ds-space-3);
+}
+
+.statusLine {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-3);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-alert-success-border);
+}
+
+.statusLineWarning {
+  color: var(--ds-alert-warning-text);
+}

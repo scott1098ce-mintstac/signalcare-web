@@ -1,0 +1,61 @@
+@import '../tokens/tokens.css';
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-2);
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 24px;
+  color: var(--ds-text-primary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  color: var(--ds-text-secondary);
+}
+
+.latestBadge {
+  display: inline-flex;
+  margin-left: var(--ds-space-2);
+  padding: 2px 8px;
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-interactive-subtle-bg);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-interactive-default);
+}
+
+.responseGrid {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.responseCardDanger {
+  border-left: 4px solid var(--ds-alert-danger-icon);
+}
+
+.responseCardWarning {
+  border-left: 4px solid var(--ds-alert-warning-icon);
+}
+
+.responseCardNeutral {
+  border-left: 4px solid var(--ds-border-strong);
+}
+
+.responseCardBrand {
+  border-left: 4px solid var(--ds-interactive-default);
+}

@@ -1,0 +1,176 @@
+@import '../tokens/tokens.css';
+
+/* Figma 297:7573 — Evidence Analysis Card */
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 1378px;
+}
+
+.header {
+  display: flex;
+  height: 44px;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.3125px;
+  color: var(--ds-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: 5px;
+  background: var(--ds-surface-base);
+  padding: 12px 24px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.metricRowItem {
+  display: contents;
+}
+
+.metricGroup {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 160px;
+}
+
+.metricGroupLast {
+  width: 474px;
+  flex: 0 0 474px;
+  justify-content: flex-end;
+}
+
+.label {
+  flex-shrink: 0;
+  font-family: var(--ds-font-family);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+}
+
+.labelLast {
+  width: 126px;
+}
+
+.valueWrap {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.value {
+  font-family: var(--ds-font-family);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: 0.0703px;
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+}
+
+.unit {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.1504px;
+  color: var(--ds-text-secondary);
+}
+
+.divider {
+  width: 1px;
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--ds-border-subtle);
+}
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--ds-alert-danger-border);
+  background: var(--ds-alert-danger-bg);
+  font-family: var(--ds-font-family);
+  font-size: 12px;
+  line-height: 16.8px;
+  color: var(--ds-alert-danger-text);
+  white-space: nowrap;
+}
+
+.trendNeutral {
+  border-color: #e1e3e7;
+  background: #f1f2f4;
+  color: #424757;
+}
+
+@media (max-width: 1200px) {
+  .metricGroup {
+    gap: 48px;
+  }
+
+  .metricGroupLast {
+    width: auto;
+    flex: 1;
+    justify-content: flex-start;
+  }
+
+  .labelLast {
+    width: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .row {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .metricGroup,
+  .metricGroupLast {
+    width: 100%;
+    flex: none;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}

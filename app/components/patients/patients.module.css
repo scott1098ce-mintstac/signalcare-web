@@ -1,0 +1,250 @@
+@import '../design-system/tokens/tokens.css';
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-page-section-gap);
+  min-height: 100%;
+  padding: var(--ds-page-content-padding);
+  background: var(--ds-surface-base);
+  box-sizing: border-box;
+}
+
+.pageIntro {
+  margin: 0;
+  max-width: 640px;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: var(--ds-line-height-body);
+  color: var(--ds-text-secondary);
+}
+
+.summaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.summaryChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px var(--ds-space-2);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-surface-subtle);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.summaryChipBrand {
+  background: var(--ds-interactive-selected-bg);
+  border-color: var(--ds-interactive-subtle-bg);
+  color: var(--ds-interactive-default);
+}
+
+.summaryChipMuted {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px var(--ds-space-2);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-surface-base);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-text-placeholder);
+}
+
+.truncatedNotice {
+  margin: 0;
+  max-width: 720px;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: var(--ds-line-height-body);
+  color: var(--ds-text-secondary);
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+.toolbarTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+}
+
+.toolbarSearch {
+  flex: 1;
+  min-width: 0;
+  max-width: 520px;
+}
+
+.toolbarEnroll {
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
+
+.filterControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.filterClearButton {
+  width: auto !important;
+  color: var(--ds-text-secondary) !important;
+}
+
+.patientSecondary {
+  margin-top: 2px;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-regular);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.clinicianUnassigned {
+  color: var(--ds-text-secondary);
+}
+
+.badgeCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+.progressCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+.progressLabel {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-text-primary);
+}
+
+.progressTrack {
+  height: 4px;
+  width: 100%;
+  max-width: 96px;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface-subtle);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--ds-radius-pill);
+  background: color-mix(in srgb, var(--ds-interactive-default) 75%, var(--ds-surface-muted));
+}
+
+.progressPercent {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-overline);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-placeholder);
+}
+
+.rowActionButton {
+  width: auto !important;
+  white-space: nowrap;
+}
+
+/* Single enterprise header + row grid — 8 columns */
+.directoryTable :global(.columnHeader),
+.directoryRow {
+  grid-template-columns: 1.55fr 1.1fr 1.05fr 0.72fr 1.05fr 0.88fr 1.05fr 1.1fr !important;
+}
+
+.directoryTable :global(.columnHeader) {
+  display: grid;
+}
+
+.directoryRow {
+  min-height: 58px;
+}
+
+.directoryRow:hover {
+  background: var(--ds-surface-subtle);
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-2) 0 0;
+}
+
+.paginationMeta {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.paginationCount {
+  margin-left: var(--ds-space-2);
+  font-weight: var(--ds-font-weight-regular);
+  color: var(--ds-text-placeholder);
+}
+
+.errorActions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--ds-space-2);
+}
+
+@media (min-width: 900px) {
+  .directoryRow {
+    align-items: center;
+    min-height: 58px;
+    padding-top: var(--ds-space-3);
+    padding-bottom: var(--ds-space-3);
+  }
+
+  .badgeCell {
+    justify-content: center;
+  }
+
+  .directoryTable :global(.cellAction) {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 899px) {
+  .directoryTable :global(.columnHeader) {
+    display: none;
+  }
+}

@@ -1,0 +1,59 @@
+@import '../tokens/tokens.css';
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0 var(--ds-space-2);
+  border-radius: var(--ds-radius-xs);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-overline);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 10px;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.dangerSubtle {
+  background: var(--ds-alert-danger-bg);
+  color: var(--ds-alert-danger-icon);
+  border: none;
+}
+
+.dangerSubtle::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.warningSubtle {
+  background: var(--ds-alert-warning-bg);
+  color: var(--ds-alert-warning-text);
+  border: 1px solid var(--ds-alert-warning-border);
+}
+
+.successSubtle {
+  background: var(--ds-alert-success-bg);
+  color: var(--ds-alert-success-text);
+  border: 1px solid var(--ds-alert-success-border);
+}
+
+.neutralSubtle {
+  background: var(--ds-surface-subtle);
+  color: var(--ds-text-secondary);
+  border: 1px solid var(--ds-border-subtle);
+}
+
+.brandSubtle {
+  background: var(--ds-interactive-subtle-bg);
+  color: var(--ds-interactive-default);
+  border: 1px solid var(--ds-interactive-default);
+}

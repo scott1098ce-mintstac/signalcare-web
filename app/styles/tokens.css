@@ -1,0 +1,124 @@
+/**
+ * SignalCare design tokens — canonical Figma MCP values.
+ * Single source for colour, typography, spacing, and radii.
+ *
+ * The --ds-* tokens in components/design-system/tokens/tokens.css are the
+ * authoritative set used by DS components. This --sc-* layer provides a
+ * stable alias for global/Tailwind integration without duplicating values.
+ */
+@import "../components/design-system/tokens/tokens.css";
+@import "../components/design-system/tokens/icon-sizes.css";
+
+:root {
+  /* Brand / interactive */
+  --sc-brand: var(--ds-interactive-default);
+  --sc-brand-hover: #2f6d70;
+  --sc-brand-focus-ring: rgba(57, 132, 135, 0.24);
+  --sc-brand-gradient: linear-gradient(
+    130deg,
+    #046b6b 0%,
+    #0a5858 50%,
+    #172829 100%
+  );
+  --sc-brand-subtle-bg: var(--ds-interactive-subtle-bg);
+  --sc-brand-selected-bg: var(--ds-interactive-selected-bg);
+
+  /* Surfaces */
+  --sc-surface-base: var(--ds-surface-base);
+  --sc-surface-muted: var(--ds-surface-muted);
+  --sc-surface-subtle: var(--ds-surface-subtle);
+  --sc-surface-page: var(--ds-surface-subtle);
+  --sc-surface-card: var(--ds-surface-base);
+  --sc-surface-inverse: var(--ds-surface-inverse);
+  --sc-surface-app: var(--ds-surface-app);
+
+  /* Text */
+  --sc-text-primary: var(--ds-text-primary);
+  --sc-text-secondary: var(--ds-text-secondary);
+  --sc-text-label: #5a6b7a;
+  --sc-text-placeholder: var(--ds-text-placeholder);
+  --sc-text-disabled: var(--ds-text-disabled);
+  --sc-text-inverse: var(--ds-text-inverse);
+  --sc-text-brand: var(--ds-interactive-default);
+
+  /* Borders */
+  --sc-border-subtle: var(--ds-border-subtle);
+  --sc-border-default: var(--ds-border-default);
+  --sc-border-input: var(--ds-border-default);
+  --sc-border-card: var(--ds-border-subtle);
+
+  /* Alert semantic */
+  --sc-alert-danger-bg: var(--ds-alert-danger-bg);
+  --sc-alert-danger-border: var(--ds-alert-danger-border);
+  --sc-alert-danger-icon: var(--ds-alert-danger-icon);
+  --sc-alert-danger-text: var(--ds-alert-danger-text);
+  --sc-alert-success-bg: var(--ds-alert-success-bg);
+  --sc-alert-success-border: var(--ds-alert-success-border);
+  --sc-alert-success-text: var(--ds-alert-success-text);
+  --sc-alert-warning-bg: var(--ds-alert-warning-bg);
+  --sc-alert-warning-border: var(--ds-alert-warning-border);
+  --sc-alert-warning-text: var(--ds-alert-warning-text);
+
+  /* Radius */
+  --sc-radius-xs: var(--ds-radius-xs);
+  --sc-radius-input: var(--ds-radius-xs);
+  --sc-radius-md: var(--ds-radius-md);
+  --sc-radius-card: var(--ds-radius-md);
+  --sc-radius-lg: var(--ds-radius-lg);
+
+  /* Shadows */
+  --sc-shadow-card: var(--ds-shadow-card);
+  --sc-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+
+  /* Spacing scale */
+  --sc-space-1: var(--ds-space-1);
+  --sc-space-2: var(--ds-space-2);
+  --sc-space-3: var(--ds-space-3);
+  --sc-space-4: var(--ds-space-4);
+  --sc-space-5: var(--ds-space-5);
+  --sc-space-6: var(--ds-space-6);
+  --sc-space-8: var(--ds-space-8);
+
+  /* Typography — Inter (loaded in root layout) */
+  --sc-font-family: var(--ds-font-family);
+  --sc-text-xs: 0.625rem; /* 10px overline */
+  --sc-text-sm: 0.75rem; /* 12px */
+  --sc-text-base: 0.875rem; /* 14px body */
+  --sc-text-md: 0.875rem;
+  --sc-text-lg: 1rem; /* 16px heading-2 */
+  --sc-text-xl: 1.25rem; /* 20px heading-1 */
+  --sc-text-2xl: 1.5rem; /* 24px display-3 */
+  --sc-tracking-label: var(--ds-tracking-label);
+  --sc-tracking-heading: -0.02em;
+  --sc-line-tight: var(--ds-line-height-tight);
+  --sc-line-body: var(--ds-line-height-body);
+  --sc-line-relaxed: var(--ds-line-height-relaxed);
+
+  /* Layout */
+  --sc-sidebar-width: var(--ds-sidebar-width);
+  --sc-header-height: var(--ds-header-height);
+
+  /* Shell — Figma Navbar (241:20677) & Header (108:14031) */
+  --sc-nav-label-inactive: #9594a6;
+  --sc-nav-divider: var(--ds-shell-nav-divider);
+  --sc-shell-nav-padding: var(--ds-shell-nav-padding);
+  --sc-shell-nav-gap: var(--ds-shell-nav-gap);
+  --sc-shell-nav-section-gap: var(--ds-shell-nav-section-gap);
+  --sc-shell-menu-padding-x: var(--ds-shell-menu-padding-x);
+  --sc-shell-menu-padding-y: var(--ds-shell-menu-padding-y);
+  --sc-shell-nav-button-width: var(--ds-shell-nav-button-width);
+  --sc-shell-nav-button-padding: var(--ds-shell-nav-button-padding);
+  --sc-shell-nav-icon-label-gap: var(--ds-shell-nav-icon-label-gap);
+  --sc-shell-nav-icon-size: var(--ds-icon-size-md);
+  --sc-shell-nav-label-size: var(--ds-font-size-heading-4);
+  --sc-shell-nav-label-weight: 500;
+  --sc-shell-nav-label-line-height: 16px;
+  --sc-shell-header-padding-x: var(--ds-shell-header-padding-x);
+  --sc-shell-header-padding-y: var(--ds-shell-header-padding-y);
+  --sc-shell-header-icon-gap: var(--ds-shell-header-icon-gap);
+  --sc-shell-header-icon-size: var(--ds-icon-size-lg);
+  --sc-shell-header-title-size: var(--ds-font-size-display-3);
+  --sc-shell-header-title-weight: 700;
+  --sc-shell-header-title-line-height: var(--ds-line-height-header);
+  --sc-shell-header-title-color: var(--ds-text-primary-header);
+}

@@ -1,0 +1,22 @@
+@import '../tokens/tokens.css';
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--ds-queue-section-header-height);
+  padding: var(--ds-queue-section-header-padding-y) var(--ds-queue-section-header-padding-x);
+  border-bottom: 1px solid var(--ds-border-subtle);
+  background: var(--ds-surface-subtle);
+  box-sizing: border-box;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 16px;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-text-primary);
+}

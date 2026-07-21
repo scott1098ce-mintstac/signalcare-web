@@ -1,0 +1,11 @@
+@import '../tokens/tokens.css';
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}

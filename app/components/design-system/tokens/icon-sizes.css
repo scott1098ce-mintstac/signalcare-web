@@ -1,0 +1,11 @@
+/**
+ * Icon sizing scale — Figma Dev Mode (277:19209, 277:17463, 241:20677, etc.)
+ */
+:root {
+  --ds-icon-size-xs: 16px;
+  --ds-icon-size-sm: 20px;
+  --ds-icon-size-md: 24px;
+  --ds-icon-size-lg: 32px;
+  --ds-icon-size-xl: 40px;
+  --ds-icon-size-empty: 96px;
+}

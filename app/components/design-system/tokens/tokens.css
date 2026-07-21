@@ -1,0 +1,176 @@
+/**
+ * SignalCare Design System tokens — Figma Dev Mode (Signal Care file).
+ * Source nodes: Navbar 241:20677, Header 68:9113, Drop Down 267:2579,
+ * Button Primary 243:4615 / 284:3785, Alert 284:3768, Badge 297:4243, etc.
+ */
+:root {
+  /* ——— Colour / surface ——— */
+  --ds-surface-base: #ffffff;
+  --ds-surface-muted: #ecebed;
+  --ds-surface-subtle: #f9f9fb;
+  --ds-surface-inverse: #181722;
+  --ds-surface-app: #f1f5f9;
+
+  /* ——— Colour / text ——— */
+  --ds-text-primary: #181722;
+  --ds-text-primary-header: #1a1a1a;
+  --ds-text-primary-assigned: #0f172b;
+  --ds-text-secondary: #706f82;
+  --ds-text-placeholder: #bab9c9;
+  --ds-text-disabled: #cccbd8;
+  --ds-text-inverse: #ffffff;
+
+  /* ——— Colour / border ——— */
+  --ds-border-subtle: #dedde6;
+  --ds-border-default: #cccbd8;
+  --ds-border-brand: #398487;
+  --ds-border-strong: #9594a6;
+
+  /* ——— Colour / interactive ——— */
+  --ds-interactive-default: #398487;
+  --ds-interactive-subtle-bg: #d0eeed;
+  --ds-interactive-selected-bg: #edf8f8;
+
+  /* ——— Colour / alert danger ——— */
+  --ds-alert-danger-icon: #e7000b;
+  --ds-alert-danger-bg: #fff0f0;
+  --ds-alert-danger-border: #ffd6d6;
+  --ds-alert-danger-text: #960007;
+
+  /* ——— Colour / alert warning ——— */
+  --ds-alert-warning-icon: #fe9a00;
+  --ds-alert-warning-bg: #fff8eb;
+  --ds-alert-warning-border: #feecc6;
+  --ds-alert-warning-text: #a05e00;
+
+  /* ——— Colour / alert success ——— */
+  --ds-alert-success-border: #00bc7d;
+  --ds-alert-success-bg: #e6faf4;
+  --ds-alert-success-text: #00774d;
+
+  /* ——— Spacing ——— */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+
+  /* ——— Radius ——— */
+  --ds-radius-xs: 4px;
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+  --ds-radius-pill: 33554400px;
+
+  /* ——— Shadows ——— */
+  --ds-shadow-focus: 0 0 0 2px rgba(57, 132, 135, 0.24);
+  --ds-shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* ——— Typography / family ——— */
+  --ds-font-family: var(--font-inter), system-ui, sans-serif;
+
+  /* ——— Typography / sizes ——— */
+  --ds-font-size-overline: 10px;
+  --ds-font-size-body-sm: 12px;
+  --ds-font-size-body: 14px;
+  --ds-font-size-body-lg: 16px;
+  --ds-font-size-heading-2: 16px;
+  --ds-font-size-heading-1: 20px;
+  --ds-font-size-heading-4: 12px;
+  --ds-font-size-heading-3: 14px;
+  --ds-font-size-display-3: 24px;
+
+  /* ——— Typography / weights ——— */
+  --ds-font-weight-regular: 400;
+  --ds-font-weight-medium: 500;
+  --ds-font-weight-semibold: 600;
+  --ds-font-weight-bold: 700;
+
+  /* ——— Typography / line heights ——— */
+  --ds-line-height-tight: 1.2;
+  --ds-line-height-normal: normal;
+  --ds-line-height-body: 1.5;
+  --ds-line-height-relaxed: 1.6;
+  --ds-line-height-row: 17.5px;
+  --ds-line-height-score: 28px;
+  --ds-line-height-header: 40px;
+  --ds-line-height-display: 32px;
+  --ds-line-height-empty: 26px;
+  --ds-line-height-overline: 1.1;
+  --ds-line-height-step: 20px;
+
+  /* ——— Typography / tracking ——— */
+  --ds-tracking-label: 0.3px;
+  --ds-tracking-heading-2: -0.1504px;
+  --ds-tracking-score: -0.4395px;
+  --ds-tracking-heading-1: -0.024px;
+
+  /* ——— Layout / shell ——— */
+  --ds-sidebar-width: 80px;
+  --ds-header-height: 72px;
+  --ds-shell-nav-padding: 12px;
+  --ds-shell-nav-gap: 12px;
+  --ds-shell-nav-section-gap: 8px;
+  --ds-shell-nav-button-width: 56px;
+  --ds-shell-nav-button-padding: 12px;
+  --ds-shell-nav-icon-label-gap: 4px;
+  --ds-shell-header-padding-x: 24px;
+  --ds-shell-header-padding-y: 16px;
+  --ds-shell-header-icon-gap: 8px;
+  --ds-shell-menu-padding-x: 12px;
+  --ds-shell-menu-padding-y: 8px;
+  --ds-shell-nav-divider: #706f82;
+
+  /* ——— Layout / workspace ——— */
+  --ds-action-bar-padding-y: 16px;
+  --ds-action-bar-padding-x: 24px;
+  --ds-card-padding: 24px;
+  --ds-timeline-step-size: 24px;
+
+  /* ——— Layout / queue ——— */
+  --ds-queue-filter-bar-height: 76px;
+  --ds-queue-filter-control-height: 52px;
+  --ds-queue-search-width: 452px;
+  --ds-queue-dropdown-width: 183px;
+  --ds-queue-filter-gap: 12px;
+  --ds-queue-filter-padding-x: 24px;
+  --ds-queue-filter-padding-y: 12px;
+  --ds-queue-clear-all-right: 30px;
+  --ds-queue-clear-all-height: 38px;
+  --ds-queue-section-header-height: 40px;
+  --ds-queue-section-header-padding-x: 16px;
+  --ds-queue-section-header-padding-y: 12px;
+  --ds-queue-severity-bar-width: 8px;
+  --ds-queue-row-padding-y: 8px;
+  --ds-queue-row-padding-y-simple: 15px;
+  --ds-queue-row-padding-left: 24px;
+  --ds-queue-row-padding-right: 32px;
+  --ds-queue-row-height: 48px;
+  --ds-queue-row-height-expanded: 51px;
+  --ds-queue-row-details-gap: 24px;
+  --ds-queue-row-leading-gap: 12px;
+  --ds-queue-row-meta-gap: 8px;
+
+  /* ——— Layout / split pane ——— */
+  /* Figma 241:20678 content 1432px; filter block 816px → 816/1432 = 57.04% */
+  --ds-split-queue-min-width: 816px;
+  --ds-split-queue-max-width: 9999px;
+  --ds-split-queue-width-percent: 57.04%;
+
+  /* ——— Layout / table ——— */
+  /* Figma 323:7447 Table Toolbar, 323:7823 Table/Staff */
+  --ds-table-toolbar-height: 38px;
+  --ds-table-column-header-height: 40px;
+  --ds-table-row-height: 51px;
+  --ds-table-padding-x: 16px;
+  --ds-table-row-padding-x: 24px;
+  --ds-page-content-padding: 24px;
+  --ds-page-section-gap: 32px;
+
+  /* ——— Layout / protocol editor ——— */
+  --ds-protocol-editor-step-list-width: 360px;
+  --ds-protocol-editor-panel-min-height: 520px;
+  --ds-protocol-editor-step-row-height: 56px;
+  --ds-protocol-editor-locked-bg: var(--ds-surface-subtle);
+}

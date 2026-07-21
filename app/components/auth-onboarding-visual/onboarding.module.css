@@ -1,0 +1,636 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.page {
+  min-height: 100vh;
+  background: #f9f9fb;
+  font-family: Inter, system-ui, sans-serif;
+  padding-top: 65px;
+  box-sizing: border-box;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid #ecebed;
+  padding: 0 32px;
+  box-sizing: border-box;
+}
+
+.headerInner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1512px;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 170px;
+  height: 43px;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.logoutButton {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #706f82;
+  cursor: pointer;
+  padding: 0;
+}
+
+.main {
+  max-width: 720px;
+  width: 720px;
+  margin: 0 auto;
+  padding: 64px 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.mainClinicDetails {
+  padding-top: 50px;
+}
+
+.mainWardsBeds {
+  padding-top: 64px;
+}
+
+.mainInviteTeam {
+  padding-top: 80px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #ecebed;
+  border-radius: 10px;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 720px;
+  box-sizing: border-box;
+}
+
+.cardRounded12 {
+  border-radius: 12px;
+}
+
+.cardRounded10 {
+  border-radius: 10px;
+}
+
+.stepper {
+  border-bottom: 1px solid #ecebed;
+  padding: 24px 32px 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.stepperInner {
+  width: 602px;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepGroup {
+  display: flex;
+  align-items: center;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+}
+
+.stepCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 33554400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-top: 5.5px;
+  padding-bottom: 6.5px;
+  box-sizing: border-box;
+}
+
+.stepCircleActive {
+  background: #398487;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.stepCircleComplete {
+  background: #398487;
+}
+
+.stepCircleInactive {
+  background: #f9f9fb;
+  border: 1px solid #ecebed;
+  color: #706f82;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.stepCheckIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.stepLabel {
+  padding-left: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.stepLabelActive {
+  color: #398487;
+}
+
+.stepLabelInactive {
+  color: #706f82;
+}
+
+.stepConnector {
+  padding: 0 16px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.stepLine {
+  height: 2px;
+  width: 76.5px;
+  background: #ecebed;
+}
+
+.stepLineActive {
+  background: #398487;
+}
+
+.content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.contentInviteTeam {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.contentHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contentTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #181722;
+}
+
+.contentDescription {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #706f82;
+}
+
+.contentDescriptionSm {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #706f82;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #706f82;
+  text-transform: uppercase;
+}
+
+.textInput,
+.selectInput {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #181722;
+  background: #ffffff;
+  border: 1px solid #dedde6;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin: 0;
+  appearance: none;
+}
+
+.textInput::placeholder {
+  color: #bab9c9;
+}
+
+.selectWrap {
+  position: relative;
+}
+
+.selectWrap .selectInput {
+  padding-right: 48px;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.selectPlaceholder {
+  color: #bab9c9;
+  display: flex;
+  align-items: center;
+  padding-right: 48px;
+}
+
+.selectPlaceholderText {
+  color: #bab9c9;
+}
+
+.cardFooter {
+  border-top: 1px solid #ecebed;
+  padding: 21px 32px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cardFooterSplit {
+  border-top: 1px solid #dce4e8;
+  background: #f9f9fb;
+  padding: 25px 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardFooterActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.capacitySummary {
+  text-align: right;
+  font-size: 14px;
+  line-height: 20px;
+  color: #706f82;
+}
+
+.capacityValue {
+  font-weight: 600;
+  color: #181722;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #398487;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #398487;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #398487;
+  cursor: pointer;
+}
+
+.addIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.buttonIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.helpFooter {
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: #706f82;
+}
+
+.helpLink {
+  color: #398487;
+  text-decoration: none;
+}
+
+.error {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #b42318;
+}
+
+/* Wards table */
+.wardHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px 40px;
+  gap: 16px;
+  padding: 0 4px;
+  margin-bottom: 16px;
+}
+
+.wardHeaderLabel {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #5a6b7a;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.wardRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.wardNameCell {
+  width: 441px;
+  flex: 0 0 441px;
+}
+
+.wardNameInput {
+  width: 100%;
+}
+
+.numberPicker {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border: 1px solid #dedde6;
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 1px;
+  box-sizing: border-box;
+  flex: 0 0 140px;
+  width: 140px;
+}
+
+.numberPickerFilled {
+  border-color: #dce4e8;
+}
+
+.numberPickerBtn {
+  width: 44px;
+  height: 46px;
+  border: none;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.numberPickerValue {
+  width: 56px;
+  height: 46px;
+  border-left: 1px solid #ecebed;
+  border-right: 1px solid #ecebed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #181722;
+  background: #ffffff;
+}
+
+.numberPickerValueEmpty {
+  color: #bab9c9;
+}
+
+.numberPickerIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.deleteBtn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0;
+}
+
+.deleteIcon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Invite team */
+.rolesBox {
+  background: #edf8f8;
+  border-radius: 8px;
+  padding: 8px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.rolesIconWrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 33554400px;
+  background: #d0eeed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rolesIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.rolesText {
+  font-size: 12px;
+  line-height: 19.5px;
+  color: #181722;
+}
+
+.rolesTextMuted {
+  color: #706f82;
+}
+
+.rolesTextStrong {
+  font-weight: 600;
+}
+
+.staffSection {
+  padding-top: 24px;
+}
+
+.staffSection .staffRow + .staffRow {
+  margin-top: 16px;
+}
+
+.staffHeader {
+  display: grid;
+  grid-template-columns: 212px 212px 140px 40px;
+  gap: 16px;
+}
+
+.staffRow {
+  display: grid;
+  grid-template-columns: 212px 212px 140px 40px;
+  gap: 16px;
+  align-items: center;
+}
+
+.roleSelect {
+  height: 49px;
+  border-color: #cccbd8;
+}
+
+.staticFieldValue {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #181722;
+  background: #ffffff;
+  border: 1px solid #dedde6;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin: 0;
+}
+
+.staticFieldPlaceholder {
+  color: #bab9c9;
+}
+
+.roleDropdownStatic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 49px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #cccbd8;
+  border-radius: 4px;
+  padding: 16px 20px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #181722;
+}
+
+.roleDropdownStatic span {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.visualPage {
+  min-height: 900px;
+  height: 900px;
+  padding-top: 65px;
+}

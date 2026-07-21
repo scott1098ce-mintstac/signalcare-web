@@ -1,0 +1,23 @@
+@import '../tokens/tokens.css';
+
+.bar {
+  width: var(--ds-queue-severity-bar-width);
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.danger {
+  background: var(--ds-alert-danger-icon);
+}
+
+.warning {
+  background: var(--ds-alert-warning-icon);
+}
+
+.success {
+  background: var(--ds-alert-success-border);
+}
+
+.neutral {
+  background: var(--ds-border-strong);
+}

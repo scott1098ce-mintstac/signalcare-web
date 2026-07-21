@@ -13,6 +13,34 @@ type AppApiFetchOptions = {
   headers?: Record<string, string>;
 };
 
+let handlingUnauthorized = false;
+
+async function handleUnauthorizedSession(): Promise<void> {
+  if (typeof window === 'undefined' || handlingUnauthorized) return;
+  handlingUnauthorized = true;
+  try {
+    const { logout } = await import('./auth/logout');
+    await logout();
+  } catch {
+    /* continue to sign-in */
+  }
+  try {
+    const path = window.location.pathname || '';
+    if (!path.startsWith('/auth/')) {
+      window.location.replace('/auth/signin');
+    }
+  } finally {
+    handlingUnauthorized = false;
+  }
+}
+
+export function accessDeniedMessage(body?: { error?: string; permission?: string } | null): string {
+  if (body?.permission === 'unknown_role' || body?.error === 'unknown_role') {
+    return 'Your account role is not recognised. Contact your clinic administrator.';
+  }
+  return 'You do not have permission to perform this action.';
+}
+
 export async function appApiFetch(path: string, options: AppApiFetchOptions = {}) {
   const {
     method = 'GET',
@@ -35,8 +63,6 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
 
   if (!path.includes('/app/me') && currentClinicId) {
     finalHeaders['X-Clinic-Id'] = currentClinicId;
-  } else {
-    console.warn('No clinic selected');
   }
 
   const hasBody = body !== undefined;
@@ -45,19 +71,16 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
   }
 
   const finalUrl = `${API_URL}${path}`;
-  if (path.includes('monitoring')) {
-    console.log('Monitoring fetch URL:', finalUrl);
-    console.log('API_URL:', API_URL);
-    console.log('path:', path);
-    console.log('headers:', {
-      Authorization: finalHeaders.Authorization ? '[present]' : '[absent]',
-      'X-Clinic-Id': finalHeaders['X-Clinic-Id'] ?? '[absent]',
-    });
-  }
 
-  return fetch(finalUrl, {
+  const res = await fetch(finalUrl, {
     method,
     headers: finalHeaders,
     body: hasBody ? JSON.stringify(body) : undefined,
   });
+
+  if (res.status === 401) {
+    void handleUnauthorizedSession();
+  }
+
+  return res;
 }

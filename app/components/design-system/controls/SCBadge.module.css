@@ -1,0 +1,42 @@
+@import '../tokens/tokens.css';
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border-radius: var(--ds-radius-xs);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-overline);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-overline);
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.danger {
+  background: var(--ds-alert-danger-icon);
+  color: var(--ds-text-inverse);
+}
+
+.warning {
+  background: var(--ds-alert-warning-icon);
+  color: var(--ds-text-inverse);
+}
+
+.success {
+  background: var(--ds-alert-success-border);
+  color: var(--ds-text-inverse);
+}
+
+.brand {
+  background: var(--ds-interactive-default);
+  color: var(--ds-text-inverse);
+}
+
+.neutral {
+  background: var(--ds-surface-muted);
+  color: var(--ds-text-primary);
+}
