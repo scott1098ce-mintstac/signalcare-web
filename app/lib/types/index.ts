@@ -8,6 +8,7 @@ export type {
   ProtocolPerformanceRow,
   RecoveryScoreMetrics,
   ReportsAnalyticsData,
+  ReportsHighRiskQueueRow,
   WeeklyTrendMetrics,
 } from './reports';
 export type { MonitoringResponse, MonitoringRow } from './monitoring';

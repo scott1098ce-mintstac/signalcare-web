@@ -24,6 +24,8 @@ export type WeeklyTrendMetrics = {
   average_recovery_score: Array<number | null>;
   checkins_sent: number[];
   checkins_replied: number[];
+  /** Mean acknowledgement minutes per weekly bucket (Reports V2 response-time chart). */
+  acknowledgement_minutes?: Array<number | null>;
 };
 
 export type ProtocolPerformanceRow = {
@@ -38,6 +40,21 @@ export type ProtocolPerformanceRow = {
   response_rate_30d: number | null;
 };
 
+export type ReportsHighRiskQueueRow = {
+  id: string;
+  created_at: string | null;
+  enrolment_id: string | null;
+  patient_name: string;
+  clinic_patient_identifier: string | null;
+  procedure_type: string | null;
+  protocol_name: string | null;
+  alert_reason: string;
+  alert_detail: string | null;
+  severity: string | null;
+  status: 'overdue' | 'acknowledged' | string;
+  escalation_count: number;
+};
+
 export type ReportsAnalyticsData = {
   engagement: EngagementMetrics | null;
   reviews: ReviewsMetrics | null;
@@ -50,6 +67,7 @@ export type ReportsAnalyticsData = {
   checkinCompletionRate30d: number | null;
   weeklyTrends: WeeklyTrendMetrics | null;
   protocolPerformance: ProtocolPerformanceRow[];
+  highRiskQueue: ReportsHighRiskQueueRow[];
   sinceIso: string | null;
   asOf: string | null;
 };

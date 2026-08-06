@@ -104,7 +104,8 @@ export function WardsBedsScreen({
             <div className={onboardingStyles.contentHeader}>
               <h1 className={onboardingStyles.contentTitle}>Map your wards and beds.</h1>
               <p className={onboardingStyles.contentDescription}>
-                Define clinical units and their monitoring capacity to set up the command center queue.
+                Optional setup notes for your clinic units. These details stay on this device for
+                onboarding only and are not saved to SignalCare yet.
               </p>
             </div>
 
@@ -177,7 +178,7 @@ export function WardsBedsScreen({
                 Back
               </button>
               <button type="submit" className={onboardingStyles.primaryButton}>
-                Next Step
+                Continue
                 <img className={onboardingStyles.buttonIcon} src="/images/ao/icon-arrow-right-onboarding-figma.svg" alt="" aria-hidden />
               </button>
             </div>
