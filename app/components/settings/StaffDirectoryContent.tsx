@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { humanizeError } from '../../lib/user-facing-errors';
 import { Alert } from '../ui/alert';
-import { ConfirmDialog } from '../ui/confirm-dialog';
 import { LoadingState } from '../ui/spinner';
 import { Modal } from '../ui/modal';
+import { SCBadge } from '../design-system/controls/SCBadge';
 import { SCButton } from '../design-system/controls/SCButton';
 import tableStyles from '../design-system/data/SCTable.module.css';
 import { SettingsBody } from './SettingsBody';
@@ -24,17 +23,11 @@ import {
   type StaffMember,
 } from '../../lib/staff-directory';
 
-const ROLE_OPTIONS = [
-  { value: 'admin', label: 'Admin' },
-  { value: 'doctor', label: 'Doctor' },
-  { value: 'nurse', label: 'Nurse' },
-  { value: 'staff', label: 'Staff' },
-];
-
 const ACTIVE_COLUMNS = [
   { key: 'name', label: 'Name' },
   { key: 'email', label: 'Email' },
   { key: 'role', label: 'Role' },
+  { key: 'status', label: 'Status' },
   { key: 'actions', label: 'Actions' },
 ];
 
@@ -46,7 +39,17 @@ const INVITATION_COLUMNS = [
   { key: 'actions', label: 'Actions' },
 ];
 
-const ACTIVE_GRID = { gridTemplateColumns: '1.6fr 1.7fr 1.2fr 1.3fr' } as const;
+const ROLE_OPTIONS = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'doctor', label: 'Doctor' },
+  { value: 'nurse', label: 'Nurse' },
+  { value: 'staff', label: 'Staff' },
+  { value: 'viewer', label: 'Viewer' },
+  { value: 'billing', label: 'Billing' },
+  { value: 'readonly', label: 'Read only' },
+];
+
+const ACTIVE_GRID = { gridTemplateColumns: '1.6fr 1.7fr 1.1fr 0.8fr 1.3fr' } as const;
 const INVITE_GRID = { gridTemplateColumns: '1.8fr 1fr 1fr 1fr 1.3fr' } as const;
 const INPUT_CLASS =
   'w-full rounded-[var(--sc-radius-input)] border border-[var(--sc-border-subtle)] bg-white px-3 py-2 text-sm text-[var(--sc-text-primary)]';
@@ -69,7 +72,6 @@ export function StaffDirectoryContent() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('doctor');
-  const [inviteError, setInviteError] = useState<string | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<null | { kind: 'revoke'; invitation: PendingInvitation } | { kind: 'remove'; member: StaffMember }>(null);
   const [roleDrafts, setRoleDrafts] = useState<Record<string, string>>({});
@@ -79,11 +81,7 @@ export function StaffDirectoryContent() {
     setPageError(null);
     const loaded = await fetchStaffDirectory();
     if (!loaded.ok) {
-      setPageError(
-        humanizeError(loaded.error, humanizeError('staff_directory_failed')),
-      );
-      setStaff([]);
-      setPendingInvitations([]);
+      setPageError(loaded.error);
       setLoading(false);
       return;
     }
@@ -109,25 +107,16 @@ export function StaffDirectoryContent() {
     setBusyKey('invite');
     setNotice(null);
     setPageError(null);
-    setInviteError(null);
 
     const result = await createStaffInvitation({ email: inviteEmail, role: inviteRole });
     if (!result.ok) {
       if (result.body?.error === 'invitation_created_email_failed') {
-        setNotice(
-          humanizeError(
-            'invitation_created_email_failed',
-            'Invitation saved, but email delivery failed. You can resend it after checking email configuration.',
-          ),
-        );
+        setNotice('Invitation saved, but email delivery failed. You can resend it after checking email configuration.');
         setInviteOpen(false);
         setInviteEmail('');
-        setInviteError(null);
         await loadDirectory();
       } else {
-        setInviteError(
-          humanizeError(result.body?.error || 'invite_failed', humanizeError('invite_failed')),
-        );
+        setPageError(typeof result.body?.error === 'string' ? result.body.error : 'invite_failed');
       }
       setBusyKey(null);
       return;
@@ -136,7 +125,6 @@ export function StaffDirectoryContent() {
     setInviteOpen(false);
     setInviteEmail('');
     setInviteRole('doctor');
-    setInviteError(null);
     setNotice('Invitation sent.');
     await loadDirectory();
     setBusyKey(null);
@@ -147,7 +135,7 @@ export function StaffDirectoryContent() {
     setNotice(null);
     const result = await resendStaffInvitation(invitation.id);
     if (!result.ok) {
-      setPageError(humanizeError(result.body?.error || 'invitation_resend_failed'));
+      setPageError(typeof result.body?.error === 'string' ? result.body.error : 'invitation_resend_failed');
     } else {
       setNotice('Invitation resent.');
       await loadDirectory();
@@ -161,7 +149,7 @@ export function StaffDirectoryContent() {
       setBusyKey(`revoke:${confirmAction.invitation.id}`);
       const result = await revokeStaffInvitation(confirmAction.invitation.id);
       if (!result.ok) {
-        setPageError(humanizeError(result.body?.error || 'invitation_revoke_failed'));
+        setPageError(typeof result.body?.error === 'string' ? result.body.error : 'invitation_revoke_failed');
       } else {
         setNotice('Invitation revoked.');
         await loadDirectory();
@@ -170,7 +158,7 @@ export function StaffDirectoryContent() {
       setBusyKey(`remove:${confirmAction.member.user_id}`);
       const result = await removeStaffAccess(confirmAction.member.user_id);
       if (!result.ok) {
-        setPageError(humanizeError(result.body?.error || 'staff_access_remove_failed'));
+        setPageError(typeof result.body?.error === 'string' ? result.body.error : 'staff_access_remove_failed');
       } else {
         setNotice('Staff access removed.');
         await loadDirectory();
@@ -186,7 +174,7 @@ export function StaffDirectoryContent() {
     setBusyKey(`role:${member.user_id}`);
     const result = await updateStaffRole(member.user_id, nextRole);
     if (!result.ok) {
-      setPageError(humanizeError(result.body?.error || 'staff_role_update_failed'));
+      setPageError(typeof result.body?.error === 'string' ? result.body.error : 'staff_role_update_failed');
     } else {
       setNotice('Role updated.');
       await loadDirectory();
@@ -211,22 +199,11 @@ export function StaffDirectoryContent() {
 
       <SettingsBody>
         {notice ? <Alert variant="success">{notice}</Alert> : null}
-        {pageError && (staff.length > 0 || pendingInvitations.length > 0) ? (
-          <Alert variant="danger">{pageError}</Alert>
-        ) : null}
+        {pageError ? <Alert variant="danger">{pageError}</Alert> : null}
 
         {loading ? <LoadingState label="Loading staff directory…" /> : null}
 
-        {!loading && pageError && staff.length === 0 && pendingInvitations.length === 0 ? (
-          <div className="space-y-3">
-            <Alert variant="danger">{pageError}</Alert>
-            <SCButton variant="outline" onClick={() => void loadDirectory()}>
-              Try again
-            </SCButton>
-          </div>
-        ) : null}
-
-        {!loading && !(pageError && staff.length === 0 && pendingInvitations.length === 0) ? (
+        {!loading ? (
           <>
             <SettingsTable
               title="Active staff"
@@ -282,6 +259,10 @@ export function StaffDirectoryContent() {
                           {busyKey === `role:${member.user_id}` ? 'Saving…' : 'Save role'}
                         </SCButton>
                       </div>
+                    </div>
+                    <div>
+                      <span className={tableStyles.cellLabel}>Status</span>
+                      <SCBadge tone="success">Active</SCBadge>
                     </div>
                     <div>
                       <span className={tableStyles.cellLabel}>Actions</span>
@@ -356,22 +337,11 @@ export function StaffDirectoryContent() {
 
       <Modal
         open={inviteOpen}
-        onClose={() => {
-          if (busyKey === 'invite') return;
-          setInviteOpen(false);
-          setInviteError(null);
-        }}
+        onClose={() => setInviteOpen(false)}
         title="Invite staff member"
         footer={
           <>
-            <SCButton
-              variant="ghost"
-              onClick={() => {
-                setInviteOpen(false);
-                setInviteError(null);
-              }}
-              disabled={busyKey === 'invite'}
-            >
+            <SCButton variant="ghost" onClick={() => setInviteOpen(false)} disabled={busyKey === 'invite'}>
               Cancel
             </SCButton>
             <SCButton variant="primarySm" type="submit" form="staff-invite-form" disabled={busyKey === 'invite'}>
@@ -381,7 +351,6 @@ export function StaffDirectoryContent() {
         }
       >
         <form id="staff-invite-form" className="space-y-4" onSubmit={handleInviteSubmit}>
-          {inviteError ? <Alert variant="danger">{inviteError}</Alert> : null}
           <div>
             <label className="mb-2 block text-sm font-medium text-[var(--sc-text-primary)]" htmlFor="invite-email">
               Work email
@@ -416,27 +385,27 @@ export function StaffDirectoryContent() {
         </form>
       </Modal>
 
-      <ConfirmDialog
+      <Modal
         open={Boolean(confirmAction)}
+        onClose={() => setConfirmAction(null)}
         title={confirmAction?.kind === 'revoke' ? 'Revoke invitation' : 'Remove staff access'}
-        body={
-          confirmAction?.kind === 'revoke'
-            ? `Revoke the invitation for ${confirmAction.invitation.email}? They will need a new invitation to join this clinic.`
-            : `Remove access for ${
-                confirmAction?.member.name ||
-                confirmAction?.member.email ||
-                'this user'
-              }? They will no longer be able to use this clinic in SignalCare.`
+        footer={
+          <>
+            <SCButton variant="ghost" onClick={() => setConfirmAction(null)}>
+              Cancel
+            </SCButton>
+            <SCButton variant="primarySm" onClick={() => void handleConfirm()}>
+              Confirm
+            </SCButton>
+          </>
         }
-        confirmLabel={confirmAction?.kind === 'revoke' ? 'Revoke invitation' : 'Remove access'}
-        loading={Boolean(busyKey?.startsWith('revoke:') || busyKey?.startsWith('remove:'))}
-        destructive
-        onCancel={() => {
-          if (busyKey) return;
-          setConfirmAction(null);
-        }}
-        onConfirm={() => void handleConfirm()}
-      />
+      >
+        <p className="text-sm leading-relaxed text-[var(--sc-text-secondary)]">
+          {confirmAction?.kind === 'revoke'
+            ? `Revoke the invitation for ${confirmAction.invitation.email}? They will need a new invitation to join this clinic.`
+            : `Remove access for ${confirmAction?.member.name}? They will no longer be able to use this clinic in SignalCare.`}
+        </p>
+      </Modal>
     </SettingsPage>
   );
 }

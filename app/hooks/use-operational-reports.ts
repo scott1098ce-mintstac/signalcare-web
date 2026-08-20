@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { appApiFetch } from '../lib/api';
-import { humanizeError, logInternalError } from '../lib/user-facing-errors';
 import type { ReportsAnalyticsData } from '../lib/types';
 
 const EMPTY_REPORTS: ReportsAnalyticsData = {
@@ -18,7 +17,6 @@ const EMPTY_REPORTS: ReportsAnalyticsData = {
   checkinCompletionRate30d: null,
   weeklyTrends: null,
   protocolPerformance: [],
-  highRiskQueue: [],
   sinceIso: null,
   asOf: null,
 };
@@ -51,7 +49,6 @@ function parseReportsResponse(json: Record<string, unknown>): ReportsAnalyticsDa
     weeklyTrends: (json.weekly_trends as ReportsAnalyticsData['weeklyTrends']) ?? null,
     protocolPerformance:
       (json.protocol_performance as ReportsAnalyticsData['protocolPerformance']) ?? [],
-    highRiskQueue: (json.high_risk_queue as ReportsAnalyticsData['highRiskQueue']) ?? [],
     sinceIso: typeof json.since_iso === 'string' ? json.since_iso : null,
     asOf: typeof json.as_of === 'string' ? json.as_of : null,
   };
@@ -82,15 +79,14 @@ export function useOperationalReports({ enabled }: UseOperationalReportsOptions)
 
       const analyticsJson = await analyticsRes.json();
       if (!analyticsRes.ok) {
-        setError(humanizeError(analyticsJson.error || analyticsRes.statusText, humanizeError('reports_load_failed')));
+        setError(String(analyticsJson.error || analyticsRes.statusText));
         setData(EMPTY_REPORTS);
         return;
       }
 
       setData(parseReportsResponse(analyticsJson));
     } catch (e) {
-      logInternalError('useOperationalReports.refresh', e);
-      setError(humanizeError(e, humanizeError('reports_load_failed')));
+      setError(e instanceof Error ? e.message : 'Failed to load reports');
       setData(EMPTY_REPORTS);
     } finally {
       setLoading(false);

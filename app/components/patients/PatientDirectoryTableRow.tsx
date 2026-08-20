@@ -7,9 +7,11 @@ import tableStyles from '../design-system/data/SCTable.module.css';
 import { cn } from '../../lib/cn';
 import {
   assignedClinicianLabel,
+  isClinicianUnassigned,
   isClinicianMuted,
   lastActivityLabel,
   monitoringProgressLabel,
+  monitoringProgressPercent,
   monitoringStatusLabel,
   monitoringStatusTone,
   patientSecondaryIdentity,
@@ -21,30 +23,23 @@ import styles from './patients.module.css';
 export type PatientDirectoryTableRowProps = {
   row: MonitoringRow;
   secondaryIdentityByEnrolment?: Record<string, string>;
-  onStartMonitoring?: (row: MonitoringRow) => void;
-  canStartMonitoring?: boolean;
 };
 
-/** Single patient row with Start Monitoring + workspace actions. */
+/** Single patient row with workspace action. */
 export function PatientDirectoryTableRow({
   row,
   secondaryIdentityByEnrolment,
-  onStartMonitoring,
-  canStartMonitoring = true,
 }: PatientDirectoryTableRowProps) {
   const router = useRouter();
+  const progress = monitoringProgressPercent(row);
   const workspaceHref = `/enrolments/${row.enrolment_id}`;
   const clinician = assignedClinicianLabel(row);
-  const patientName = row.patient_name?.trim() || '—';
-  const progressLabel = monitoringProgressLabel(row);
 
   return (
     <div className={cn(tableStyles.row, styles.directoryRow)}>
       <div>
         <span className={tableStyles.cellLabel}>Patient</span>
-        <div className={styles.patientName} title={patientName}>
-          {patientName}
-        </div>
+        <div className={tableStyles.cellPrimary}>{row.patient_name ?? '—'}</div>
         <div className={styles.patientSecondary}>
           {patientSecondaryIdentity(row, secondaryIdentityByEnrolment)}
         </div>
@@ -60,7 +55,7 @@ export function PatientDirectoryTableRow({
         </SCStatusPill>
       </div>
       <div className={styles.badgeCell}>
-        <span className={tableStyles.cellLabel}>Recovery score</span>
+        <span className={tableStyles.cellLabel}>Risk</span>
         <SCStatusPill tone={riskLevelTone(row.risk_level)}>
           {riskLevelLabel(row.risk_level)}
         </SCStatusPill>
@@ -83,28 +78,21 @@ export function PatientDirectoryTableRow({
       <div>
         <span className={tableStyles.cellLabel}>Recovery progress</span>
         <div className={styles.progressCell}>
-          <span className={styles.progressLabel}>{progressLabel}</span>
+          <span className={styles.progressLabel}>{monitoringProgressLabel(row)}</span>
+          <div className={styles.progressTrack} aria-hidden>
+            <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+          </div>
+          <span className={styles.progressPercent}>{progress}%</span>
         </div>
       </div>
-      <div className={cn(tableStyles.cellAction, styles.rowAction)}>
-        <div className={styles.rowActionGroup}>
-          {canStartMonitoring && onStartMonitoring ? (
-            <SCButton
-              variant="primary"
-              className={styles.rowActionButton}
-              onClick={() => onStartMonitoring(row)}
-            >
-              Start Monitoring
-            </SCButton>
-          ) : null}
-          <SCButton
-            variant="outline"
-            className={styles.rowActionButton}
-            onClick={() => router.push(workspaceHref)}
-          >
-            View Workspace
-          </SCButton>
-        </div>
+      <div className={tableStyles.cellAction}>
+        <SCButton
+          variant="outline"
+          className={styles.rowActionButton}
+          onClick={() => router.push(workspaceHref)}
+        >
+          View Workspace
+        </SCButton>
       </div>
     </div>
   );

@@ -1,17 +1,14 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ForgotPasswordScreen } from '../../../components/auth-onboarding-visual/ForgotPasswordScreen';
 import { getPasswordRecoverySendErrorMessage } from '../../../lib/password-recovery-errors';
 import { supabase } from '../../../lib/supabase';
-import { LoadingState } from '../../../components/ui';
 
-function ForgotPasswordPageInner() {
+export default function ForgotPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialEmail = (searchParams.get('email') || '').trim();
-  const [email, setEmail] = useState(initialEmail);
+  const [email, setEmail] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -48,13 +45,5 @@ function ForgotPasswordPageInner() {
       onEmailChange={setEmail}
       onSubmit={handleSubmit}
     />
-  );
-}
-
-export default function ForgotPasswordPage() {
-  return (
-    <Suspense fallback={<LoadingState label="Loading…" />}>
-      <ForgotPasswordPageInner />
-    </Suspense>
   );
 }

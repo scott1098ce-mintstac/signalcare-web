@@ -9,32 +9,34 @@ import {
   fetchClinicProtocols,
   fetchProtocolTemplates,
   filterClinicOwnedProtocols,
+  formatCurrentVersion,
   formatProcedureType,
+  formatProtocolDate,
   type ClinicProtocol,
   type ProtocolTemplate,
 } from '../../lib/protocol-types';
 import {
-  ProtocolLibraryOperationalRow,
   ProtocolLibraryRow,
   ProtocolLibrarySection,
   UseTemplateButton,
 } from '../../components/ProtocolLibrarySection';
-import { ProtocolLibraryHeader } from '../../components/protocol-library/ProtocolLibraryHeader';
-import {
-  MY_PROTOCOLS_COLUMNS,
-  TEMPLATE_COLUMNS,
-  presentProtocolLibraryRow,
-} from '../../components/protocol-library/protocol-library-v2-model';
 import { UseTemplateModal } from '../../components/UseTemplateModal';
-import { humanizeError, logInternalError } from '../../lib/user-facing-errors';
 import styles from '../../components/protocol-library/protocol-library.module.css';
 
-const MY_COLUMNS = MY_PROTOCOLS_COLUMNS.filter(
-  (column) => column.key !== 'owner' && column.key !== 'health',
-);
-const MY_GRID =
-  'minmax(11rem, 1.6fr) minmax(6.5rem, 1fr) minmax(4.5rem, 0.7fr) minmax(5rem, 0.75fr) minmax(5rem, 0.75fr) minmax(6rem, 0.9fr)';
-const TMPL_COLUMNS = [...TEMPLATE_COLUMNS];
+const MY_COLUMNS = [
+  { key: 'name', label: 'Protocol name' },
+  { key: 'procedure', label: 'Procedure type' },
+  { key: 'version', label: 'Current version' },
+  { key: 'updated', label: 'Updated' },
+];
+
+const TEMPLATE_COLUMNS = [
+  { key: 'name', label: 'Template name' },
+  { key: 'procedure', label: 'Procedure type' },
+  { key: 'version', label: 'Version' },
+  { key: 'steps', label: 'Step count' },
+  { key: 'action', label: '' },
+];
 
 export default function ProtocolLibraryPage() {
   const router = useRouter();
@@ -72,15 +74,13 @@ export default function ProtocolLibraryPage() {
       }
 
       if (!protocolsResult.ok) {
-        setErrMy(humanizeError(protocolsResult.error, 'We couldn’t load protocols. Please try again.'));
+        setErrMy(protocolsResult.error || 'Failed to load protocols');
         setMyProtocols([]);
         return;
       }
 
       if (!templatesResult.ok) {
-        setErrTemplates(
-          humanizeError(templatesResult.error, 'We couldn’t load protocol templates. Please try again.'),
-        );
+        setErrTemplates(templatesResult.error || 'Failed to load templates');
         setTemplates([]);
       } else {
         setTemplates(templatesResult.templates);
@@ -91,8 +91,7 @@ export default function ProtocolLibraryPage() {
       );
       setMyProtocols(filterClinicOwnedProtocols(protocolsResult.protocols, templateIds));
     } catch (e) {
-      logInternalError('protocols.loadMyProtocols', e);
-      setErrMy(humanizeError(e, 'We couldn’t load protocols. Please try again.'));
+      setErrMy(e instanceof Error ? e.message : 'Failed to load protocols');
       setMyProtocols([]);
     } finally {
       setLoadingMy(false);
@@ -114,16 +113,13 @@ export default function ProtocolLibraryPage() {
         return;
       }
       if (!result.ok) {
-        setErrTemplates(
-          humanizeError(result.error, 'We couldn’t load protocol templates. Please try again.'),
-        );
+        setErrTemplates(result.error || 'Failed to load templates');
         setTemplates([]);
         return;
       }
       setTemplates(result.templates);
     } catch (e) {
-      logInternalError('protocols.loadTemplates', e);
-      setErrTemplates(humanizeError(e, 'We couldn’t load protocol templates. Please try again.'));
+      setErrTemplates(e instanceof Error ? e.message : 'Failed to load templates');
       setTemplates([]);
     } finally {
       setLoadingTemplates(false);
@@ -163,14 +159,14 @@ export default function ProtocolLibraryPage() {
 
   return (
     <div className={styles.page} data-node-id="protocol-library-page">
-      <ProtocolLibraryHeader />
+      <p className={styles.pageIntro}>
+        Manage clinic-owned monitoring protocols and create new ones from SignalCare templates.
+      </p>
 
       <ProtocolLibrarySection
         title="My Protocols"
-        description="Your clinic’s active monitoring protocols — open one to improve and publish."
+        description="Protocols owned by your clinic. These are used when enrolling patients for recovery monitoring."
         columns={MY_COLUMNS}
-        gridTemplateColumns={MY_GRID}
-        prominence="primary"
         emptyTitle="No clinic protocols yet"
         emptyDescription="Use a SignalCare template below to create your first protocol."
         loading={loadingMy}
@@ -178,30 +174,23 @@ export default function ProtocolLibraryPage() {
         isEmpty={!loadingMy && !errMy && sortedMyProtocols.length === 0}
         dataNodeId="protocol-library-my-protocols"
       >
-        {sortedMyProtocols.map((p) => {
-          const row = presentProtocolLibraryRow(p);
-          return (
-            <ProtocolLibraryOperationalRow
-              key={p.id}
-              columns={MY_COLUMNS}
-              gridTemplateColumns={MY_GRID}
-              href={`/protocols/${p.id}`}
-              name={p.name ?? '—'}
-              procedureType={formatProcedureType(p.procedure_type)}
-              status={row.status}
-              currentVersion={row.currentVersion}
-              draft={row.draft}
-              lastPublished={row.lastPublished}
-            />
-          );
-        })}
+        {sortedMyProtocols.map((p) => (
+          <ProtocolLibraryRow
+            key={p.id}
+            columns={MY_COLUMNS}
+            href={`/protocols/${p.id}`}
+            name={p.name ?? '—'}
+            procedureType={formatProcedureType(p.procedure_type)}
+            version={formatCurrentVersion(p)}
+            meta={formatProtocolDate(p.updated_at)}
+          />
+        ))}
       </ProtocolLibrarySection>
 
       <ProtocolLibrarySection
         title="SignalCare Templates"
-        description="Start from a SignalCare standard when adding a new clinic protocol."
-        columns={TMPL_COLUMNS}
-        prominence="secondary"
+        description="Standard monitoring protocols maintained by SignalCare. Clone a template to add it to My Protocols."
+        columns={TEMPLATE_COLUMNS}
         emptyTitle="No templates available"
         loading={loadingTemplates}
         error={errTemplates}
@@ -217,7 +206,7 @@ export default function ProtocolLibraryPage() {
           return (
             <ProtocolLibraryRow
               key={t.id}
-              columns={TMPL_COLUMNS}
+              columns={TEMPLATE_COLUMNS}
               name={t.name ?? '—'}
               procedureType={formatProcedureType(t.procedure_type)}
               version={versionLabel}

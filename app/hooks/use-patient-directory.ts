@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { appApiFetch } from '../lib/api';
-import { humanizeError, logInternalError } from '../lib/user-facing-errors';
 import type { PatientDirectoryFacets, PatientDirectoryRow } from '../lib/types';
 import type { PatientDirectoryFilters, PatientDirectorySort } from '../components/patients/patients-presentation';
 
@@ -111,12 +110,7 @@ export function usePatientDirectory({
 
       const json = await res.json();
       if (!res.ok) {
-        setError(
-          humanizeError(
-            json.error || res.statusText || 'patients_load_failed',
-            humanizeError('patients_load_failed'),
-          ),
-        );
+        setError(String(json.error || res.statusText || 'Failed to load patients'));
         setRows([]);
         setTotalCount(0);
         setActiveCount(0);
@@ -134,8 +128,7 @@ export function usePatientDirectory({
       setIsTruncated(Boolean(json.is_truncated));
       setCanEnrol(json.permissions?.can_enrol_patient !== false);
     } catch (e) {
-      logInternalError('usePatientDirectory.refresh', e);
-      setError(humanizeError(e, humanizeError('patients_load_failed')));
+      setError(e instanceof Error ? e.message : 'Failed to load patients');
       setRows([]);
       setTotalCount(0);
       setActiveCount(0);
@@ -143,7 +136,7 @@ export function usePatientDirectory({
     } finally {
       setLoading(false);
     }
-  }, [router, queryString]);
+  }, [router, queryString, refreshSignal]);
 
   useEffect(() => {
     if (!enabled) {
@@ -151,7 +144,7 @@ export function usePatientDirectory({
       return;
     }
     void refresh();
-  }, [enabled, refresh, refreshSignal]);
+  }, [enabled, refresh]);
 
   const isSearchPending = filters.search !== debouncedSearch;
 
@@ -163,8 +156,7 @@ export function usePatientDirectory({
     showingFrom,
     showingTo,
     facets,
-    loading,
-    isSearchPending,
+    loading: loading || isSearchPending,
     error,
     isForbidden,
     isTruncated,

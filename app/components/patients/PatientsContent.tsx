@@ -5,7 +5,6 @@ import type { MonitoringRow, PatientDirectoryFacets } from '../../lib/types';
 import { usePatientDirectory } from '../../hooks/use-patient-directory';
 import { sortQueueRows } from '../../lib/command-queue';
 import { SCButton, SCTable } from '../design-system';
-import { IconAdd } from '../design-system/icons';
 import {
   DEFAULT_PATIENT_DIRECTORY_FILTERS,
   filterPatientDirectory,
@@ -20,7 +19,7 @@ const DIRECTORY_COLUMNS = [
   { key: 'patient', label: 'Patient' },
   { key: 'procedure', label: 'Procedure' },
   { key: 'status', label: 'Monitoring status' },
-  { key: 'risk', label: 'Recovery score' },
+  { key: 'risk', label: 'Risk' },
   { key: 'clinician', label: 'Assigned clinician' },
   { key: 'activity', label: 'Last activity' },
   { key: 'progress', label: 'Recovery progress' },
@@ -42,14 +41,12 @@ export type PatientsContentProps = {
   facets?: PatientDirectoryFacets;
   onRetry?: () => void;
   onEnroll?: () => void;
-  onStartMonitoring?: (row: MonitoringRow) => void;
   onPageChange?: (page: number) => void;
   refreshSignal?: number;
   initialFilters?: Partial<PatientDirectoryFilters>;
   searchDisabled?: boolean;
   filtersDisabled?: boolean;
   showEnrollAction?: boolean;
-  showNewPatientAction?: boolean;
   canEnrol?: boolean;
   secondaryIdentityByEnrolment?: Record<string, string>;
   emptyTitle?: string;
@@ -75,14 +72,12 @@ export function PatientsContent({
   facets: facetsOverride,
   onRetry,
   onEnroll,
-  onStartMonitoring,
   onPageChange,
   refreshSignal = 0,
   initialFilters,
   searchDisabled = false,
   filtersDisabled = false,
   showEnrollAction = true,
-  showNewPatientAction = true,
   canEnrol = true,
   secondaryIdentityByEnrolment,
   emptyTitle = 'No patients enrolled',
@@ -171,18 +166,6 @@ export function PatientsContent({
   const showPagination =
     !loading && !error && (useServer ? resolvedTotalCount > 25 : filteredRows.length > 25);
 
-  const showNewPatient =
-    (showNewPatientAction || showEnrollAction) &&
-    canEnrolResolved &&
-    !isForbidden &&
-    Boolean(onEnroll);
-  const showStartMonitoring =
-    canEnrolResolved && !isForbidden && Boolean(onStartMonitoring);
-
-  const tableTitle = loading
-    ? 'Patients'
-    : `Patients (${resolvedTotalCount.toLocaleString()})`;
-
   const handlePageChange = (nextPage: number) => {
     if (onPageChange) onPageChange(nextPage);
     else setPage(nextPage);
@@ -191,8 +174,8 @@ export function PatientsContent({
   return (
     <div className={styles.page} data-node-id="patient-directory">
       <p className={styles.pageIntro}>
-        Operational index of patients enrolled on a monitoring protocol — locate a patient, see
-        monitoring status and recovery progress, and open their workspace.
+        Clinical monitoring directory for enrolled patients — search, filter, and open individual
+        recovery workspaces.
       </p>
 
       <div className={styles.summaryRow} aria-label="Directory summary">
@@ -222,8 +205,10 @@ export function PatientsContent({
         facets={facets}
         sort={sort}
         sortDir={sortDir}
-        searchDisabled={searchDisabled || isForbidden}
-        filtersDisabled={filtersDisabled || isForbidden}
+        searchDisabled={searchDisabled || loading}
+        filtersDisabled={filtersDisabled || loading || Boolean(error)}
+        showEnrollAction={showEnrollAction && canEnrolResolved && !isForbidden}
+        onEnroll={onEnroll}
         onFiltersChange={(next) => {
           setFilters(next);
           setPage(1);
@@ -245,20 +230,8 @@ export function PatientsContent({
 
       <SCTable
         className={styles.directoryTable}
-        title={tableTitle}
-        description="Search the clinic registry, review monitoring status, and open individual recovery workspaces."
-        toolbarAside={
-          showNewPatient ? (
-            <SCButton
-              variant="primary"
-              className={styles.tableEnrollButton}
-              icon={<IconAdd />}
-              onClick={onEnroll}
-            >
-              New Patient
-            </SCButton>
-          ) : null
-        }
+        title="Enrolled patients"
+        description="Patients currently under post-procedure recovery monitoring at this clinic."
         columns={DIRECTORY_COLUMNS}
         loading={loading}
         error={error}
@@ -272,10 +245,6 @@ export function PatientsContent({
             key={row.enrolment_id}
             row={row}
             secondaryIdentityByEnrolment={secondaryIdentityByEnrolment}
-            onStartMonitoring={onStartMonitoring}
-            canStartMonitoring={
-              showStartMonitoring && row.is_active_or_monitoring === false
-            }
           />
         ))}
       </SCTable>
