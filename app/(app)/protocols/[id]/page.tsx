@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getAppSession } from '../../../lib/clinic';
 import { appApiFetch } from '../../../lib/api';
@@ -14,16 +14,14 @@ import {
   formatProtocolDate,
   formatProtocolTiming,
 } from '../../../lib/protocol-types';
-import {
-  formatJourneyCheckHeading,
-  formatJourneyMilestone,
-  formatJourneyPurpose,
-  formatProtocolPurpose,
-} from '../../../components/protocol-editor/protocol-editor-journey';
-import { ProtocolEditorV3 } from '../../../components/protocol-editor-v3';
+import { ProtocolEditorBanners } from '../../../components/protocol-editor/ProtocolEditorBanners';
+import { ProtocolEditorStepDetail, ProtocolEditorStepEmpty } from '../../../components/protocol-editor/ProtocolEditorStepDetail';
+import { ProtocolEditorStepList } from '../../../components/protocol-editor/ProtocolEditorStepList';
+import { ProtocolEditorToolbar } from '../../../components/protocol-editor/ProtocolEditorToolbar';
+import { ProtocolVersionHistorySection } from '../../../components/protocol-editor/ProtocolVersionHistorySection';
 import { SCButton } from '../../../components/design-system';
 import { Alert, LoadingState, Modal } from '../../../components/ui';
-import styles from '../../../components/protocol-editor-v3/protocol-editor-v3.module.css';
+import styles from '../../../components/protocol-editor/protocol-editor.module.css';
 
 type ProtocolDetail = {
   id: string;
@@ -117,6 +115,11 @@ type EditableStepField =
   | 'responseWindowMinutes'
   | 'expectedSymptomsText'
   | 'escalationWeight';
+
+function formatReadonly(v: string | number | boolean | null | undefined): string {
+  if (v === null || v === undefined || v === '') return '—';
+  return String(v);
+}
 
 function symptomsToTextarea(value: string[] | null | undefined): string {
   if (!value?.length) return '';
@@ -259,8 +262,6 @@ export default function ProtocolDetailPage() {
   const [versionHistoryLoading, setVersionHistoryLoading] = useState(true);
   const [versionHistoryError, setVersionHistoryError] = useState<string | null>(null);
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
-  /** Prevents overlapping load() runs from applying a stale failure over a successful load. */
-  const loadRequestIdRef = useRef(0);
 
   const anyDirty = stepEditors.some(stepIsDirty);
   const anySaving = stepEditors.some((s) => s.isSaving);
@@ -281,11 +282,8 @@ export default function ProtocolDetailPage() {
   }, [protocolId, router]);
 
   const loadStepsForVersion = useCallback(
-    async (versionId: string, requestId?: number) => {
-      const isStale = () => requestId != null && requestId !== loadRequestIdRef.current;
-
+    async (versionId: string) => {
       const stepsRes = await appApiFetch(`/app/protocols/${protocolId}/versions/${versionId}/steps`);
-      if (isStale()) return false;
       if (stepsRes.status === 401) {
         router.replace('/auth/signin');
         return false;
@@ -297,13 +295,11 @@ export default function ProtocolDetailPage() {
       }
       if (!stepsRes.ok) {
         const sj = await stepsRes.json().catch(() => ({}));
-        if (isStale()) return false;
         setErr(typeof sj.error === 'string' ? sj.error : stepsRes.statusText);
         setStepEditors([]);
         return false;
       }
       const sj = await stepsRes.json();
-      if (isStale()) return false;
       const rows = (sj.steps || []) as ApiStepRow[];
       setStepEditors(rows.map(apiRowToEditor));
       return true;
@@ -356,9 +352,6 @@ export default function ProtocolDetailPage() {
       setLoading(false);
       return;
     }
-    const requestId = ++loadRequestIdRef.current;
-    const isStale = () => requestId !== loadRequestIdRef.current;
-
     setLoading(true);
     setErr(null);
     setPublishError(null);
@@ -371,7 +364,7 @@ export default function ProtocolDetailPage() {
       }
 
       if (!canViewProtocols(session.role)) {
-        if (!isStale()) setAccessDenied(true);
+        setAccessDenied(true);
         return;
       }
 
@@ -379,7 +372,6 @@ export default function ProtocolDetailPage() {
         appApiFetch(`/app/protocols/${protocolId}`),
         fetchVersionHistory(),
       ]);
-      if (isStale()) return;
       if (detailOut.status === 401) {
         router.replace('/auth/signin');
         return;
@@ -393,7 +385,6 @@ export default function ProtocolDetailPage() {
       }
       if (!detailOut.ok) {
         const dj = await detailOut.json().catch(() => ({}));
-        if (isStale()) return;
         setErr(typeof dj.error === 'string' ? dj.error : detailOut.statusText);
         setProtocolMeta(null);
         setDraftVersion(null);
@@ -402,7 +393,6 @@ export default function ProtocolDetailPage() {
       }
 
       const dj = await detailOut.json();
-      if (isStale()) return;
       const protocol = dj.protocol as ProtocolDetail | undefined;
       if (!protocol?.id) {
         setErr('protocol_not_found');
@@ -419,31 +409,25 @@ export default function ProtocolDetailPage() {
           version_number: protocol.current_draft_version.version_number,
           status: 'draft',
         });
-        const stepsOk = await loadStepsForVersion(protocol.current_draft_version.id, requestId);
-        if (!stepsOk || isStale()) return;
-        setErr(null);
+        const stepsOk = await loadStepsForVersion(protocol.current_draft_version.id);
+        if (!stepsOk) return;
         return;
       }
 
       setDraftVersion(null);
       if (protocol.latest_published_version?.id) {
-        const stepsOk = await loadStepsForVersion(protocol.latest_published_version.id, requestId);
-        if (!stepsOk || isStale()) return;
-        setErr(null);
+        const stepsOk = await loadStepsForVersion(protocol.latest_published_version.id);
+        if (!stepsOk) return;
         return;
       }
 
-      if (isStale()) return;
       setStepEditors([]);
       setErr('no_published_version');
     } catch (e) {
-      if (isStale()) return;
-      const raw = e instanceof Error ? e.message : 'Failed to load';
-      // Safari: TypeError "Load failed"; Chromium: "Failed to fetch"
-      setErr(raw === 'Load failed' || raw === 'Failed to fetch' ? 'Failed to load' : raw);
+      setErr(e instanceof Error ? e.message : 'Failed to load');
       setStepEditors([]);
     } finally {
-      if (!isStale()) setLoading(false);
+      setLoading(false);
     }
   }, [protocolId, router, loadStepsForVersion, fetchVersionHistory]);
 
@@ -715,45 +699,22 @@ export default function ProtocolDetailPage() {
             ? 'A protocol must have at least one active step before publishing.'
             : null;
 
-  const createDraftDisabledReason = !roleCanEdit
-    ? 'You do not have permission to create a draft.'
-    : loading
-      ? 'Loading protocol…'
-      : creatingDraft
-        ? 'Creating draft…'
-        : null;
-
-  const saveDraftDisabledReason = !draftVersion
-    ? null
-    : !roleCanEdit
-      ? 'You do not have permission to save this draft.'
-      : anySaving
-        ? 'Saving…'
-        : anyValidationError
-          ? 'Fix validation errors before saving.'
-          : !anyDirty
-            ? 'No unsaved changes.'
-            : null;
-
   const versionLabel = draftVersion
     ? `Draft v${draftVersion.version_number}`
     : liveVersionNumber != null
       ? `Published v${liveVersionNumber}`
       : 'No published version';
 
-  const procedureLabel = formatProcedureType(protocolMeta?.procedure_type);
-  const purpose = formatProtocolPurpose(procedureLabel);
-
-  const journeySteps = stepEditors.map((step) => {
+  const stepListItems = stepEditors.map((step) => {
     const dirty = stepIsDirty(step);
     const validationError = getStepValidationError(step);
     const status = getStepStatus(step, dirty, validationError);
-    const purposeFromLabel = step.stepLabel.trim();
 
     return {
       id: step.id,
-      timing: formatJourneyMilestone(step.offset_minutes),
-      purpose: purposeFromLabel || formatJourneyPurpose(step.offset_minutes),
+      stepOrder: formatReadonly(step.step_order),
+      label: step.stepLabel.trim() || `Step ${formatReadonly(step.step_order)}`,
+      timing: formatProtocolTiming(step.offset_minutes),
       statusLine: status.line,
       statusTone: status.tone,
     };
@@ -775,78 +736,83 @@ export default function ProtocolDetailPage() {
 
   const selectedInvalidField = selectedStep ? getInvalidField(selectedStep) : null;
 
-  const loadError =
-    err === 'no_published_version'
-      ? 'This protocol has no published version yet.'
-      : err;
-
-  const selectedStepView = selectedStep
-    ? {
-        id: selectedStep.id,
-        timing: formatProtocolTiming(selectedStep.offset_minutes),
-        heading: formatJourneyCheckHeading(selectedStep.offset_minutes),
-        statusLine: selectedStatus.line,
-        statusTone: selectedStatus.tone,
-        messageBodyOverride: selectedStep.messageBodyOverride,
-        expectedSymptomsText: selectedStep.expectedSymptomsText,
-        escalationWeight: selectedStep.escalationWeight,
-        stepLabel: selectedStep.stepLabel,
-        responseWindowMinutes: selectedStep.responseWindowMinutes,
-        messageTemplateCode: selectedStep.messageTemplateCode,
-        responseType: formatExpectedResponseType(selectedStep.expected_response_type),
-        scoringLines: formatScoringSnapshotDisplay(selectedStep.scoring_snapshot),
-        invalidField: selectedInvalidField,
-        canSave: selectedCanSave,
-      }
-    : null;
-
   return (
     <div className={styles.page}>
-      <ProtocolEditorV3
+      <ProtocolEditorToolbar
         title={title}
-        purpose={purpose}
+        procedureType={formatProcedureType(protocolMeta?.procedure_type)}
         versionLabel={versionLabel}
-        procedureLabel={procedureLabel}
-        checkpointCount={stepEditors.length}
-        hasDraft={Boolean(draftVersion)}
-        isLive={liveVersionNumber != null && !draftVersion}
-        lastEditedLabel={formatLastEditedLabel(protocolMeta?.updated_at)}
+        stepCount={stepEditors.length}
+        lastEditedLabel={formatLastEditedLabel(protocolMeta?.updated_at) ?? undefined}
+        isReadOnly={isReadOnly}
+        draftVersion={draftVersion}
+        liveVersionNumber={liveVersionNumber}
         canCreateDraft={canCreateDraft}
-        canSaveDraft={canSaveDraft}
         canPublish={canPublish}
+        canSaveDraft={canSaveDraft}
         creatingDraft={creatingDraft}
-        createDraftDisabledReason={createDraftDisabledReason}
-        saveDraftDisabledReason={saveDraftDisabledReason}
         publishDisabledReason={publishDisabledReason}
         createDraftError={createDraftError}
-        hasUnsavedChanges={anyDirty}
-        loadError={loadError}
-        isReadOnly={isReadOnly}
-        liveBannerVersion={isReadOnly ? liveVersionNumber : null}
-        publishSuccess={publishSuccess && !draftVersion ? publishSuccess : null}
-        publishErrorBanner={publishError && !publishModalOpen ? publishError : null}
-        journeySteps={journeySteps}
-        selectedStepId={selectedStepId}
-        selectedStep={selectedStepView}
-        versionHistoryLoading={versionHistoryLoading}
-        versionHistoryError={versionHistoryError}
-        versionHistoryRows={versionHistory}
-        formatDate={formatProtocolDate}
-        onSelectStep={setSelectedStepId}
         onCreateDraft={() => void createDraft()}
         onSaveDraft={() => void saveAllDirtySteps()}
         onPublishClick={() => {
           setPublishError(null);
           setPublishModalOpen(true);
         }}
-        onFieldChange={(field, value) => {
-          if (!selectedStep) return;
-          updateStepField(selectedStep.id, field, value);
-        }}
-        onSaveStep={() => {
-          if (!selectedStep) return;
-          void saveStep(selectedStep);
-        }}
+      />
+
+      <ProtocolEditorBanners
+        isReadOnly={isReadOnly}
+        liveVersionNumber={liveVersionNumber}
+        publishSuccess={publishSuccess && !draftVersion ? publishSuccess : null}
+        publishError={publishError}
+        publishModalOpen={publishModalOpen}
+      />
+
+      {err ? (
+        <Alert variant="danger">
+          {err === 'no_published_version' ? 'This protocol has no published version yet.' : err}
+        </Alert>
+      ) : (
+        <div className={styles.editorSplit}>
+          <ProtocolEditorStepList
+            steps={stepListItems}
+            selectedStepId={selectedStepId}
+            onSelectStep={setSelectedStepId}
+          />
+          <div className={styles.stepEditorPane}>
+            {selectedStep ? (
+              <ProtocolEditorStepDetail
+                stepOrder={formatReadonly(selectedStep.step_order)}
+                timing={formatProtocolTiming(selectedStep.offset_minutes)}
+                responseType={formatExpectedResponseType(selectedStep.expected_response_type)}
+                scoringLines={formatScoringSnapshotDisplay(selectedStep.scoring_snapshot)}
+                isReadOnly={isReadOnly}
+                stepLabel={selectedStep.stepLabel}
+                responseWindowMinutes={selectedStep.responseWindowMinutes}
+                expectedSymptomsText={selectedStep.expectedSymptomsText}
+                escalationWeight={selectedStep.escalationWeight}
+                messageBodyOverride={selectedStep.messageBodyOverride}
+                messageTemplateCode={selectedStep.messageTemplateCode}
+                statusLine={selectedStatus.line}
+                statusTone={selectedStatus.tone}
+                invalidField={selectedInvalidField}
+                canSave={selectedCanSave}
+                onFieldChange={(field, value) => updateStepField(selectedStep.id, field, value)}
+                onSave={() => void saveStep(selectedStep)}
+              />
+            ) : (
+              <ProtocolEditorStepEmpty />
+            )}
+          </div>
+        </div>
+      )}
+
+      <ProtocolVersionHistorySection
+        loading={versionHistoryLoading}
+        error={versionHistoryError}
+        rows={versionHistory}
+        formatDate={formatProtocolDate}
       />
 
       <Modal
