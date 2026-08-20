@@ -104,6 +104,14 @@ export type WorkspaceEvidence = {
     severity: string | null;
     created_at: string | null;
   } | null;
+  patient_media?: Array<{
+    id: string;
+    mime_type: string | null;
+    created_at: string | null;
+    stage_key: string | null;
+    accompanying_text: string | null;
+    source?: string | null;
+  }>;
 };
 
 export type WorkspaceTimelinePreviewItem = {
@@ -202,6 +210,14 @@ export type EnrolmentPageViewModel = {
     decision_snapshot: unknown;
   }>;
   interpretation: WorkspaceInterpretation | null;
+  patientMedia: Array<{
+    id: string;
+    mime_type: string | null;
+    created_at: string | null;
+    stage_key: string | null;
+    accompanying_text: string | null;
+    source?: string | null;
+  }>;
   alertId: string | null;
   latestReview: WorkspaceLatestReview | null;
   reviewRequired: boolean | null;

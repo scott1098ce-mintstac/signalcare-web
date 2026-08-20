@@ -185,6 +185,7 @@ export function mapWorkspaceToPageViewModel(
     },
     timelinePreview: workspace.timeline_preview ?? [],
     signals: mapEvidenceToSignalRows(enrolmentId, summary.patient_id, evidence),
+    patientMedia: evidence?.patient_media ?? [],
     interpretation,
     alertId: alert?.id ?? null,
     latestReview,
