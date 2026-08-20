@@ -43,7 +43,6 @@ import {
 import { ClinicalNotesSection } from './ClinicalNotesSection';
 import type { ClinicalNote } from '../../lib/types/clinical-notes';
 import styles from './patient-workspace.module.css';
-import { PatientMediaEvidence } from './PatientMediaEvidence';
 
 function clinicalVariant(status: MonitoringRow['v2_status']): SCClinicalContextVariant {
   if (status === 'stable') return 'stable';
@@ -110,13 +109,6 @@ export type PatientWorkspaceBodyProps = {
   onEditClinicalNote?: (noteId: string, body: string) => Promise<{ ok: boolean }>;
   onClinicalNotesChanged?: () => void;
   actions?: ReactNode;
-  patientMedia?: Array<{
-    id: string;
-    mime_type: string | null;
-    created_at: string | null;
-    stage_key: string | null;
-    accompanying_text: string | null;
-  }>;
   signals?: Array<{
     id: string;
     score: number | null;
@@ -153,7 +145,6 @@ export function PatientWorkspaceBody({
   onEditClinicalNote,
   onClinicalNotesChanged,
   actions,
-  patientMedia = [],
   signals = [],
   figmaLayout = false,
   evidenceConfig = null,
@@ -307,7 +298,6 @@ export function PatientWorkspaceBody({
 
   const belowFold = !hideBelowFold ? (
     <>
-      <PatientMediaEvidence items={patientMedia} />
       <SCWorkspaceTimeline items={timelineItems} loading={loadingTimeline} error={timelineError} />
 
       <ClinicalNotesSection

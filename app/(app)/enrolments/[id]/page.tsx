@@ -60,7 +60,6 @@ export default function EnrolmentDetailPage() {
   const [loadingTimeline, setLoadingTimeline] = useState(false);
   const [timelineError, setTimelineError] = useState<string | null>(null);
   const [signals, setSignals] = useState<EnrolmentPageViewModel['signals']>([]);
-  const [patientMedia, setPatientMedia] = useState<EnrolmentPageViewModel['patientMedia']>([]);
   const [interpretation, setInterpretation] = useState<WorkspaceInterpretation | null>(null);
   const [alertId, setAlertId] = useState<string | null>(null);
   const [latestReview, setLatestReview] = useState<WorkspaceLatestReview | null>(null);
@@ -135,7 +134,6 @@ export default function EnrolmentDetailPage() {
                 setSummary(null);
                 setAuditTimeline([]);
                 setSignals([]);
-            setPatientMedia([]);
                 setInterpretation(null);
                 setAlertId(null);
                 setLatestReview(null);
@@ -153,7 +151,6 @@ export default function EnrolmentDetailPage() {
 
           setSummary(view.summary);
           setSignals(view.signals);
-          setPatientMedia(view.patientMedia ?? []);
           setInterpretation(view.interpretation);
           setAlertId(view.alertId);
           setLatestReview(view.latestReview);
@@ -174,7 +171,6 @@ export default function EnrolmentDetailPage() {
             setSummary(null);
             setAuditTimeline([]);
             setSignals([]);
-            setPatientMedia([]);
             setInterpretation(null);
             setAlertId(null);
             setLatestReview(null);
@@ -422,7 +418,6 @@ export default function EnrolmentDetailPage() {
             onEditClinicalNote={reviseNote}
             onClinicalNotesChanged={() => void refreshTimelineAfterNotes()}
             signals={signals}
-            patientMedia={patientMedia}
             figmaLayout
             useFigmaIcons
             breadcrumb={
