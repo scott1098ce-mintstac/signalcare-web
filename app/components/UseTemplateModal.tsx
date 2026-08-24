@@ -63,7 +63,7 @@ export function UseTemplateModal({ template, onClose, onSuccess }: UseTemplateMo
       <form id="use-template-form" onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
         <p className="m-0 text-[length:var(--sc-text-sm)] leading-[var(--sc-line-body)] text-[var(--sc-text-secondary)]">
           Create a clinic-owned copy of <strong className="text-[var(--sc-text-primary)]">{template.name}</strong>.
-          You can rename it before adding it to My Protocols.
+          You can rename it before adding it to My Clinic Protocols.
         </p>
 
         <div>

@@ -164,7 +164,7 @@ export default function ProtocolLibraryPage() {
       </p>
 
       <ProtocolLibrarySection
-        title="My Protocols"
+        title="My Clinic Protocols"
         description="Protocols owned by your clinic. These are used when enrolling patients for recovery monitoring."
         columns={MY_COLUMNS}
         emptyTitle="No clinic protocols yet"
@@ -188,10 +188,11 @@ export default function ProtocolLibraryPage() {
       </ProtocolLibrarySection>
 
       <ProtocolLibrarySection
-        title="SignalCare Templates"
-        description="Standard monitoring protocols maintained by SignalCare. Clone a template to add it to My Protocols."
+        title="Starter Library"
+        description="SignalCare starter protocols for your clinic type. Use a template to create a clinic-owned copy."
         columns={TEMPLATE_COLUMNS}
-        emptyTitle="No templates available"
+        emptyTitle="No starter protocols available"
+        emptyDescription="Starter protocols appear here when SignalCare has published commercially ready content for your clinic type."
         loading={loadingTemplates}
         error={errTemplates}
         isEmpty={!loadingTemplates && !errTemplates && sortedTemplates.length === 0}

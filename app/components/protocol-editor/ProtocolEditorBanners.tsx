@@ -35,8 +35,8 @@ export function ProtocolEditorBanners({
       ) : null}
 
       <p className={styles.infoBanner}>
-        Clinics can edit wording only. Timing, scoring, response behaviour, and step structure are
-        locked by SignalCare.
+        Scoring, response type, and Conversation Engine behaviour stay locked by SignalCare. You
+        can edit clinic wording, stage timing, and whether a stage is optional.
       </p>
     </div>
   );

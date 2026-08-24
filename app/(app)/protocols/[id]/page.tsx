@@ -82,6 +82,7 @@ type ApiStepRow = {
   response_window_minutes: number | null;
   expected_symptoms: string[] | null;
   escalation_weight: number | null;
+  stage_optional?: boolean | null;
 };
 
 type StepEditorState = {
@@ -103,6 +104,10 @@ type StepEditorState = {
   expectedSymptomsText: string;
   originalEscalationWeight: string;
   escalationWeight: string;
+  originalOffsetMinutes: string;
+  offsetMinutes: string;
+  originalStageOptional: boolean;
+  stageOptional: boolean;
   isSaving: boolean;
   saveError: string | null;
   saveSuccess: boolean;
@@ -114,7 +119,9 @@ type EditableStepField =
   | 'stepLabel'
   | 'responseWindowMinutes'
   | 'expectedSymptomsText'
-  | 'escalationWeight';
+  | 'escalationWeight'
+  | 'offsetMinutes'
+  | 'stageOptional';
 
 function formatReadonly(v: string | number | boolean | null | undefined): string {
   if (v === null || v === undefined || v === '') return '—';
@@ -133,6 +140,8 @@ function apiRowToEditor(s: ApiStepRow): StepEditorState {
   const windowMinutes = s.response_window_minutes != null ? String(s.response_window_minutes) : '';
   const symptomsText = symptomsToTextarea(s.expected_symptoms);
   const weight = s.escalation_weight != null ? String(s.escalation_weight) : '';
+  const offsetMinutes = s.offset_minutes != null ? String(s.offset_minutes) : '';
+  const stageOptional = s.stage_optional === true;
 
   return {
     id: s.id,
@@ -153,6 +162,10 @@ function apiRowToEditor(s: ApiStepRow): StepEditorState {
     expectedSymptomsText: symptomsText,
     originalEscalationWeight: weight,
     escalationWeight: weight,
+    originalOffsetMinutes: offsetMinutes,
+    offsetMinutes,
+    originalStageOptional: stageOptional,
+    stageOptional,
     isSaving: false,
     saveError: null,
     saveSuccess: false,
@@ -166,7 +179,9 @@ function stepIsDirty(s: StepEditorState): boolean {
     s.stepLabel !== s.originalStepLabel ||
     s.responseWindowMinutes !== s.originalResponseWindowMinutes ||
     s.expectedSymptomsText !== s.originalExpectedSymptomsText ||
-    s.escalationWeight !== s.originalEscalationWeight
+    s.escalationWeight !== s.originalEscalationWeight ||
+    s.offsetMinutes !== s.originalOffsetMinutes ||
+    s.stageOptional !== s.originalStageOptional
   );
 }
 
@@ -208,17 +223,36 @@ function parseEscalationWeight(
   return { ok: true, value: n };
 }
 
+function parseOffsetMinutes(
+  value: string,
+): { ok: true; value: number } | { ok: false; error: string } {
+  const trimmed = value.trim();
+  if (trimmed === '') return { ok: false, error: 'Stage timing is required' };
+  const n = Number(trimmed);
+  if (!Number.isInteger(n) || n < 0 || n > 43200) {
+    return { ok: false, error: 'Stage timing must be a whole number of minutes between 0 and 43200' };
+  }
+  return { ok: true, value: n };
+}
+
 function getStepValidationError(step: StepEditorState): string | null {
+  const offsetResult = parseOffsetMinutes(step.offsetMinutes);
+  if (!offsetResult.ok) return offsetResult.error;
   const windowResult = parseResponseWindowMinutes(step.responseWindowMinutes);
   if (!windowResult.ok) return windowResult.error;
   const weightResult = parseEscalationWeight(step.escalationWeight);
   if (!weightResult.ok) return weightResult.error;
+  if (!step.messageBodyOverride.trim() && !step.messageTemplateCode.trim()) {
+    return 'A patient-facing message is required';
+  }
   return null;
 }
 
 function getInvalidField(
   step: StepEditorState,
-): 'responseWindowMinutes' | 'escalationWeight' | null {
+): 'responseWindowMinutes' | 'escalationWeight' | 'offsetMinutes' | null {
+  const offsetResult = parseOffsetMinutes(step.offsetMinutes);
+  if (!offsetResult.ok) return 'offsetMinutes';
   const windowResult = parseResponseWindowMinutes(step.responseWindowMinutes);
   if (!windowResult.ok) return 'responseWindowMinutes';
   const weightResult = parseEscalationWeight(step.escalationWeight);
@@ -227,11 +261,14 @@ function getInvalidField(
 }
 
 function buildPatchBody(step: StepEditorState) {
+  const offsetResult = parseOffsetMinutes(step.offsetMinutes);
   const windowResult = parseResponseWindowMinutes(step.responseWindowMinutes);
   const weightResult = parseEscalationWeight(step.escalationWeight);
-  if (!windowResult.ok || !weightResult.ok) return null;
+  if (!offsetResult.ok || !windowResult.ok || !weightResult.ok) return null;
 
   return {
+    offset_minutes: offsetResult.value,
+    stage_optional: step.stageOptional,
     message_body_override: trimOrNull(step.messageBodyOverride),
     message_template_code: trimOrNull(step.messageTemplateCode),
     step_label: trimOrNull(step.stepLabel),
@@ -262,6 +299,8 @@ export default function ProtocolDetailPage() {
   const [versionHistoryLoading, setVersionHistoryLoading] = useState(true);
   const [versionHistoryError, setVersionHistoryError] = useState<string | null>(null);
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
+  const [archiving, setArchiving] = useState(false);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
 
   const anyDirty = stepEditors.some(stepIsDirty);
   const anySaving = stepEditors.some((s) => s.isSaving);
@@ -494,8 +533,16 @@ export default function ProtocolDetailPage() {
         const apiError = typeof json.error === 'string' ? json.error : '';
         if (apiError === 'version_not_draft') {
           setPublishError('This version is no longer a draft.');
-        } else if (apiError === 'at_least_one_active_step_required') {
-          setPublishError('A protocol must have at least one active step before publishing.');
+        } else if (apiError === 'protocol_validation_failed') {
+          const details = Array.isArray(json.details)
+            ? json.details
+                .map((d: { message?: string }) => d.message)
+                .filter(Boolean)
+                .join(' ')
+            : '';
+          setPublishError(details || 'This draft is not ready to publish.');
+        } else if (apiError === 'at_least_one_active_step_required' || apiError === 'no_required_stages') {
+          setPublishError('A protocol must have at least one required monitoring stage before publishing.');
         } else {
           setPublishError('Could not publish draft.');
         }
@@ -514,6 +561,29 @@ export default function ProtocolDetailPage() {
       setPublishError('Could not publish draft.');
     } finally {
       setPublishing(false);
+    }
+  }
+
+  async function archiveProtocol() {
+    if (!protocolId || archiving) return;
+    setArchiving(true);
+    setArchiveError(null);
+    try {
+      const res = await appApiFetch(`/app/protocols/${protocolId}/archive`, { method: 'POST' });
+      if (res.status === 401) {
+        router.replace('/auth/signin');
+        return;
+      }
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setArchiveError(typeof json.error === 'string' ? json.error : 'Could not deactivate protocol.');
+        return;
+      }
+      await fetchProtocolDetail();
+    } catch {
+      setArchiveError('Could not deactivate protocol.');
+    } finally {
+      setArchiving(false);
     }
   }
 
@@ -539,13 +609,16 @@ export default function ProtocolDetailPage() {
     );
   }, [stepEditors]);
 
-  function updateStepField(id: string, field: EditableStepField, value: string) {
+  function updateStepField(id: string, field: EditableStepField, value: string | boolean) {
     setStepEditors((prev) =>
       prev.map((s) =>
         s.id === id
           ? {
               ...s,
               [field]: value,
+              ...(field === 'offsetMinutes' && typeof value === 'string'
+                ? { offset_minutes: Number(value) }
+                : {}),
               saveError: null,
               saveSuccess: false,
             }
@@ -670,8 +743,9 @@ export default function ProtocolDetailPage() {
   const role = getAppSession()?.role;
   const roleCanEdit = canEditProtocols(role);
   const roleCanPublish = canPublishProtocols(role);
-  const isReadOnly = !draftVersion || !roleCanEdit;
-  const canCreateDraft = roleCanEdit && !draftVersion && !creatingDraft && !loading;
+  const isOwned = protocolMeta?.is_owned !== false;
+  const isReadOnly = !draftVersion || !roleCanEdit || !isOwned;
+  const canCreateDraft = roleCanEdit && isOwned && !draftVersion && !creatingDraft && !loading;
   const canPublish =
     roleCanPublish &&
     Boolean(draftVersion?.id) &&
@@ -784,11 +858,17 @@ export default function ProtocolDetailPage() {
             {selectedStep ? (
               <ProtocolEditorStepDetail
                 stepOrder={formatReadonly(selectedStep.step_order)}
-                timing={formatProtocolTiming(selectedStep.offset_minutes)}
+                timing={formatProtocolTiming(
+                  Number.isFinite(Number(selectedStep.offsetMinutes))
+                    ? Number(selectedStep.offsetMinutes)
+                    : selectedStep.offset_minutes,
+                )}
                 responseType={formatExpectedResponseType(selectedStep.expected_response_type)}
                 scoringLines={formatScoringSnapshotDisplay(selectedStep.scoring_snapshot)}
                 isReadOnly={isReadOnly}
                 stepLabel={selectedStep.stepLabel}
+                offsetMinutes={selectedStep.offsetMinutes}
+                stageOptional={selectedStep.stageOptional}
                 responseWindowMinutes={selectedStep.responseWindowMinutes}
                 expectedSymptomsText={selectedStep.expectedSymptomsText}
                 escalationWeight={selectedStep.escalationWeight}
@@ -814,6 +894,23 @@ export default function ProtocolDetailPage() {
         rows={versionHistory}
         formatDate={formatProtocolDate}
       />
+
+      {roleCanPublish && isOwned && protocolMeta?.is_active !== false ? (
+        <div>
+          <SCButton
+            variant="secondary"
+            disabled={archiving}
+            onClick={() => void archiveProtocol()}
+          >
+            {archiving ? 'Deactivating…' : 'Deactivate protocol'}
+          </SCButton>
+          <p className={styles.sectionDescription}>
+            Deactivated protocols cannot be used for new enrolments. Patients already enrolled keep
+            their existing journey.
+          </p>
+          {archiveError ? <Alert variant="danger">{archiveError}</Alert> : null}
+        </div>
+      ) : null}
 
       <Modal
         open={publishModalOpen}

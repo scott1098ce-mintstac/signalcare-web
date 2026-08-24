@@ -193,14 +193,14 @@ export function isEnrolmentEligibleProtocol(
 }
 
 /**
- * One enrolment option per template lineage: prefer clinic clone when published, else global template.
+ * One enrolment option per template lineage: clinic-owned published clone only.
+ * Global templates are never enrolable.
  */
 export function buildEnrolmentProtocolOptions(
   templates: ProtocolTemplate[],
   protocols: ClinicProtocol[],
 ): ClinicProtocol[] {
   const byId = new Map(protocols.map((p) => [p.id, p]));
-  const templateIds = new Set(templates.map((t) => t.id));
   const options: ClinicProtocol[] = [];
   const usedIds = new Set<string>();
 
@@ -210,17 +210,11 @@ export function buildEnrolmentProtocolOptions(
     if (isEnrolmentEligibleProtocol(clone)) {
       options.push(clone);
       usedIds.add(clone.id);
-      continue;
-    }
-    const global = byId.get(template.id);
-    if (isEnrolmentEligibleProtocol(global)) {
-      options.push(global);
-      usedIds.add(global.id);
     }
   }
 
   for (const p of protocols) {
-    if (usedIds.has(p.id) || templateIds.has(p.id)) continue;
+    if (usedIds.has(p.id)) continue;
     if (isEnrolmentEligibleProtocol(p)) {
       options.push(p);
       usedIds.add(p.id);

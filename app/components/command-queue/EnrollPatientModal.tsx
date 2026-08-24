@@ -9,6 +9,7 @@ type ProtocolOption = {
   id: string;
   name: string;
   procedure_type: string | null;
+  is_active?: boolean;
   latest_published_version: { id: string } | null;
 };
 
@@ -47,7 +48,8 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
       .then((res) => res.json())
       .then((json) => {
         const list = (json.protocols ?? []).filter(
-          (p: ProtocolOption) => p.latest_published_version?.id,
+          (p: ProtocolOption) =>
+            p.latest_published_version?.id && p.is_active !== false,
         ) as ProtocolOption[];
         setProtocols(list);
         if (list.length > 0) {
@@ -239,6 +241,12 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
                   </option>
                 ))}
               </Select>
+              {!loadingProtocols && protocols.length === 0 ? (
+                <p className="mt-1 text-[length:var(--sc-text-xs)] text-[var(--sc-text-secondary)]">
+                  No published clinic protocols yet. Open Protocol Library and use a starter
+                  template first.
+                </p>
+              ) : null}
             </div>
             <div>
               <FieldLabel htmlFor="enroll-practitioner">Treating Practitioner</FieldLabel>

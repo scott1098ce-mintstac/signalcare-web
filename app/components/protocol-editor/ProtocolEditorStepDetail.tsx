@@ -1,6 +1,6 @@
 import type { ScoringDisplayLine } from '../../lib/protocol-display';
 import { SCButton, SCEmptyState } from '../design-system';
-import { IconAdd, IconLock } from '../design-system/icons';
+import { IconLock } from '../design-system/icons';
 import { FieldLabel, Input, Textarea } from '../ui';
 import { cn } from '../../lib/cn';
 import styles from './protocol-editor.module.css';
@@ -19,8 +19,10 @@ export type ProtocolEditorStepDetailProps = {
   messageTemplateCode: string;
   statusLine: string | null;
   statusTone: 'dirty' | 'saved' | 'saving' | 'error' | null;
-  invalidField?: 'responseWindowMinutes' | 'escalationWeight' | null;
+  invalidField?: 'responseWindowMinutes' | 'escalationWeight' | 'offsetMinutes' | null;
   canSave: boolean;
+  offsetMinutes: string;
+  stageOptional: boolean;
   onFieldChange: (
     field:
       | 'stepLabel'
@@ -28,8 +30,10 @@ export type ProtocolEditorStepDetailProps = {
       | 'expectedSymptomsText'
       | 'escalationWeight'
       | 'messageBodyOverride'
-      | 'messageTemplateCode',
-    value: string,
+      | 'messageTemplateCode'
+      | 'offsetMinutes'
+      | 'stageOptional',
+    value: string | boolean,
   ) => void;
   onSave: () => void;
 };
@@ -50,6 +54,8 @@ export function ProtocolEditorStepDetail({
   statusTone,
   invalidField = null,
   canSave,
+  offsetMinutes,
+  stageOptional,
   onFieldChange,
   onSave,
 }: ProtocolEditorStepDetailProps) {
@@ -131,6 +137,43 @@ export function ProtocolEditorStepDetail({
                 disabled={isReadOnly}
                 onChange={(e) => onFieldChange('stepLabel', e.target.value)}
               />
+            </div>
+
+            <div
+              className={cn(
+                styles.fieldGroup,
+                invalidField === 'offsetMinutes' && styles.fieldGroupInvalid,
+              )}
+            >
+              <FieldLabel htmlFor="offset-minutes">Timing (minutes after treatment)</FieldLabel>
+              <Input
+                id="offset-minutes"
+                type="number"
+                min={0}
+                step={1}
+                value={offsetMinutes}
+                readOnly={isReadOnly}
+                disabled={isReadOnly}
+                aria-invalid={invalidField === 'offsetMinutes'}
+                onChange={(e) => onFieldChange('offsetMinutes', e.target.value)}
+              />
+            </div>
+
+            <div className={styles.fieldGroup}>
+              <label htmlFor="stage-optional" className={styles.configLabel}>
+                <input
+                  id="stage-optional"
+                  type="checkbox"
+                  checked={stageOptional}
+                  disabled={isReadOnly}
+                  onChange={(e) => onFieldChange('stageOptional', e.target.checked)}
+                />{' '}
+                Optional stage
+              </label>
+              <p className={styles.sectionDescription}>
+                Optional stages remain on the published pathway but are not required for every
+                patient journey.
+              </p>
             </div>
 
             <div
