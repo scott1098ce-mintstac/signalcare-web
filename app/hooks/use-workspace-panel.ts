@@ -17,6 +17,7 @@ import { assignAlert } from '../lib/command-queue-actions';
 
 type WorkspacePanelData = {
   actions: WorkspaceActions | null;
+  enrolmentStatus: string | null;
   signals: ReturnType<typeof mapWorkspaceToPageViewModel>['signals'];
   interpretation: WorkspaceInterpretation | null;
   reviewNote: string | null;
@@ -72,6 +73,7 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
         const view = mapWorkspaceToPageViewModel(workspaceResult.data, enrolmentId);
         setWorkspaceData({
           actions: view.actions,
+          enrolmentStatus: view.summary.enrolment_status,
           signals: view.signals,
           interpretation: view.interpretation,
           reviewNote: view.latestReview?.review_note ?? null,

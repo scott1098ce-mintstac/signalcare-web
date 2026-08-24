@@ -160,6 +160,7 @@ export type FetchWorkspaceResult =
 /** View-model summary for enrolment detail — presentation and queue status kept separate. */
 export type EnrolmentPageSummary = {
   enrolment_id: string;
+  enrolment_status: string | null;
   patient_id: string;
   patient_name: string | null;
   patient_mobile: string | null;

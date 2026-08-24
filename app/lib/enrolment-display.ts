@@ -5,6 +5,7 @@ import type { EnrolmentPageSummary } from './workspace-types';
 export function enrolmentSummaryToMonitoringRow(summary: EnrolmentPageSummary): MonitoringRow {
   return {
     enrolment_id: summary.enrolment_id,
+    enrolment_status: summary.enrolment_status,
     patient_id: summary.patient_id,
     patient_name: summary.patient_name,
     patient_mobile: summary.patient_mobile,

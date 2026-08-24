@@ -78,6 +78,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     if (!selected) return null;
     return {
       ...selected,
+      enrolment_status: workspaceData?.enrolmentStatus ?? selected.enrolment_status,
       owned_by_user_id: workspaceData?.ownedByUserId ?? selected.owned_by_user_id,
       owned_at: workspaceData?.ownedAt ?? selected.owned_at,
       review_note: workspaceData?.reviewNote ?? selected.review_note,

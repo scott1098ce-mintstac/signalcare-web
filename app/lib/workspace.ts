@@ -150,6 +150,7 @@ export function mapWorkspaceToPageViewModel(
   return {
     summary: {
       enrolment_id: enrolmentId,
+      enrolment_status: summary.enrolment_status ?? null,
       patient_id: summary.patient_id ?? '',
       patient_name: summary.patient_name,
       patient_mobile: summary.patient_mobile ?? null,

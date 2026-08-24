@@ -206,25 +206,41 @@ export function clinicalQueueReason(row: MonitoringRow): string {
 
 /** 3. Current status */
 export function clinicalWorkflowStatus(row: MonitoringRow): string | null {
+  const completedPrefix =
+    row.enrolment_status === 'completed'
+      ? 'Patient journey completed · clinician work remains open'
+      : null;
+
+  let workflowStatus: string | null;
   switch (row.v2_status) {
     case 'alert_open':
-      return row.owned_by_user_id ? 'Under clinical review' : 'Awaiting clinician acknowledgement';
+      workflowStatus = row.owned_by_user_id
+        ? 'Under clinical review'
+        : 'Awaiting clinician acknowledgement';
+      break;
     case 'alert_acknowledged': {
       const who = row.acknowledged_by?.trim();
       const when = row.acknowledged_at ? formatRelativeAttempt(row.acknowledged_at) : null;
-      if (who && when) return `Alert acknowledged by ${who} · ${when}`;
-      if (who) return `Alert acknowledged by ${who}`;
-      return 'Alert acknowledged — awaiting resolution';
+      if (who && when) workflowStatus = `Alert acknowledged by ${who} · ${when}`;
+      else if (who) workflowStatus = `Alert acknowledged by ${who}`;
+      else workflowStatus = 'Alert acknowledged — awaiting resolution';
+      break;
     }
     case 'review_required':
-      return 'Under clinical review';
+      workflowStatus = 'Under clinical review';
+      break;
     case 'awaiting_response':
-      return 'Awaiting patient response';
+      workflowStatus = 'Awaiting patient response';
+      break;
     case 'stable':
-      return 'Stable monitoring — no action required';
+      workflowStatus = 'Stable monitoring — no action required';
+      break;
     default:
-      return null;
+      workflowStatus = null;
   }
+
+  if (completedPrefix && workflowStatus) return `${completedPrefix} · ${workflowStatus}`;
+  return workflowStatus;
 }
 
 /** 4. Recommended action (title + supporting detail) */

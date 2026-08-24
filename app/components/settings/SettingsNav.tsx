@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { cn } from '../../lib/cn';
 import { useAuth } from '../../lib/auth';
-import { canViewClinicSettings } from '../../lib/app-permissions';
+import { canMutateAlerts, canViewClinicSettings } from '../../lib/app-permissions';
 import {
   SETTINGS_CLINIC_TABS,
   SETTINGS_PRIMARY_TABS,
@@ -55,12 +55,15 @@ export function SettingsNav({
 }: SettingsNavProps) {
   const { session } = useAuth();
 
-  // Clinic-administration tabs are admin-only; personal Account stays for everyone.
-  // Fail closed: until an admin session is confirmed, only Account is shown.
+  // Clinic administration is admin-only. Notification preferences are personal,
+  // so every clinician who can act on alerts can configure their own delivery.
   const isClinicSettingsAdmin = canViewClinicSettings(session?.role);
+  const canConfigureNotifications = canMutateAlerts(session?.role);
   const primaryTabs = isClinicSettingsAdmin
     ? SETTINGS_PRIMARY_TABS
-    : SETTINGS_PRIMARY_TABS.filter((tab) => tab.id === 'account');
+    : SETTINGS_PRIMARY_TABS.filter(
+        (tab) => tab.id === 'account' || (tab.id === 'notifications' && canConfigureNotifications),
+      );
 
   const showSecondary = isClinicSettingsAdmin && primaryActive === 'clinic' && secondaryActive;
 

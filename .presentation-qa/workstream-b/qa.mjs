@@ -312,6 +312,10 @@ async function run(browserType, name) {
   await page.getByText('Contact Request').first().click()
   await page.getByText('Clinical notes', { exact: true }).waitFor()
   assertions.push('clinical_notes_wired')
+  await page
+    .getByText('Patient journey completed · clinician work remains open', { exact: false })
+    .waitFor()
+  assertions.push('completed_journey_open_work_labelled')
   if (await page.getByRole('button', { name: 'Complete monitoring', exact: true }).count()) {
     throw new Error('completed_open_work_must_not_offer_complete_monitoring')
   }

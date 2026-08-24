@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "generated_at": "2026-08-24T03:10:59.190Z",
+  "generated_at": "2026-08-24T03:33:02.850Z",
   "results": [
     {
       "browser": "chromium",
@@ -8,6 +8,7 @@
         "contact_request_visible",
         "high_critical_review_required_visible",
         "clinical_notes_wired",
+        "completed_journey_open_work_labelled",
         "completed_open_work_actionable",
         "assignment_and_reassignment",
         "acknowledged_and_resolved",
@@ -22,6 +23,7 @@
         "contact_request_visible",
         "high_critical_review_required_visible",
         "clinical_notes_wired",
+        "completed_journey_open_work_labelled",
         "completed_open_work_actionable",
         "assignment_and_reassignment",
         "acknowledged_and_resolved",

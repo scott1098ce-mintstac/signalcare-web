@@ -1,6 +1,7 @@
 /** GET /app/monitoring row — command centre queue item. */
 export type MonitoringRow = {
   enrolment_id: string;
+  enrolment_status?: string | null;
   patient_id: string;
   patient_name: string | null;
   patient_mobile: string | null;
