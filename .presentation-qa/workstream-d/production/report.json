@@ -1,0 +1,36 @@
+{
+  "chromium_admin": {
+    "name": "chromium",
+    "openRecord": 3,
+    "viewWorkspace": 3,
+    "optionValues": [
+      "0f837641-411b-4e38-9372-c32cce83b968",
+      "d9dbae02-c557-4617-9c4c-612eb75b2aaa",
+      "fd22f719-d0ed-425f-a8d5-eedf7b227653",
+      "10c90553-304d-4f5c-9fd1-7d2923f644d3",
+      "af5d3b31-9689-4d72-ac41-1d93021304df"
+    ],
+    "findings": []
+  },
+  "chromium_viewer": {
+    "name": "chromium",
+    "denied": true
+  },
+  "webkit_admin": {
+    "name": "webkit",
+    "openRecord": 3,
+    "viewWorkspace": 3,
+    "optionValues": [
+      "0f837641-411b-4e38-9372-c32cce83b968",
+      "d9dbae02-c557-4617-9c4c-612eb75b2aaa",
+      "fd22f719-d0ed-425f-a8d5-eedf7b227653",
+      "10c90553-304d-4f5c-9fd1-7d2923f644d3",
+      "af5d3b31-9689-4d72-ac41-1d93021304df"
+    ],
+    "findings": []
+  },
+  "webkit_viewer": {
+    "name": "webkit",
+    "denied": true
+  }
+}

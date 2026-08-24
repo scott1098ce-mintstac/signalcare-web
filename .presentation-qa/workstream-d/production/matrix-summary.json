@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "passed": 51,
+  "failed": 0,
+  "counts_before": { "patients": 55, "enrolments": 95, "e2ePatients": 0 },
+  "counts_after_cleanup": { "patients": 55, "enrolments": 95, "e2ePatients": 0 },
+  "api_sha": "41a8880b2063f366bafa652ef0a6c146c76f707c",
+  "web_sha": "79b073fc2dd4344f28c6549e92be12f2fe0f8de2",
+  "ecs": "signalcare-api:158",
+  "patient_media_enabled": false,
+  "clinician_notifications_delivery_enabled": false,
+  "patient_sms_mms": 0,
+  "clinician_notification_sends": 0
+}
