@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { appApiFetch } from '../lib/api';
+import { accessDeniedMessage, appApiFetch } from '../lib/api';
 import type { AppSession } from '../lib/auth/session';
 import type { MonitoringRow } from '../lib/types';
 import type { WorkspaceTimelineEntry } from '../lib/timeline-interpreter';
@@ -90,6 +90,7 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
         });
       } else {
         setWorkspaceData(null);
+        setTimelineError(workspaceResult.error || 'Failed to load patient workspace');
       }
     } catch {
       setTimeline([]);
@@ -236,8 +237,8 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
           'Add a brief resolution note for the clinical audit trail.',
           '',
         )?.trim();
-        if (!note || note.length < 3) {
-          setActionError('A resolution note is required.');
+        if (!note || note.length < 3 || note.length > 2000) {
+          setActionError('Resolution note must be between 3 and 2,000 characters.');
           return;
         }
         body = { resolution_note: note };
@@ -252,7 +253,12 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
       }
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setActionError(String(json?.error || res.statusText || `${suffix}_failed`));
+        if (res.status === 403) setActionError(accessDeniedMessage(json));
+        else if (json?.error === 'assigned_to_another_clinician') {
+          setActionError('This alert is assigned to another clinician. Reassign it before acting.');
+        } else {
+          setActionError('The alert could not be updated. Refresh and try again.');
+        }
         return;
       }
       await onRefreshQueue();
@@ -296,5 +302,6 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
     runAlertAction,
     refreshTimeline,
     currentUserId: session?.user_id ?? null,
+    currentUserRole: session?.role ?? null,
   };
 }

@@ -7,17 +7,17 @@ import { QueueRow } from './QueueRow';
 type ImmediateActionPanelProps = {
   rows: MonitoringRow[];
   selectedEnrolmentId: string | null;
+  currentUserId: string | null;
   onSelect: (row: MonitoringRow) => void;
   onActionComplete: () => void;
-  onOptimistic: (enrolmentId: string, action: 'acknowledge' | 'resolve') => void;
 };
 
 export function ImmediateActionPanel({
   rows,
   selectedEnrolmentId,
+  currentUserId,
   onSelect,
   onActionComplete,
-  onOptimistic,
 }: ImmediateActionPanelProps) {
   if (rows.length === 0) return null;
 
@@ -31,9 +31,9 @@ export function ImmediateActionPanel({
           key={`immediate-${row.enrolment_id}`}
           row={row}
           selected={row.enrolment_id === selectedEnrolmentId}
+          currentUserId={currentUserId}
           onSelect={() => onSelect(row)}
           onActionComplete={onActionComplete}
-          onOptimistic={onOptimistic}
         />
       ))}
     </section>

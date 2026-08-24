@@ -11,9 +11,9 @@ type QueueSectionProps = {
   countOverride?: number;
   rows: MonitoringRow[];
   selectedEnrolmentId: string | null;
+  currentUserId: string | null;
   onSelect: (row: MonitoringRow) => void;
   onActionComplete: () => void;
-  onOptimistic: (enrolmentId: string, action: 'acknowledge' | 'resolve') => void;
   banner?: React.ReactNode;
   metaForRow?: (row: MonitoringRow) => string | undefined;
 };
@@ -25,9 +25,9 @@ export function QueueSection({
   countOverride,
   rows,
   selectedEnrolmentId,
+  currentUserId,
   onSelect,
   onActionComplete,
-  onOptimistic,
   banner,
   metaForRow,
 }: QueueSectionProps) {
@@ -40,9 +40,9 @@ export function QueueSection({
           key={row.enrolment_id}
           row={row}
           selected={row.enrolment_id === selectedEnrolmentId}
+          currentUserId={currentUserId}
           onSelect={() => onSelect(row)}
           onActionComplete={onActionComplete}
-          onOptimistic={onOptimistic}
           metaOverride={metaForRow?.(row)}
         />
       ))}

@@ -43,6 +43,7 @@ export default function CommandQueuePage() {
           <CommandQueuePanel
             {...queue}
             selectedEnrolmentId={workspace.selectedEnrolmentId}
+            currentUserId={session?.user_id ?? null}
             onSelectEpisode={workspace.selectEpisode}
             onEnroll={canEnrol ? () => setEnrollOpen(true) : undefined}
             canEnrol={canEnrol}

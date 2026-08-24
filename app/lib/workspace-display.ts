@@ -169,6 +169,10 @@ export function clinicalWhatHappened(row: MonitoringRow): string {
 
 /** 2. Why is this patient on my Command Queue? */
 export function clinicalQueueReason(row: MonitoringRow): string {
+  if (row.contact_requested === true) {
+    return row.contact_request_label?.trim() || 'Patient requested contact from the clinic.';
+  }
+
   if (row.v2_status === 'awaiting_response') {
     return 'No response received within the expected monitoring window.';
   }
@@ -240,7 +244,7 @@ export function clinicalWorkflowStatus(row: MonitoringRow): string | null {
   }
 
   if (completedPrefix && workflowStatus) return `${completedPrefix} · ${workflowStatus}`;
-  return workflowStatus;
+  return completedPrefix || workflowStatus;
 }
 
 /** 4. Recommended action (title + supporting detail) */

@@ -11,6 +11,7 @@ import styles from './command-queue.module.css';
 
 type CommandQueuePanelProps = ReturnType<typeof useCommandQueue> & {
   selectedEnrolmentId: string | null;
+  currentUserId: string | null;
   onSelectEpisode: (row: MonitoringRow) => void;
   onEnroll?: () => void;
   canEnrol?: boolean;
@@ -32,8 +33,8 @@ export function CommandQueuePanel({
   procedures,
   assignees,
   refresh,
-  optimisticAlertAction,
   selectedEnrolmentId,
+  currentUserId,
   onSelectEpisode,
   onEnroll,
   canEnrol = true,
@@ -71,9 +72,9 @@ export function CommandQueuePanel({
               <ImmediateActionPanel
                 rows={immediateRows}
                 selectedEnrolmentId={selectedEnrolmentId}
+                currentUserId={currentUserId}
                 onSelect={onSelectEpisode}
                 onActionComplete={refresh}
-                onOptimistic={optimisticAlertAction}
               />
             ) : null}
 
@@ -83,9 +84,9 @@ export function CommandQueuePanel({
               count={groups.needsAttention.length}
               rows={groups.needsAttention}
               selectedEnrolmentId={selectedEnrolmentId}
+              currentUserId={currentUserId}
               onSelect={onSelectEpisode}
               onActionComplete={refresh}
-              onOptimistic={optimisticAlertAction}
               banner={showAllClear ? <AllClearBanner /> : undefined}
             />
 
@@ -95,9 +96,9 @@ export function CommandQueuePanel({
               count={groups.awaitingResponse.length}
               rows={groups.awaitingResponse}
               selectedEnrolmentId={selectedEnrolmentId}
+              currentUserId={currentUserId}
               onSelect={onSelectEpisode}
               onActionComplete={refresh}
-              onOptimistic={optimisticAlertAction}
             />
 
             <QueueSection
@@ -106,9 +107,9 @@ export function CommandQueuePanel({
               count={groups.stable.length}
               rows={groups.stable}
               selectedEnrolmentId={selectedEnrolmentId}
+              currentUserId={currentUserId}
               onSelect={onSelectEpisode}
               onActionComplete={refresh}
-              onOptimistic={optimisticAlertAction}
             />
 
             {filtered.length === 0 && monitoring.length > 0 ? (

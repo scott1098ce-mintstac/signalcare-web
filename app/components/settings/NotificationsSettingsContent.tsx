@@ -90,7 +90,7 @@ export function NotificationsSettingsContent() {
         {error ? <Alert variant="danger">{error}</Alert> : null}
         {notice ? <Alert variant="success">{notice}</Alert> : null}
 
-        {!loading ? (
+        {!loading && !error ? (
           <>
         <SettingsCard
           title="Command Queue assignment"
@@ -186,7 +186,11 @@ export function NotificationsSettingsContent() {
       </SettingsBody>
 
       <SettingsFooter note="Command Queue remains available even when every external channel is disabled or unavailable.">
-        <SCButton type="button" disabled={loading || saving} onClick={() => void handleSave()}>
+        <SCButton
+          type="button"
+          disabled={loading || saving || Boolean(error)}
+          onClick={() => void handleSave()}
+        >
           {saving ? 'Saving…' : 'Save settings'}
         </SCButton>
       </SettingsFooter>

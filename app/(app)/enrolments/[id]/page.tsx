@@ -261,8 +261,8 @@ export default function EnrolmentDetailPage() {
       'Add a brief resolution note for the clinical audit trail.',
       '',
     )?.trim();
-    if (!resolutionNote || resolutionNote.length < 3) {
-      setResError('A resolution note is required.');
+    if (!resolutionNote || resolutionNote.length < 3 || resolutionNote.length > 2000) {
+      setResError('Resolution note must be between 3 and 2,000 characters.');
       return;
     }
     pausePollingRef.current = true;

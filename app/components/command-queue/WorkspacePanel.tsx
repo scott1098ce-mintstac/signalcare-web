@@ -21,6 +21,7 @@ import {
   fetchAssignableClinicians,
   type AssignableClinician,
 } from '../../lib/command-queue-actions';
+import { canMutateClinicalNotes } from '../../lib/app-permissions';
 import styles from './workspace.module.css';
 
 type WorkspacePanelProps = ReturnType<typeof useWorkspacePanel> & {
@@ -36,6 +37,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     workspaceData,
     actionError,
     currentUserId,
+    currentUserRole,
     reviewSubmitting,
     completeSubmitting,
     ownershipSubmitting,
@@ -64,11 +66,20 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
       return;
     }
     let cancelled = false;
-    void fetchAssignableClinicians().then((rows) => {
-      if (cancelled) return;
-      setClinicians(rows);
-      setAssigneeDraft(activeOwnerId || '');
-    });
+    void fetchAssignableClinicians()
+      .then((rows) => {
+        if (cancelled) return;
+        setAssignmentError(null);
+        setClinicians(rows);
+        setAssigneeDraft(activeOwnerId || '');
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setClinicians([]);
+        setAssignmentError(
+          error instanceof Error ? error.message : 'Assignable clinicians could not be loaded.',
+        );
+      });
     return () => {
       cancelled = true;
     };
@@ -114,9 +125,12 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
 
   const actions = workspaceData?.actions;
   const alertId = workspaceData?.alertId ?? selected.open_alert_id;
+  const ownedByAnother =
+    Boolean(activeOwnerId) && String(activeOwnerId) !== String(currentUserId);
   const canTakeOwnership = actions?.can_take_ownership === true && Boolean(alertId);
-  const canAcknowledge = actions?.can_acknowledge_alert === true && Boolean(alertId);
-  const canResolve = actions?.can_resolve_alert === true && Boolean(alertId);
+  const canAcknowledge =
+    actions?.can_acknowledge_alert === true && Boolean(alertId) && !ownedByAnother;
+  const canResolve = actions?.can_resolve_alert === true && Boolean(alertId) && !ownedByAnother;
   const canOpenReview = actions?.can_open_review === true;
   const canCompleteMonitoring = actions?.can_complete_monitoring === true;
 
@@ -157,7 +171,9 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
             clinicalNotesLoading={clinicalNotesHook.loading}
             clinicalNotesError={clinicalNotesHook.error}
             clinicalNotesSubmitting={clinicalNotesHook.submitting}
-            canCreateClinicalNotes={Boolean(currentUserId)}
+            canCreateClinicalNotes={
+              Boolean(currentUserId) && canMutateClinicalNotes(currentUserRole)
+            }
             onCreateClinicalNote={clinicalNotesHook.addNote}
             onEditClinicalNote={clinicalNotesHook.reviseNote}
             onClinicalNotesChanged={() =>

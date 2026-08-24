@@ -21,9 +21,9 @@ import {
 type QueueRowProps = {
   row: MonitoringRow;
   selected: boolean;
+  currentUserId: string | null;
   onSelect: () => void;
   onActionComplete: () => void;
-  onOptimistic: (enrolmentId: string, action: 'acknowledge' | 'resolve') => void;
   metaOverride?: string;
 };
 
@@ -80,15 +80,20 @@ function iconForRow(row: MonitoringRow, variant: SCQueueRowVariant) {
 export function QueueRow({
   row,
   selected,
+  currentUserId,
   onSelect,
   onActionComplete,
-  onOptimistic,
   metaOverride,
 }: QueueRowProps) {
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const variant = rowVariant(row);
-  const showAcknowledge = row.v2_status === 'alert_open' && row.open_alert_id;
-  const showResolve = row.v2_status === 'alert_acknowledged' && row.open_alert_id;
+  const ownedByAnother =
+    Boolean(row.owned_by_user_id) && String(row.owned_by_user_id) !== String(currentUserId);
+  const showAcknowledge =
+    row.v2_status === 'alert_open' && row.open_alert_id && !ownedByAnother;
+  const showResolve =
+    row.v2_status === 'alert_acknowledged' && row.open_alert_id && !ownedByAnother;
   const showReview = row.v2_status === 'review_required';
   const showScore = variant === 'dangerColored' || variant === 'assigned';
   const showBar = variant === 'dangerColored' || variant === 'assigned';
@@ -99,11 +104,12 @@ export function QueueRow({
   async function handleAcknowledge(e: React.MouseEvent) {
     e.stopPropagation();
     if (!row.open_alert_id || busy) return;
-    onOptimistic(row.enrolment_id, 'acknowledge');
+    setActionError(null);
     setBusy(true);
     try {
-      const ok = await acknowledgeAlert(row.open_alert_id);
-      if (ok) await onActionComplete();
+      const result = await acknowledgeAlert(row.open_alert_id);
+      if (result.ok) await onActionComplete();
+      else setActionError(result.error);
     } finally {
       setBusy(false);
     }
@@ -116,12 +122,17 @@ export function QueueRow({
       'Add a brief resolution note for the clinical audit trail.',
       '',
     )?.trim();
-    if (!resolutionNote || resolutionNote.length < 3) return;
-    onOptimistic(row.enrolment_id, 'resolve');
+    if (!resolutionNote) return;
+    if (resolutionNote.length < 3 || resolutionNote.length > 2000) {
+      setActionError('Resolution note must be between 3 and 2,000 characters.');
+      return;
+    }
+    setActionError(null);
     setBusy(true);
     try {
-      const ok = await resolveAlert(row.open_alert_id, resolutionNote);
-      if (ok) await onActionComplete();
+      const result = await resolveAlert(row.open_alert_id, resolutionNote);
+      if (result.ok) await onActionComplete();
+      else setActionError(result.error);
     } finally {
       setBusy(false);
     }
@@ -149,6 +160,11 @@ export function QueueRow({
       onClick={onSelect}
       actions={
         <>
+          {actionError ? (
+            <span className="text-xs text-[var(--sc-danger-700)]" role="alert">
+              {actionError}
+            </span>
+          ) : null}
           {showAcknowledge ? (
             <SCButton variant="primarySm" disabled={busy} onClick={handleAcknowledge}>
               Acknowledge

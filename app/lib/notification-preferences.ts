@@ -1,4 +1,4 @@
-import { appApiFetch } from './api';
+import { accessDeniedMessage, appApiFetch } from './api';
 
 export type NotificationPreferences = {
   email_enabled: boolean;
@@ -30,7 +30,13 @@ export async function fetchNotificationPreferences(): Promise<
   const res = await appApiFetch('/app/notification-preferences');
   const body = await res.json().catch(() => ({}));
   if (!res.ok || !body?.preferences) {
-    return { ok: false, error: String(body?.error || 'notification_preferences_load_failed') };
+    return {
+      ok: false,
+      error:
+        res.status === 403
+          ? accessDeniedMessage(body)
+          : 'Notification preferences could not be loaded.',
+    };
   }
   return {
     ok: true,
@@ -48,7 +54,13 @@ export async function saveNotificationPreferences(
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok || !body?.preferences) {
-    return { ok: false, error: String(body?.error || 'notification_preferences_save_failed') };
+    return {
+      ok: false,
+      error:
+        res.status === 403
+          ? accessDeniedMessage(body)
+          : 'Notification preferences could not be saved.',
+    };
   }
   return { ok: true, preferences: body.preferences };
 }
