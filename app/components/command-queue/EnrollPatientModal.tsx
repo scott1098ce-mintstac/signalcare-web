@@ -31,6 +31,7 @@ function procedureLabel(type: string): string {
 export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientModalProps) {
   const [fullName, setFullName] = useState('');
   const [mobile, setMobile] = useState('');
+  const [clinicIdentifier, setClinicIdentifier] = useState('');
   const [procedureType, setProcedureType] = useState('');
   const [protocolId, setProtocolId] = useState('');
   const [practitioner, setPractitioner] = useState('');
@@ -107,22 +108,36 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
 
     setSubmitting(true);
     try {
+      const createBody: Record<string, string> = {
+        name,
+        mobile: normalizedMobile,
+        consent_status: 'unknown',
+        protocol_id: protocolId,
+      };
+      const identifier = clinicIdentifier.trim();
+      if (identifier) createBody.clinic_patient_identifier = identifier;
+
       const createRes = await appApiFetch('/app/patients', {
         method: 'POST',
-        body: {
-          name,
-          mobile: normalizedMobile,
-          consent_status: 'unknown',
-          protocol_id: protocolId,
-        },
+        body: createBody,
       });
       const createJson = await createRes.json();
+      let patientId = createJson.patient?.id as string | undefined;
       if (!createRes.ok) {
-        setError(String(createJson.error || 'Could not create patient'));
-        return;
+        if (createRes.status === 409 && createJson.error === 'duplicate_mobile' && createJson.patient_id) {
+          patientId = createJson.patient_id;
+        } else if (createRes.status === 409 && createJson.error === 'duplicate_mobile') {
+          setError('This mobile number is already registered and cannot be used for a new patient.');
+          return;
+        } else if (createRes.status === 409 && createJson.error === 'duplicate_clinic_patient_identifier') {
+          setError('That clinic patient identifier is already in use.');
+          return;
+        } else {
+          setError(String(createJson.error || 'Could not create patient'));
+          return;
+        }
       }
 
-      const patientId = createJson.patient?.id;
       if (!patientId) {
         setError('Patient created but no id returned.');
         return;
@@ -138,12 +153,27 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
       });
       const enrJson = await enrRes.json();
       if (!enrRes.ok) {
+        if (enrRes.status === 409 && enrJson.error === 'active_enrolment_exists') {
+          setError(
+            'This patient already has an active monitoring journey. Open their record from the directory instead of starting another.',
+          );
+          return;
+        }
+        if (enrRes.status === 409 && enrJson.error === 'patient_sms_opted_out') {
+          setError('This patient has opted out of SMS. Restore messaging eligibility on their record before enrolling.');
+          return;
+        }
+        if (enrRes.status === 400 && enrJson.error === 'patient_archived') {
+          setError('This patient is archived. Restore them from the patient record before enrolling.');
+          return;
+        }
         setError(String(enrJson.error || 'Could not start monitoring enrolment'));
         return;
       }
 
       setFullName('');
       setMobile('');
+      setClinicIdentifier('');
       setPractitioner('');
       setProcedureDate(toDateInputValue(new Date()));
       onSuccess();
@@ -202,6 +232,15 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 required
+              />
+            </div>
+            <div>
+              <FieldLabel htmlFor="enroll-identifier">Clinic patient identifier</FieldLabel>
+              <Input
+                id="enroll-identifier"
+                placeholder="Optional MRN / chart number"
+                value={clinicIdentifier}
+                onChange={(e) => setClinicIdentifier(e.target.value)}
               />
             </div>
           </div>

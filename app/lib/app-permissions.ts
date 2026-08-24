@@ -38,6 +38,10 @@ export function canEnrolPatient(role?: string | null): boolean {
   return hasClinicalAccess(role);
 }
 
+export function canMutatePatients(role?: string | null): boolean {
+  return hasClinicalAccess(role);
+}
+
 export function canViewMonitoring(role?: string | null): boolean {
   return hasClinicalAccess(role);
 }

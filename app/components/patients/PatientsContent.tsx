@@ -80,8 +80,8 @@ export function PatientsContent({
   showEnrollAction = true,
   canEnrol = true,
   secondaryIdentityByEnrolment,
-  emptyTitle = 'No patients enrolled',
-  emptyDescription = 'Patients will appear here once enrolled on a monitoring protocol.',
+  emptyTitle = 'No patients',
+  emptyDescription = 'Patients will appear here once added to this clinic.',
   serverMode = false,
   sessionEnabled = false,
 }: PatientsContentProps = {}) {
@@ -174,8 +174,7 @@ export function PatientsContent({
   return (
     <div className={styles.page} data-node-id="patient-directory">
       <p className={styles.pageIntro}>
-        Clinical monitoring directory for enrolled patients — search, filter, and open individual
-        recovery workspaces.
+        Clinical patient directory — search, filter, open records, and open recovery workspaces.
       </p>
 
       <div className={styles.summaryRow} aria-label="Directory summary">
@@ -230,8 +229,8 @@ export function PatientsContent({
 
       <SCTable
         className={styles.directoryTable}
-        title="Enrolled patients"
-        description="Patients currently under post-procedure recovery monitoring at this clinic."
+        title="Patients"
+        description="Clinic patients, monitoring journeys, and recovery workspaces."
         columns={DIRECTORY_COLUMNS}
         loading={loading}
         error={error}

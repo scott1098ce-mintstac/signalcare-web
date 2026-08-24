@@ -8,7 +8,7 @@ import {
 } from '../../lib/command-queue';
 
 export type PatientDirectoryFilters = QueueFilters & {
-  cohort: 'all' | 'active' | 'completed';
+  cohort: 'all' | 'active' | 'completed' | 'unenrolled';
 };
 
 export type PatientDirectorySort = 'patient' | 'activity' | 'status' | 'risk' | 'progress';
@@ -38,9 +38,11 @@ export function filterPatientDirectory(
   const base = applyQueueFilters(rows, filters);
   if (filters.cohort === 'all') return base;
   return base.filter((row) => {
+    const directoryRow = row as PatientDirectoryRow;
     const isActive = row.is_active_or_monitoring !== false;
     if (filters.cohort === 'active') return isActive;
-    return !isActive;
+    if (filters.cohort === 'unenrolled') return !directoryRow.enrolment_id;
+    return Boolean(directoryRow.enrolment_id) && !isActive;
   });
 }
 
@@ -66,7 +68,7 @@ export function isClinicianMuted(row: MonitoringRow | PatientDirectoryRow): bool
   return isClinicianUnassigned(row);
 }
 
-export function monitoringStatusLabel(status: MonitoringRow['v2_status']): string {
+export function monitoringStatusLabel(status: PatientDirectoryRow['v2_status'] | MonitoringRow['v2_status']): string {
   switch (status) {
     case 'alert_open':
       return 'Open alert';
@@ -78,13 +80,15 @@ export function monitoringStatusLabel(status: MonitoringRow['v2_status']): strin
       return 'Awaiting response';
     case 'stable':
       return 'Stable';
+    case 'not_enrolled':
+      return 'Not enrolled';
     default:
       return 'Monitoring';
   }
 }
 
 export function monitoringStatusTone(
-  status: MonitoringRow['v2_status'],
+  status: PatientDirectoryRow['v2_status'] | MonitoringRow['v2_status'],
 ): 'dangerSubtle' | 'warningSubtle' | 'successSubtle' | 'neutralSubtle' | 'brandSubtle' {
   switch (status) {
     case 'alert_open':
@@ -96,6 +100,8 @@ export function monitoringStatusTone(
       return 'brandSubtle';
     case 'stable':
       return 'successSubtle';
+    case 'not_enrolled':
+      return 'neutralSubtle';
     default:
       return 'neutralSubtle';
   }
@@ -136,7 +142,7 @@ export function patientSecondaryIdentity(
   row: MonitoringRow | PatientDirectoryRow,
   overrides?: Record<string, string>,
 ): string {
-  const override = overrides?.[row.enrolment_id];
+  const override = row.enrolment_id ? overrides?.[row.enrolment_id] : undefined;
   if (override) return override;
 
   const directoryRow = row as PatientDirectoryRow;

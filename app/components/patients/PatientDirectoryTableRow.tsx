@@ -1,14 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import type { MonitoringRow } from '../../lib/types';
+import type { PatientDirectoryRow } from '../../lib/types';
 import { SCButton, SCStatusPill } from '../design-system';
 import tableStyles from '../design-system/data/SCTable.module.css';
 import { cn } from '../../lib/cn';
 import {
-  assignedClinicianLabel,
-  isClinicianUnassigned,
-  isClinicianMuted,
+    assignedClinicianLabel,
+    isClinicianMuted,
   lastActivityLabel,
   monitoringProgressLabel,
   monitoringProgressPercent,
@@ -21,7 +20,7 @@ import {
 import styles from './patients.module.css';
 
 export type PatientDirectoryTableRowProps = {
-  row: MonitoringRow;
+  row: PatientDirectoryRow;
   secondaryIdentityByEnrolment?: Record<string, string>;
 };
 
@@ -32,14 +31,26 @@ export function PatientDirectoryTableRow({
 }: PatientDirectoryTableRowProps) {
   const router = useRouter();
   const progress = monitoringProgressPercent(row);
-  const workspaceHref = `/enrolments/${row.enrolment_id}`;
+  const recordHref = `/patients/${row.patient_id}`;
+  const workspaceHref = row.enrolment_id ? `/enrolments/${row.enrolment_id}` : null;
   const clinician = assignedClinicianLabel(row);
 
   return (
     <div className={cn(tableStyles.row, styles.directoryRow)}>
       <div>
         <span className={tableStyles.cellLabel}>Patient</span>
-        <div className={tableStyles.cellPrimary}>{row.patient_name ?? '—'}</div>
+        <div
+          className={tableStyles.cellPrimary}
+          role="link"
+          tabIndex={0}
+          style={{ cursor: 'pointer' }}
+          onClick={() => router.push(recordHref)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') router.push(recordHref);
+          }}
+        >
+          {row.patient_name ?? '—'}
+        </div>
         <div className={styles.patientSecondary}>
           {patientSecondaryIdentity(row, secondaryIdentityByEnrolment)}
         </div>
@@ -89,9 +100,9 @@ export function PatientDirectoryTableRow({
         <SCButton
           variant="outline"
           className={styles.rowActionButton}
-          onClick={() => router.push(workspaceHref)}
+          onClick={() => router.push(workspaceHref || recordHref)}
         >
-          View Workspace
+          {workspaceHref ? 'View Workspace' : 'Open record'}
         </SCButton>
       </div>
     </div>

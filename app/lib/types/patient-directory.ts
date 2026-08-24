@@ -1,12 +1,14 @@
 import type { MonitoringRow } from './monitoring';
 
 /** GET /app/patient-directory row — one patient with primary enrolment summary. */
-export type PatientDirectoryRow = MonitoringRow & {
+export type PatientDirectoryRow = Omit<MonitoringRow, 'enrolment_id' | 'v2_status' | 'enrolment_status'> & {
+  enrolment_id: string | null;
   clinic_patient_identifier?: string | null;
   assigned_clinician_id: string | null;
   assigned_clinician_name: string | null;
   patient_secondary_identity: string;
-  enrolment_status: 'active' | 'completed';
+  enrolment_status: 'active' | 'completed' | 'unenrolled';
+  v2_status: MonitoringRow['v2_status'] | 'not_enrolled';
 };
 
 export type PatientDirectoryFacets = {

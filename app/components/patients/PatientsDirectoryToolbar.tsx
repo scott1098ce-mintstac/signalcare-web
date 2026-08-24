@@ -33,6 +33,7 @@ const COHORT_OPTIONS = [
   { value: 'all', label: 'Cohort (All)' },
   { value: 'active', label: 'Active monitoring' },
   { value: 'completed', label: 'Completed' },
+  { value: 'unenrolled', label: 'Not enrolled' },
 ];
 
 const SORT_DIR_OPTIONS = [
