@@ -4,15 +4,12 @@ import type { ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Header, SCButton } from '../design-system';
 import {
-  IconAdd,
   IconNavProtocols,
   IconNavReports,
   IconNavSettings,
   IconQueue,
 } from '../design-system/icons';
 import { logout } from '../../lib/auth';
-import { useAuth } from '../providers/AuthProvider';
-import { canEditProtocols } from '../../lib/app-permissions';
 
 export type AppHeaderProps = {
   title: ReactNode;
@@ -41,19 +38,9 @@ function resolveHeaderIcon(pathname: string) {
   return <IconQueue size={32} />;
 }
 
-function NewProtocolButton() {
-  return (
-    <SCButton variant="primary" icon={<IconAdd />}>
-      New Protocol
-    </SCButton>
-  );
-}
-
 export function AppHeader({ title }: AppHeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { session } = useAuth();
-  const showNewProtocol = pathname === '/protocols' && canEditProtocols(session?.role);
 
   async function handleLogout() {
     await logout();
@@ -62,7 +49,6 @@ export function AppHeader({ title }: AppHeaderProps) {
 
   const aside = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      {showNewProtocol ? <NewProtocolButton /> : null}
       <SCButton variant="outline" type="button" onClick={() => void handleLogout()}>
         Log out
       </SCButton>
