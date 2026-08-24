@@ -1,0 +1,28 @@
+{
+  "chromium": [
+    "queue_shows_synthetic_high_critical_review_completed",
+    "contact_request_visible",
+    "clinical_notes_wired",
+    "acknowledged_work_can_resolve",
+    "resolution_note_prompt_required",
+    "completed_journey_open_work_labelled",
+    "completed_open_work_not_reopened",
+    "completed_review_required_actionable",
+    "assignment_control_visible",
+    "notification_preferences_loaded",
+    "viewer_notification_settings_forbidden"
+  ],
+  "webkit": [
+    "queue_shows_synthetic_high_critical_review_completed",
+    "contact_request_visible",
+    "clinical_notes_wired",
+    "acknowledged_work_can_resolve",
+    "resolution_note_prompt_required",
+    "completed_journey_open_work_labelled",
+    "completed_open_work_not_reopened",
+    "completed_review_required_actionable",
+    "assignment_control_visible",
+    "notification_preferences_loaded",
+    "viewer_notification_settings_forbidden"
+  ]
+}
