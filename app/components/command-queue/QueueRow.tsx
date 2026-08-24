@@ -112,10 +112,15 @@ export function QueueRow({
   async function handleResolve(e: React.MouseEvent) {
     e.stopPropagation();
     if (!row.open_alert_id || busy) return;
+    const resolutionNote = window.prompt(
+      'Add a brief resolution note for the clinical audit trail.',
+      '',
+    )?.trim();
+    if (!resolutionNote || resolutionNote.length < 3) return;
     onOptimistic(row.enrolment_id, 'resolve');
     setBusy(true);
     try {
-      const ok = await resolveAlert(row.open_alert_id);
+      const ok = await resolveAlert(row.open_alert_id, resolutionNote);
       if (ok) await onActionComplete();
     } finally {
       setBusy(false);

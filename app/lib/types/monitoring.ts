@@ -34,6 +34,8 @@ export type MonitoringRow = {
   reply_type?: string | null;
   urgent_red_flag_detected?: boolean | null;
   operational_outcome?: string | null;
+  contact_requested?: boolean;
+  contact_request_label?: string | null;
   reviewed_at?: string | null;
   reviewed_by?: string | null;
   review_note?: string | null;

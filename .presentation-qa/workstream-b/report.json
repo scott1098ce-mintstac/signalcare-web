@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "generated_at": "2026-08-24T03:10:59.190Z",
+  "results": [
+    {
+      "browser": "chromium",
+      "assertions": [
+        "contact_request_visible",
+        "high_critical_review_required_visible",
+        "clinical_notes_wired",
+        "completed_open_work_actionable",
+        "assignment_and_reassignment",
+        "acknowledged_and_resolved",
+        "preferences_save",
+        "permission_error",
+        "empty_queue"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "assertions": [
+        "contact_request_visible",
+        "high_critical_review_required_visible",
+        "clinical_notes_wired",
+        "completed_open_work_actionable",
+        "assignment_and_reassignment",
+        "acknowledged_and_resolved",
+        "preferences_save",
+        "permission_error",
+        "empty_queue"
+      ]
+    }
+  ]
+}

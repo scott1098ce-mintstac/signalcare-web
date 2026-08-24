@@ -257,13 +257,21 @@ export default function EnrolmentDetailPage() {
 
   async function resolveAlert() {
     if (!alertId) return;
+    const resolutionNote = window.prompt(
+      'Add a brief resolution note for the clinical audit trail.',
+      '',
+    )?.trim();
+    if (!resolutionNote || resolutionNote.length < 3) {
+      setResError('A resolution note is required.');
+      return;
+    }
     pausePollingRef.current = true;
     setResLoading(true);
     setResError(null);
     try {
       const res = await appApiFetch(`/app/alerts/${encodeURIComponent(alertId)}/resolve`, {
         method: 'POST',
-        body: {},
+        body: { resolution_note: resolutionNote },
       });
       const json = await res.json();
       if (!res.ok) throw new Error(String(json?.error || res.statusText || 'resolve_failed'));

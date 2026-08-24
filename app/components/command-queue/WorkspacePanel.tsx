@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { MonitoringRow } from '../../lib/types';
 import {
   formatDate,
@@ -17,6 +17,10 @@ import {
 import { IconStatusCheck } from '../design-system/icons';
 import { PatientWorkspaceActions } from '../workspace/PatientWorkspaceActions';
 import { PatientWorkspaceBody } from '../workspace/PatientWorkspaceBody';
+import {
+  fetchAssignableClinicians,
+  type AssignableClinician,
+} from '../../lib/command-queue-actions';
 import styles from './workspace.module.css';
 
 type WorkspacePanelProps = ReturnType<typeof useWorkspacePanel> & {
@@ -38,6 +42,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     markEnrolmentReviewed,
     completeMonitoring,
     claimAlertOwnership,
+    assignAlertToClinician,
     runAlertAction,
     refreshTimeline,
   } = props;
@@ -46,6 +51,28 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     enrolmentId: selected?.enrolment_id ?? null,
     enabled: Boolean(selected?.enrolment_id),
   });
+  const [clinicians, setClinicians] = useState<AssignableClinician[]>([]);
+  const [assigneeDraft, setAssigneeDraft] = useState('');
+  const [assignmentBusy, setAssignmentBusy] = useState(false);
+  const [assignmentError, setAssignmentError] = useState<string | null>(null);
+
+  const activeAlertId = workspaceData?.alertId ?? selected?.open_alert_id ?? null;
+  const activeOwnerId = workspaceData?.ownedByUserId ?? selected?.owned_by_user_id ?? null;
+
+  useEffect(() => {
+    if (!activeAlertId) {
+      return;
+    }
+    let cancelled = false;
+    void fetchAssignableClinicians().then((rows) => {
+      if (cancelled) return;
+      setClinicians(rows);
+      setAssigneeDraft(activeOwnerId || '');
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeAlertId, activeOwnerId]);
 
   const mergedRow = useMemo(() => {
     if (!selected) return null;
@@ -106,9 +133,9 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         <span className={styles.chromeState}>· {selected.patient_name ?? 'Episode'}</span>
       </div>
 
-      {actionError ? (
+      {actionError || assignmentError ? (
         <div className={styles.actionError} role="alert">
-          {actionError}
+          {actionError || assignmentError}
         </div>
       ) : null}
 
@@ -137,7 +164,61 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
             }
             signals={workspaceData?.signals ?? []}
             actions={
-              <PatientWorkspaceActions
+              <>
+                {alertId && clinicians.length ? (
+                  <div className="flex items-center gap-2">
+                    <label className="sr-only" htmlFor={`alert-assignee-${alertId}`}>
+                      Assign clinician
+                    </label>
+                    <select
+                      id={`alert-assignee-${alertId}`}
+                      value={assigneeDraft}
+                      disabled={assignmentBusy}
+                      onChange={(event) => setAssigneeDraft(event.target.value)}
+                      className="rounded-md border border-[var(--sc-border-subtle)] bg-white px-2 py-2 text-sm"
+                    >
+                      <option value="">Select clinician</option>
+                      {clinicians.map((clinician) => (
+                        <option key={clinician.user_id} value={clinician.user_id}>
+                          {clinician.name} · {clinician.role}
+                        </option>
+                      ))}
+                    </select>
+                    <SCButton
+                      variant="outline"
+                      disabled={
+                        assignmentBusy ||
+                        !assigneeDraft ||
+                        assigneeDraft === activeOwnerId
+                      }
+                      onClick={() => {
+                        if (!alertId || !assigneeDraft || !selected) return;
+                        setAssignmentBusy(true);
+                        setAssignmentError(null);
+                        void assignAlertToClinician(
+                          alertId,
+                          selected.enrolment_id,
+                          assigneeDraft,
+                        )
+                          .then(async (ok) => {
+                            if (!ok) {
+                              setAssignmentError('Could not assign this alert.');
+                              return;
+                            }
+                            void props.refreshTimeline(selected.enrolment_id);
+                          })
+                          .finally(() => setAssignmentBusy(false));
+                      }}
+                    >
+                      {assignmentBusy
+                        ? 'Assigning…'
+                        : activeOwnerId
+                          ? 'Reassign'
+                          : 'Assign'}
+                    </SCButton>
+                  </div>
+                ) : null}
+                <PatientWorkspaceActions
                 row={mergedRow}
                 canTakeOwnership={canTakeOwnership}
                 canAcknowledge={canAcknowledge}
@@ -164,7 +245,8 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
                 }
                 onMarkReviewed={() => void markEnrolmentReviewed(selected.enrolment_id)}
                 onCompleteMonitoring={() => void completeMonitoring(selected.enrolment_id)}
-              />
+                />
+              </>
             }
           />
         </div>

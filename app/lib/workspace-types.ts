@@ -90,6 +90,8 @@ export type WorkspaceSummary = {
   reply_type: string | null;
   urgent_red_flag_detected: boolean | null;
   operational_outcome: string | null;
+  contact_requested: boolean;
+  contact_request_label: string | null;
 };
 
 export type WorkspaceEvidence = {
@@ -192,6 +194,8 @@ export type EnrolmentPageSummary = {
   reply_type?: string | null;
   urgent_red_flag_detected?: boolean | null;
   operational_outcome?: string | null;
+  contact_requested?: boolean;
+  contact_request_label?: string | null;
 };
 
 export type EnrolmentPageViewModel = {

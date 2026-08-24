@@ -179,6 +179,8 @@ export function mapWorkspaceToPageViewModel(
       reply_type: summary.reply_type ?? review?.reply_type ?? null,
       urgent_red_flag_detected: summary.urgent_red_flag_detected,
       operational_outcome: summary.operational_outcome,
+      contact_requested: summary.contact_requested === true,
+      contact_request_label: summary.contact_request_label ?? null,
       review_note: latestReview?.review_note ?? null,
       reviewed_at: latestReview?.reviewed_at ?? null,
       reviewed_by: latestReview?.reviewed_by ?? null,

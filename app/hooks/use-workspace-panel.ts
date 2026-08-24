@@ -13,6 +13,7 @@ import {
   sortAuditTimelineNewestFirst,
 } from '../lib/workspace';
 import type { WorkspaceActions, WorkspaceInterpretation } from '../lib/workspace-types';
+import { assignAlert } from '../lib/command-queue-actions';
 
 type WorkspacePanelData = {
   actions: WorkspaceActions | null;
@@ -199,10 +200,50 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
     [loadEpisodeData, onRefreshQueue, router, selectedEnrolmentId],
   );
 
+  const assignAlertToClinician = useCallback(
+    async (alertId: string, enrolmentId: string, userId: string) => {
+      setOwnershipSubmitting(true);
+      setActionError(null);
+      try {
+        const ok = await assignAlert(alertId, userId);
+        if (!ok) {
+          setActionError('Could not assign this alert.');
+          return false;
+        }
+        await onRefreshQueue();
+        if (selectedEnrolmentId === enrolmentId) {
+          void loadEpisodeData(enrolmentId);
+        }
+        return true;
+      } catch {
+        setActionError('Could not assign this alert.');
+        return false;
+      } finally {
+        setOwnershipSubmitting(false);
+      }
+    },
+    [loadEpisodeData, onRefreshQueue, selectedEnrolmentId],
+  );
+
   const runAlertAction = useCallback(
     async (alertId: string, enrolmentId: string, suffix: 'acknowledge' | 'resolve') => {
       setActionError(null);
-      const res = await appApiFetch(`/app/alerts/${alertId}/${suffix}`, { method: 'POST' });
+      let body: Record<string, string> | undefined;
+      if (suffix === 'resolve') {
+        const note = window.prompt(
+          'Add a brief resolution note for the clinical audit trail.',
+          '',
+        )?.trim();
+        if (!note || note.length < 3) {
+          setActionError('A resolution note is required.');
+          return;
+        }
+        body = { resolution_note: note };
+      }
+      const res = await appApiFetch(`/app/alerts/${alertId}/${suffix}`, {
+        method: 'POST',
+        body,
+      });
       if (res.status === 401) {
         router.replace('/auth/signin');
         return;
@@ -249,6 +290,7 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
     markEnrolmentReviewed,
     completeMonitoring,
     claimAlertOwnership,
+    assignAlertToClinician,
     runAlertAction,
     refreshTimeline,
     currentUserId: session?.user_id ?? null,
