@@ -155,20 +155,20 @@ export function patientSecondaryIdentity(
   return '—';
 }
 
-export function lastActivityLabel(row: MonitoringRow): string {
+export function lastActivityLabel(row: MonitoringRow | PatientDirectoryRow): string {
   const iso = row.last_response_at ?? row.last_checkin_at ?? row.started_at;
   return formatRelativeTime(iso);
 }
 
 const DEFAULT_MONITORING_DAYS = 14;
 
-export function monitoringProgressPercent(row: MonitoringRow): number {
+export function monitoringProgressPercent(row: MonitoringRow | PatientDirectoryRow): number {
   const day = row.recovery_day ?? 0;
   if (day <= 0) return 0;
   return Math.min(Math.round((day / DEFAULT_MONITORING_DAYS) * 100), 100);
 }
 
-export function monitoringProgressLabel(row: MonitoringRow): string {
+export function monitoringProgressLabel(row: MonitoringRow | PatientDirectoryRow): string {
   return formatRecoveryDay(row.recovery_day);
 }
 

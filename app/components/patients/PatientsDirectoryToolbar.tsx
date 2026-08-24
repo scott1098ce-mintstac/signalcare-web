@@ -1,6 +1,6 @@
 'use client';
 
-import type { MonitoringRow, PatientDirectoryFacets } from '../../lib/types';
+import type { MonitoringRow, PatientDirectoryFacets, PatientDirectoryRow } from '../../lib/types';
 import { uniqueAssignees, uniqueProcedures } from '../../lib/command-queue';
 import { SCButton, SCDropdown, SCSearchInput } from '../design-system';
 import { IconAdd } from '../design-system/icons';
@@ -43,7 +43,7 @@ const SORT_DIR_OPTIONS = [
 
 export type PatientsDirectoryToolbarProps = {
   filters: PatientDirectoryFilters;
-  rows: MonitoringRow[];
+  rows: MonitoringRow[] | PatientDirectoryRow[];
   facets?: PatientDirectoryFacets;
   sort?: PatientDirectorySort;
   sortDir?: 'asc' | 'desc';
@@ -79,7 +79,7 @@ export function PatientsDirectoryToolbar({
     { value: 'all', label: 'Procedure (All)' },
     ...(serverMode && facets
       ? facets.procedures.map((p) => ({ value: p, label: p }))
-      : uniqueProcedures(rows).map((p) => ({ value: p, label: p }))),
+      : uniqueProcedures(rows as MonitoringRow[]).map((p) => ({ value: p, label: p }))),
   ];
 
   const assigneeOptions = [
@@ -87,7 +87,7 @@ export function PatientsDirectoryToolbar({
     { value: 'unassigned', label: 'Unassigned' },
     ...(serverMode && facets
       ? facets.clinicians.map((c) => ({ value: c.id, label: c.name }))
-      : uniqueAssignees(rows).map((a) => ({ value: a, label: a }))),
+      : uniqueAssignees(rows as MonitoringRow[]).map((a) => ({ value: a, label: a }))),
   ];
 
   const sortOptions = PATIENT_DIRECTORY_SORT_OPTIONS.map((o) => ({

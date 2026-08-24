@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { MonitoringRow, PatientDirectoryFacets } from '../../lib/types';
+import type { MonitoringRow, PatientDirectoryFacets, PatientDirectoryRow } from '../../lib/types';
 import { usePatientDirectory } from '../../hooks/use-patient-directory';
 import { sortQueueRows } from '../../lib/command-queue';
 import { SCButton, SCTable } from '../design-system';
@@ -122,7 +122,7 @@ export function PatientsContent({
 
   const filteredRows = useMemo(() => {
     if (useServer || loading || error) return rows;
-    return sortQueueRows(filterPatientDirectory(rows, filters));
+    return sortQueueRows(filterPatientDirectory(rows as MonitoringRow[], filters));
   }, [rows, filters, loading, error, useServer]);
 
   const displayRows = useServer ? rows : filteredRows;
@@ -241,8 +241,8 @@ export function PatientsContent({
       >
         {paginatedRows.map((row) => (
           <PatientDirectoryTableRow
-            key={row.enrolment_id}
-            row={row}
+            key={row.patient_id}
+            row={row as PatientDirectoryRow}
             secondaryIdentityByEnrolment={secondaryIdentityByEnrolment}
           />
         ))}
