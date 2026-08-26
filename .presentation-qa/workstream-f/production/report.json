@@ -1,0 +1,10 @@
+{
+  "chromium": {
+    "admin": [],
+    "viewer": []
+  },
+  "webkit": {
+    "admin": [],
+    "viewer": []
+  }
+}
