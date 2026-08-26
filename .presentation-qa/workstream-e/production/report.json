@@ -1,0 +1,20 @@
+{
+  "chromium": {
+    "admin": [],
+    "viewer": []
+  },
+  "webkit": {
+    "admin": [],
+    "viewer": []
+  },
+  "setup": {
+    "create": {
+      "status": 201,
+      "siteId": "23da116b-cdee-4cfe-9b2e-eebeadfdb637"
+    },
+    "grant": {
+      "status": 201,
+      "userId": "9ec049da-ded3-4233-9a14-407d879a8322"
+    }
+  }
+}
