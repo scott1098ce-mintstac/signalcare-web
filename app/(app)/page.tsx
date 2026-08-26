@@ -15,7 +15,10 @@ export default function CommandQueuePage() {
   const { session } = useAuth();
   const canViewQueue = canViewMonitoring(session?.role);
   const canEnrol = canEnrolPatient(session?.role);
-  const queue = useCommandQueue({ enabled: session !== null && canViewQueue });
+  const queue = useCommandQueue({
+    enabled: session !== null && canViewQueue,
+    clinicId: session?.clinic?.id ?? null,
+  });
   const workspace = useWorkspacePanel({
     session,
     onRefreshQueue: queue.refresh,

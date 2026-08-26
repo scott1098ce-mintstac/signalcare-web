@@ -103,6 +103,13 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
   }, []);
 
   useEffect(() => {
+    setSelectedEnrolmentId(null);
+    setTimeline([]);
+    setWorkspaceData(null);
+    setActionError(null);
+  }, [session?.clinic?.id]);
+
+  useEffect(() => {
     if (!selectedEnrolmentId) {
       setTimeline([]);
       setWorkspaceData(null);

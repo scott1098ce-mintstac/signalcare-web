@@ -96,7 +96,7 @@ export default function ProtocolLibraryPage() {
     } finally {
       setLoadingMy(false);
     }
-  }, [router]);
+  }, [router, session?.clinic?.id]);
 
   const loadTemplates = useCallback(async () => {
     setLoadingTemplates(true);
@@ -124,7 +124,7 @@ export default function ProtocolLibraryPage() {
     } finally {
       setLoadingTemplates(false);
     }
-  }, [router]);
+  }, [router, session?.clinic?.id]);
 
   const refreshAll = useCallback(async () => {
     await Promise.all([loadMyProtocols(), loadTemplates()]);

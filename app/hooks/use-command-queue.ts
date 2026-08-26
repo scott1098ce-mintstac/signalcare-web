@@ -23,9 +23,10 @@ import type {
 
 type UseCommandQueueOptions = {
   enabled: boolean;
+  clinicId?: string | null;
 };
 
-export function useCommandQueue({ enabled }: UseCommandQueueOptions) {
+export function useCommandQueue({ enabled, clinicId }: UseCommandQueueOptions) {
   const router = useRouter();
   const [monitoring, setMonitoring] = useState<MonitoringRow[]>([]);
   const [monitoringCount, setMonitoringCount] = useState(0);
@@ -115,12 +116,14 @@ export function useCommandQueue({ enabled }: UseCommandQueueOptions) {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, clinicId]);
 
   useEffect(() => {
+    setMonitoring([]);
+    setError(null);
     if (!enabled) return;
     void refresh();
-  }, [enabled, refresh]);
+  }, [enabled, refresh, clinicId]);
 
   const optimisticAlertAction = useCallback(
     (enrolmentId: string, action: 'acknowledge' | 'resolve') => {

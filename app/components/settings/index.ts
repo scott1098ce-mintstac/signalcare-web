@@ -34,7 +34,9 @@ export { SettingsNav, type SettingsNavProps } from './SettingsNav';
 export {
   SETTINGS_PRIMARY_TABS,
   SETTINGS_CLINIC_TABS,
+  SETTINGS_ORGANISATION_TABS,
   type SettingsPrimaryTabId,
   type SettingsClinicTabId,
+  type SettingsOrganisationTabId,
 } from './settings-nav.config';
 export { SettingsFooter, type SettingsFooterProps } from './SettingsFooter';

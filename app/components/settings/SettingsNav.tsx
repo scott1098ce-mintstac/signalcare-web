@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { cn } from '../../lib/cn';
 import { useAuth } from '../../lib/auth';
 import { canMutateAlerts, canViewClinicSettings } from '../../lib/app-permissions';
+import { canViewOrganisation } from '../../lib/organisation-permissions';
 import {
   SETTINGS_CLINIC_TABS,
+  SETTINGS_ORGANISATION_TABS,
   SETTINGS_PRIMARY_TABS,
   type SettingsClinicTabId,
+  type SettingsOrganisationTabId,
   type SettingsPrimaryTabId,
   type SettingsTabItem,
 } from './settings-nav.config';
@@ -15,7 +18,7 @@ import styles from './settings-nav.module.css';
 
 export type SettingsNavProps = {
   primaryActive: SettingsPrimaryTabId;
-  secondaryActive?: SettingsClinicTabId;
+  secondaryActive?: SettingsClinicTabId | SettingsOrganisationTabId;
   className?: string;
   dataNodeId?: string;
 };
@@ -55,17 +58,19 @@ export function SettingsNav({
 }: SettingsNavProps) {
   const { session } = useAuth();
 
-  // Clinic administration is admin-only. Notification preferences are personal,
-  // so every clinician who can act on alerts can configure their own delivery.
   const isClinicSettingsAdmin = canViewClinicSettings(session?.role);
+  const isOrganisationAdmin = canViewOrganisation(session?.organisation_role);
   const canConfigureNotifications = canMutateAlerts(session?.role);
-  const primaryTabs = isClinicSettingsAdmin
-    ? SETTINGS_PRIMARY_TABS
-    : SETTINGS_PRIMARY_TABS.filter(
-        (tab) => tab.id === 'account' || (tab.id === 'notifications' && canConfigureNotifications),
-      );
 
-  const showSecondary = isClinicSettingsAdmin && primaryActive === 'clinic' && secondaryActive;
+  const primaryTabs = SETTINGS_PRIMARY_TABS.filter((tab) => {
+    if (tab.id === 'organisation') return isOrganisationAdmin;
+    if (tab.id === 'clinic') return isClinicSettingsAdmin;
+    if (tab.id === 'notifications') return canConfigureNotifications;
+    return true;
+  });
+
+  const showClinicSecondary = isClinicSettingsAdmin && primaryActive === 'clinic' && Boolean(secondaryActive);
+  const showOrgSecondary = isOrganisationAdmin && primaryActive === 'organisation' && Boolean(secondaryActive);
 
   return (
     <nav className={cn(styles.nav, className)} aria-label="Settings" data-node-id={dataNodeId}>
@@ -75,9 +80,16 @@ export function SettingsNav({
             renderTab(tab, tab.id === primaryActive, 'primary'),
           )}
         </div>
-        {showSecondary ? (
+        {showClinicSecondary ? (
           <div className={styles.secondaryRow} data-node-id="284:9820">
             {SETTINGS_CLINIC_TABS.map((tab) =>
+              renderTab(tab, tab.id === secondaryActive, 'secondary'),
+            )}
+          </div>
+        ) : null}
+        {showOrgSecondary ? (
+          <div className={styles.secondaryRow}>
+            {SETTINGS_ORGANISATION_TABS.map((tab) =>
               renderTab(tab, tab.id === secondaryActive, 'secondary'),
             )}
           </div>

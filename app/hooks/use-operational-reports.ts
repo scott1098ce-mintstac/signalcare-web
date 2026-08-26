@@ -23,6 +23,7 @@ const EMPTY_REPORTS: ReportsAnalyticsData = {
 
 type UseOperationalReportsOptions = {
   enabled: boolean;
+  clinicId?: string | null;
 };
 
 /** @deprecated Use ReportsAnalyticsData from lib/types — kept for visual fixture compatibility. */
@@ -54,7 +55,7 @@ function parseReportsResponse(json: Record<string, unknown>): ReportsAnalyticsDa
   };
 }
 
-export function useOperationalReports({ enabled }: UseOperationalReportsOptions) {
+export function useOperationalReports({ enabled, clinicId }: UseOperationalReportsOptions) {
   const router = useRouter();
   const [data, setData] = useState<ReportsAnalyticsData>(EMPTY_REPORTS);
   const [loading, setLoading] = useState(true);
@@ -91,15 +92,16 @@ export function useOperationalReports({ enabled }: UseOperationalReportsOptions)
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, clinicId]);
 
   useEffect(() => {
+    setData(EMPTY_REPORTS);
     if (!enabled) {
       setLoading(false);
       return;
     }
     void refresh();
-  }, [enabled, refresh]);
+  }, [enabled, refresh, clinicId]);
 
   return { data, loading, error, refresh };
 }

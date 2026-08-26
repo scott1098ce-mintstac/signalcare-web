@@ -54,6 +54,7 @@ export type PatientsContentProps = {
   /** When true (default), loads GET /app/patient-directory with server pagination. */
   serverMode?: boolean;
   sessionEnabled?: boolean;
+  clinicId?: string | null;
 };
 
 /** Clinical patient monitoring directory — search, filter, and open Patient Workspace. */
@@ -84,6 +85,7 @@ export function PatientsContent({
   emptyDescription = 'Patients will appear here once added to this clinic.',
   serverMode = false,
   sessionEnabled = false,
+  clinicId = null,
 }: PatientsContentProps = {}) {
   const [filters, setFilters] = useState<PatientDirectoryFilters>({
     ...DEFAULT_PATIENT_DIRECTORY_FILTERS,
@@ -95,6 +97,7 @@ export function PatientsContent({
 
   const serverQuery = usePatientDirectory({
     enabled: serverMode && sessionEnabled && rowsOverride === undefined,
+    clinicId,
     filters,
     page,
     sort,

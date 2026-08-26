@@ -10,6 +10,7 @@ import {
   IconQueue,
 } from '../design-system/icons';
 import { logout } from '../../lib/auth';
+import { SiteSwitcher } from './SiteSwitcher';
 
 export type AppHeaderProps = {
   title: ReactNode;
@@ -49,6 +50,7 @@ export function AppHeader({ title }: AppHeaderProps) {
 
   const aside = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <SiteSwitcher />
       <SCButton variant="outline" type="button" onClick={() => void handleLogout()}>
         Log out
       </SCButton>

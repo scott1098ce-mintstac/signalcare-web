@@ -27,6 +27,7 @@ export default function PatientsPage() {
       <PatientsContent
         serverMode
         sessionEnabled={session !== null}
+        clinicId={session?.clinic?.id ?? null}
         refreshSignal={refreshSignal}
         canEnrol={canEnrolPatient(session?.role)}
         onEnroll={() => setEnrollOpen(true)}

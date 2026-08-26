@@ -12,6 +12,8 @@ function resolvePageTitle(pathname: string): string {
   if (pathname === '/protocols') return 'Protocol Library';
   if (pathname === '/reports') return 'Clinical Reports';
   if (pathname.startsWith('/protocols/')) return 'Protocol Editor';
+  if (pathname.startsWith('/settings/organisation')) return 'Organisation';
+  if (pathname.startsWith('/settings/clinic')) return 'Clinic site';
   if (pathname.startsWith('/settings/staff')) return 'Settings';
   if (pathname.startsWith('/settings/escalation')) return 'Escalation settings';
   if (pathname.startsWith('/settings')) return 'Settings';

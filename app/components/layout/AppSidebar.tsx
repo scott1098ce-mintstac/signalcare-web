@@ -2,7 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../lib/auth';
-import { canViewClinicSettings } from '../../lib/app-permissions';
+import { canViewClinicSettings, hasClinicalAccess } from '../../lib/app-permissions';
+import { canViewOrganisation } from '../../lib/organisation-permissions';
 import { Sidebar, type SidebarNavItem } from '../design-system';
 import {
   IconNavPatients,
@@ -50,15 +51,23 @@ function toSidebarItem(item: NavItem, pathname: string): SidebarNavItem {
 export function AppSidebar() {
   const pathname = usePathname();
   const { session } = useAuth();
+  const clinical = hasClinicalAccess(session?.role);
+  const canOrg = canViewOrganisation(session?.organisation_role);
 
-  // Clinic Settings is admin-only; personal Account/Profile stays visible to everyone.
-  const bottomNav = BOTTOM_NAV_ITEMS.filter(
-    (item) => item.icon !== 'settings' || canViewClinicSettings(session?.role),
-  );
+  const primaryNav = clinical
+    ? MAIN_NAV_ITEMS.map((item) => toSidebarItem(item, pathname))
+    : [];
+
+  const settingsHref = canOrg && !clinical ? '/settings/organisation' : '/settings/escalation';
+  const bottomNav = BOTTOM_NAV_ITEMS
+    .filter((item) => item.icon !== 'settings' || canViewClinicSettings(session?.role) || canOrg)
+    .map((item) =>
+      item.icon === 'settings' ? { ...item, href: settingsHref } : item,
+    );
 
   return (
     <Sidebar
-      primaryNav={MAIN_NAV_ITEMS.map((item) => toSidebarItem(item, pathname))}
+      primaryNav={primaryNav}
       secondaryNav={bottomNav.map((item) => toSidebarItem(item, pathname))}
     />
   );

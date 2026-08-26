@@ -11,6 +11,7 @@ import { SettingsTableCell } from '../settings/SettingsData';
 import frameworkStyles from '../settings/settings-framework.module.css';
 import type { ReportsAnalyticsData } from '../../lib/types';
 import { useOperationalReports } from '../../hooks/use-operational-reports';
+import { useAuth } from '../../lib/auth';
 import type { ProtocolPerformanceRow } from '../../lib/types';
 import { ReportsBarChart } from './ReportsBarChart';
 import { ReportsDashboardToolbar } from './ReportsDashboardToolbar';
@@ -147,8 +148,10 @@ export function ReportsContent({
     setDateRangeValue(dateRangeValueProp);
   }, [dateRangeValueProp]);
 
+  const { session } = useAuth();
   const { data: liveData, loading: liveLoading, error } = useOperationalReports({
     enabled: !fixture && visualState == null,
+    clinicId: session?.clinic?.id ?? null,
   });
 
   const isLoading = loadingOverride || (!fixture && visualState == null && liveLoading);

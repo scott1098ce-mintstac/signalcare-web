@@ -11,6 +11,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 type UsePatientDirectoryOptions = {
   enabled: boolean;
+  clinicId?: string | null;
   filters: PatientDirectoryFilters;
   page: number;
   sort: PatientDirectorySort;
@@ -43,6 +44,7 @@ function buildQueryString(
 
 export function usePatientDirectory({
   enabled,
+  clinicId,
   filters,
   page,
   sort,
@@ -136,15 +138,16 @@ export function usePatientDirectory({
     } finally {
       setLoading(false);
     }
-  }, [router, queryString, refreshSignal]);
+  }, [router, queryString, refreshSignal, clinicId]);
 
   useEffect(() => {
+    setRows([]);
     if (!enabled) {
       setLoading(false);
       return;
     }
     void refresh();
-  }, [enabled, refresh]);
+  }, [enabled, refresh, clinicId]);
 
   const isSearchPending = filters.search !== debouncedSearch;
 

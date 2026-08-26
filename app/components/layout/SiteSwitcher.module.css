@@ -1,0 +1,17 @@
+@import '../design-system/tokens/tokens.css';
+
+.current {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 16px;
+  color: var(--ds-text-secondary);
+}
+
+.switcher {
+  flex-shrink: 0;
+}

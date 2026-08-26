@@ -4,6 +4,7 @@
  */
 import {
   clearAppSession,
+  clearCurrentClinicId,
   getAppSession,
   getCurrentClinicId,
   initAppSession,
@@ -24,6 +25,7 @@ export {
   getCurrentClinicId,
   initAppSession,
   setCurrentClinicId,
+  clearCurrentClinicId,
   type AppSession,
   type ClinicInfo,
 };
@@ -32,22 +34,24 @@ export {
 export type MeResponse = {
   error?: string;
   user_id?: string;
-  role?: string;
+  role?: string | null;
   clinic?: { id: string; name: string | null } | null;
-  clinic_id?: string;
+  clinic_id?: string | null;
+  organisation_role?: string | null;
+  organisation?: AppSession['organisation'];
   ok?: boolean;
   permission?: string;
   user?: {
     user_id?: string;
-    clinic_id?: string;
+    clinic_id?: string | null;
     role?: string | null;
   };
 };
 
-/** GET /app/my-clinics; if ≥1 clinic, stores first id (temporary default when multiple). */
+/** GET /app/my-clinics; stores current id only when none is set and exactly one clinic exists. */
 export async function syncClinicSelectionFromApi(
   accessToken: string
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; clinics: Array<{ id: string }> } | { ok: false; error: string }> {
   const res = await fetch(`${API_URL}/app/my-clinics`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -59,15 +63,16 @@ export async function syncClinicSelectionFromApi(
     };
   }
   const clinics = Array.isArray(body?.clinics) ? body.clinics : [];
-  if (clinics.length === 0) {
-    return { ok: false, error: 'no_clinics' };
+  const current = getCurrentClinicId();
+  const currentValid = Boolean(current && clinics.some((c: { id?: string }) => c?.id === current));
+  if (!currentValid) {
+    if (clinics.length === 1 && clinics[0]?.id) {
+      setCurrentClinicId(clinics[0].id);
+    } else {
+      clearCurrentClinicId();
+    }
   }
-  const first = clinics[0] as { id?: string };
-  if (!first?.id) {
-    return { ok: false, error: 'no_clinics' };
-  }
-  setCurrentClinicId(first.id);
-  return { ok: true };
+  return { ok: true, clinics };
 }
 
 function toMeResponse(parsed: AppMeParsed): MeResponse {
@@ -78,6 +83,8 @@ function toMeResponse(parsed: AppMeParsed): MeResponse {
       role: parsed.role,
       clinic_id: parsed.clinic_id,
       clinic: parsed.clinic,
+      organisation_role: parsed.organisation_role,
+      organisation: parsed.organisation,
       user: parsed.user,
     };
   }
@@ -88,11 +95,7 @@ function toMeResponse(parsed: AppMeParsed): MeResponse {
   };
 }
 
-/**
- * Fetch and validate GET /app/me for session bootstrap.
- * 401 clears local app session (fail closed). Does not invent roles.
- */
-export async function getClinicForUser(accessToken: string, preferredClinicId?: string | null): Promise<MeResponse> {
+async function fetchMe(accessToken: string, preferredClinicId?: string | null) {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
   };
@@ -101,9 +104,28 @@ export async function getClinicForUser(accessToken: string, preferredClinicId?: 
   }
   const res = await fetch(`${API_URL}/app/me`, { headers });
   const body = (await res.json().catch(() => ({}))) as MeResponse;
-  const parsed = parseAppMeResponse(res.status, body);
+  return { status: res.status, body };
+}
 
-  if (res.status === 401) {
+/**
+ * Fetch and validate GET /app/me for session bootstrap.
+ * 401 clears local app session (fail closed). Unmatched clinic headers retry without the header.
+ */
+export async function getClinicForUser(accessToken: string, preferredClinicId?: string | null): Promise<MeResponse> {
+  const first = await fetchMe(accessToken, preferredClinicId);
+  let status = first.status;
+  let body = first.body;
+
+  if (status === 403 && body?.error === 'clinic_not_permitted') {
+    clearCurrentClinicId();
+    const retry = await fetchMe(accessToken, null);
+    status = retry.status;
+    body = retry.body;
+  }
+
+  const parsed = parseAppMeResponse(status, body);
+
+  if (status === 401) {
     clearAppSession();
   }
 

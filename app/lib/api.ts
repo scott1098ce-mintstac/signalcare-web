@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { getCurrentClinicId } from './clinic';
+import { clearCurrentClinicId, getCurrentClinicId } from './clinic';
 
 if (!process.env.NEXT_PUBLIC_API_URL) {
   throw new Error('NEXT_PUBLIC_API_URL is not set');
@@ -61,7 +61,7 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
     finalHeaders.Authorization = `Bearer ${accessToken}`;
   }
 
-  if (!path.includes('/app/me') && currentClinicId) {
+  if (currentClinicId) {
     finalHeaders['X-Clinic-Id'] = currentClinicId;
   }
 
@@ -80,6 +80,19 @@ export async function appApiFetch(path: string, options: AppApiFetchOptions = {}
 
   if (res.status === 401) {
     void handleUnauthorizedSession();
+  }
+
+  if (res.status === 403 && currentClinicId && typeof window !== 'undefined') {
+    const peeked = await res.clone().json().catch(() => ({} as { error?: string }));
+    if (peeked?.error === 'clinic_not_permitted') {
+      clearCurrentClinicId();
+      if (!sessionStorage.getItem('signalcare_clinic_context_reset')) {
+        sessionStorage.setItem('signalcare_clinic_context_reset', '1');
+        window.location.reload();
+      }
+    }
+  } else if (res.ok && typeof window !== 'undefined') {
+    sessionStorage.removeItem('signalcare_clinic_context_reset');
   }
 
   return res;

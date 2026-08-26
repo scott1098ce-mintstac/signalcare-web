@@ -1,6 +1,7 @@
 export { APP_SESSION_KEY, CURRENT_CLINIC_ID_KEY, LEGACY_ACCESS_TOKEN_KEY } from './constants';
 export {
   clearAppSession,
+  clearCurrentClinicId,
   getAppSession,
   getCurrentClinicId,
   initAppSession,
