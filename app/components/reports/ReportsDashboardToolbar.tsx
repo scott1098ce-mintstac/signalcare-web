@@ -9,19 +9,18 @@ const DATE_RANGE_OPTIONS = [
   { value: '7d', label: 'Last 7 days' },
   { value: '30d', label: 'Last 30 days' },
   { value: '90d', label: 'Last 90 days' },
-  { value: '12m', label: 'Last 12 months' },
 ];
 
 const QUICK_PERIOD_CHIPS = [
   { value: '7d', label: '7 Days' },
   { value: '30d', label: '30 Days' },
   { value: '90d', label: '90 Days' },
-  { value: '12m', label: '12 Months' },
 ];
 
 export type ReportsDashboardToolbarProps = {
   periodLabel: string;
   asOfLabel?: string | null;
+  timezoneLabel?: string | null;
   dateRangeValue?: string;
   onDateRangeChange?: (value: string) => void;
   onExportClick?: () => void;
@@ -29,10 +28,11 @@ export type ReportsDashboardToolbarProps = {
   filtersDisabled?: boolean;
 };
 
-/** Reports page controls — date range, metadata chips, export (presentation only). */
+/** Reports page controls — clinic-local period and CSV export. */
 export function ReportsDashboardToolbar({
   periodLabel,
   asOfLabel,
+  timezoneLabel,
   dateRangeValue = '30d',
   onDateRangeChange,
   onExportClick,
@@ -43,12 +43,13 @@ export function ReportsDashboardToolbar({
     <div className={styles.dashboardToolbar}>
       <div className={styles.dashboardToolbarMain}>
         <p className={styles.pageDescription}>
-          Analytics and business intelligence for recovery monitoring — track engagement, clinical
-          performance, and outcomes over time.
+          Clinic-scoped clinical intelligence — monitoring activity, attention, response, and
+          outstanding clinician work for the selected reporting period.
         </p>
         <div className={styles.metaChips} aria-label="Reporting period">
           <span className={styles.metaChipBrand}>{periodLabel}</span>
           {asOfLabel ? <span className={styles.metaChipNeutral}>{asOfLabel}</span> : null}
+          {timezoneLabel ? <span className={styles.metaChipNeutral}>{timezoneLabel}</span> : null}
         </div>
         <div className={styles.periodChipRow} aria-label="Quick period filters">
           {QUICK_PERIOD_CHIPS.map((chip) => (

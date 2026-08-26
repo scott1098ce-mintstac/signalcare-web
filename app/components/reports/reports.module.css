@@ -288,7 +288,7 @@
 
 @media (min-width: 1100px) {
   .metricGrid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -500,4 +500,22 @@
   font-weight: var(--ds-font-weight-regular);
   line-height: var(--ds-line-height-body);
   color: var(--ds-text-secondary);
+}
+
+.handoffLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.handoffLink {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-interactive-default);
+  text-decoration: none;
+}
+
+.handoffLink:hover {
+  text-decoration: underline;
 }

@@ -4,9 +4,13 @@ export type {
   ReviewsMetrics,
 } from './metrics';
 export type {
+  ClinicalIntelligenceReport,
   ClinicalPerformanceMetrics,
+  ClinicalValueBlock,
+  CurrentWorkRow,
   ProtocolPerformanceRow,
   RecoveryScoreMetrics,
+  ReportWindow,
   ReportsAnalyticsData,
   WeeklyTrendMetrics,
 } from './reports';

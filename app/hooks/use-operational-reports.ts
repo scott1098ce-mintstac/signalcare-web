@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { appApiFetch } from '../lib/api';
-import type { ReportsAnalyticsData } from '../lib/types';
+import type {
+  ClinicalIntelligenceReport,
+  ReportsAnalyticsData,
+} from '../lib/types';
 
 const EMPTY_REPORTS: ReportsAnalyticsData = {
   engagement: null,
@@ -19,17 +22,22 @@ const EMPTY_REPORTS: ReportsAnalyticsData = {
   protocolPerformance: [],
   sinceIso: null,
   asOf: null,
+  report: null,
+  clinicalValue: null,
+  window: null,
 };
 
 type UseOperationalReportsOptions = {
   enabled: boolean;
   clinicId?: string | null;
+  period?: string;
 };
 
 /** @deprecated Use ReportsAnalyticsData from lib/types — kept for visual fixture compatibility. */
 export type OperationalReportsData = ReportsAnalyticsData;
 
 function parseReportsResponse(json: Record<string, unknown>): ReportsAnalyticsData {
+  const report = (json.report as ClinicalIntelligenceReport | undefined) ?? null;
   return {
     engagement: (json.engagement as ReportsAnalyticsData['engagement']) ?? null,
     reviews: (json.reviews as ReportsAnalyticsData['reviews']) ?? null,
@@ -49,23 +57,36 @@ function parseReportsResponse(json: Record<string, unknown>): ReportsAnalyticsDa
         : null,
     weeklyTrends: (json.weekly_trends as ReportsAnalyticsData['weeklyTrends']) ?? null,
     protocolPerformance:
-      (json.protocol_performance as ReportsAnalyticsData['protocolPerformance']) ?? [],
+      (json.protocol_performance as ReportsAnalyticsData['protocolPerformance']) ??
+      report?.protocol_performance ??
+      [],
     sinceIso: typeof json.since_iso === 'string' ? json.since_iso : null,
     asOf: typeof json.as_of === 'string' ? json.as_of : null,
+    report,
+    clinicalValue: (json.clinical_value as ReportsAnalyticsData['clinicalValue']) ?? null,
+    window: (json.window as ReportsAnalyticsData['window']) ?? report?.window ?? null,
   };
 }
 
-export function useOperationalReports({ enabled, clinicId }: UseOperationalReportsOptions) {
+export function useOperationalReports({
+  enabled,
+  clinicId,
+  period = '30d',
+}: UseOperationalReportsOptions) {
   const router = useRouter();
   const [data, setData] = useState<ReportsAnalyticsData>(EMPTY_REPORTS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [forbidden, setForbidden] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setForbidden(false);
     try {
-      const analyticsRes = await appApiFetch('/app/analytics/reports-v1');
+      const analyticsRes = await appApiFetch(
+        `/app/analytics/reports-v1?period=${encodeURIComponent(period)}`,
+      );
 
       if (analyticsRes.status === 401) {
         router.replace('/auth/signin');
@@ -73,6 +94,7 @@ export function useOperationalReports({ enabled, clinicId }: UseOperationalRepor
       }
 
       if (analyticsRes.status === 403) {
+        setForbidden(true);
         setError('You do not have permission to view reports.');
         setData(EMPTY_REPORTS);
         return;
@@ -92,7 +114,7 @@ export function useOperationalReports({ enabled, clinicId }: UseOperationalRepor
     } finally {
       setLoading(false);
     }
-  }, [router, clinicId]);
+  }, [router, period]);
 
   useEffect(() => {
     setData(EMPTY_REPORTS);
@@ -101,7 +123,23 @@ export function useOperationalReports({ enabled, clinicId }: UseOperationalRepor
       return;
     }
     void refresh();
-  }, [enabled, refresh, clinicId]);
+  }, [enabled, refresh, clinicId, period]);
 
-  return { data, loading, error, refresh };
+  return { data, loading, error, forbidden, refresh };
+}
+
+export async function downloadReportsCsv(period: string) {
+  const res = await appApiFetch(`/app/analytics/reports-v1.csv?period=${encodeURIComponent(period)}`);
+  if (!res.ok) {
+    throw new Error('Could not export this report');
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `signalcare-reports-${period}.csv`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }

@@ -54,30 +54,15 @@ function formatScore(score: number | null | undefined): string {
   return score.toFixed(1);
 }
 
-function toneForRate(rate: number | null, goodAt = 0.7): ReportsKpiMetric['tone'] {
-  if (rate == null) return 'neutral';
-  if (rate >= goodAt) return 'success';
-  if (rate >= goodAt * 0.85) return 'neutral';
-  return 'warning';
+function formatCount(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return '0';
+  return String(value);
 }
 
-function kpiStatusLabel(tone: ReportsKpiMetric['tone']): string | undefined {
-  if (tone === 'success') return 'Healthy metric';
-  if (tone === 'warning') return 'Needs attention';
-  if (tone === 'danger') return 'Outside expected range';
-  return undefined;
-}
-
-function ackIndicatorLevel(minutes: number | null | undefined): number | null {
-  if (minutes == null || !Number.isFinite(minutes)) return null;
-  const targetMinutes = 60;
-  return Math.min(targetMinutes / Math.max(minutes, 1), 1);
-}
-
-function resolutionIndicatorLevel(hours: number | null | undefined): number | null {
-  if (hours == null || !Number.isFinite(hours)) return null;
-  const targetHours = 8;
-  return Math.min(targetHours / Math.max(hours, 0.1), 1);
+function toneForOutstanding(count: number): ReportsKpiMetric['tone'] {
+  if (count <= 0) return 'success';
+  if (count >= 5) return 'warning';
+  return 'neutral';
 }
 
 function weeklySparkline(values: Array<number | null> | undefined, scale = 100): number[] | null {
@@ -87,304 +72,241 @@ function weeklySparkline(values: Array<number | null> | undefined, scale = 100):
   return values.map((v) => (v == null ? 0 : Math.round(v * scale)));
 }
 
-/** Period-over-period delta from weekly series (presentation only). */
-function computePeriodTrendDelta(
-  series: Array<number | null> | undefined,
-): ReportsKpiTrendDelta | undefined {
-  const numeric = series?.filter((v): v is number => v != null && Number.isFinite(v)) ?? [];
-  if (numeric.length < 2) return undefined;
-
-  const previous = numeric[0];
-  const current = numeric[numeric.length - 1];
-  if (previous === 0 && current === 0) {
-    return { direction: 'flat', label: 'Stable vs previous period' };
-  }
-
-  const pctChange =
-    previous === 0
-      ? current > 0
-        ? 100
-        : 0
-      : Math.round(((current - previous) / Math.abs(previous)) * 100);
-
-  if (Math.abs(pctChange) < 1) {
-    return { direction: 'flat', label: 'Stable vs previous period' };
-  }
-
-  const direction = pctChange > 0 ? 'up' : 'down';
-  const arrow = direction === 'up' ? '↑' : '↓';
-  return {
-    direction,
-    label: `${arrow} ${Math.abs(pctChange)}% vs previous period`,
-  };
-}
-
-function engagementWeeklySeries(
-  weeklyTrends: ReportsAnalyticsData['weeklyTrends'],
-  patientEngagementIndex: number | null,
-): Array<number | null> | undefined {
-  if (!weeklyTrends?.response_rate?.length) return undefined;
-  return weeklyTrends.response_rate.map((rate, index) => {
-    const sent = weeklyTrends.checkins_sent[index] ?? 0;
-    const replied = weeklyTrends.checkins_replied[index] ?? 0;
-    if (sent === 0 || rate == null) return patientEngagementIndex;
-    return rate * 0.7 + (replied / Math.max(sent, 1)) * 0.3;
-  });
-}
-
 export function buildReportingKpis(data: ReportsAnalyticsData): ReportsKpiMetric[] {
-  const {
-    engagement,
-    reviews,
-    escalations,
-    recoveryScores,
-    patientEngagementIndex,
-    escalationRate30d,
-    weeklyTrends,
-  } = data;
+  const report = data.report;
+  const monitoring = report?.monitoring;
+  const engagement = report?.engagement;
+  const attention = report?.attention;
+  const outstanding = report?.outstanding;
 
-  const reviewCompletionRate =
-    reviews && reviews.reviews_required_30d > 0
-      ? reviews.reviews_completed_30d / reviews.reviews_required_30d
-      : null;
+  const responseRate =
+    engagement?.response_rate ??
+    (data.engagement && data.engagement.checkins_sent_30d > 0
+      ? data.engagement.response_rate_30d
+      : null);
 
-  const recoveryTone =
-    recoveryScores?.average_score_30d != null && recoveryScores.average_score_30d <= 6
-      ? 'success'
-      : recoveryScores?.average_score_30d != null && recoveryScores.average_score_30d > 7
-        ? 'warning'
-        : 'neutral';
-
-  const escalationTone =
-    escalationRate30d != null && escalationRate30d <= 0.35
-      ? 'success'
-      : escalationRate30d != null && escalationRate30d > 0.45
-        ? 'warning'
-        : 'neutral';
+  const activity = monitoring?.patients_with_monitoring_activity ?? 0;
+  const sent = monitoring?.checkins_sent ?? data.engagement?.checkins_sent_30d ?? 0;
+  const alerts = attention?.alerts_created ?? data.escalations?.alerts_generated_30d ?? 0;
+  const open = outstanding?.open_alerts_now ?? data.escalations?.open_alerts_now ?? 0;
+  const completed = monitoring?.journeys_completed ?? 0;
+  const currentlyMonitoring = monitoring?.patients_currently_monitoring ?? 0;
 
   return [
     {
-      key: 'engagement',
-      label: 'Patient engagement',
-      value: formatPct(patientEngagementIndex, 0),
+      key: 'activity',
+      label: 'Patients with activity',
+      value: formatCount(activity),
       context:
-        patientEngagementIndex != null
-          ? 'Composite of response and review completion (30 days)'
-          : 'Insufficient data in the last 30 days',
-      tone: toneForRate(patientEngagementIndex),
-      statusLabel: kpiStatusLabel(toneForRate(patientEngagementIndex)),
-      trendDelta: computePeriodTrendDelta(engagementWeeklySeries(weeklyTrends, patientEngagementIndex)),
-      unavailable: patientEngagementIndex == null,
+        currentlyMonitoring > 0
+          ? `${currentlyMonitoring} currently on monitoring`
+          : activity > 0
+            ? 'Historical activity in this period'
+            : 'No monitoring activity in this period',
+      tone: activity > 0 ? 'neutral' : 'neutral',
+    },
+    {
+      key: 'checkins',
+      label: 'Check-ins sent',
+      value: formatCount(sent),
+      context: `${monitoring?.replies_received ?? data.engagement?.replies_received_30d ?? 0} replies received`,
+    },
+    {
+      key: 'attention',
+      label: 'Clinical attention',
+      value: formatCount(alerts),
+      context:
+        attention != null
+          ? `${attention.high_risk_alerts} high-risk · ${attention.review_required_interactions} review-required`
+          : undefined,
+      tone: alerts > 0 ? 'warning' : 'success',
     },
     {
       key: 'response_rate',
       label: 'Response rate',
-      value: formatPct(engagement?.response_rate_30d),
+      value: formatPct(responseRate),
       context:
-        engagement != null
-          ? `${engagement.replies_received_30d} of ${engagement.checkins_sent_30d} check-ins replied`
-          : undefined,
-      tone: toneForRate(engagement?.response_rate_30d ?? null),
-      statusLabel: kpiStatusLabel(toneForRate(engagement?.response_rate_30d ?? null)),
-      trendDelta: computePeriodTrendDelta(weeklyTrends?.response_rate),
-      unavailable: engagement == null,
+        sent > 0
+          ? `${engagement?.replies_among_sent ?? data.engagement?.replies_received_30d ?? 0} of ${sent} sent check-ins replied`
+          : 'No sent check-ins in this period',
+      unavailable: responseRate == null,
     },
     {
-      key: 'recovery_score',
-      label: 'Average recovery score',
-      value: formatScore(recoveryScores?.average_score_30d),
+      key: 'outstanding',
+      label: 'Outstanding work',
+      value: formatCount(open),
       context:
-        recoveryScores && recoveryScores.signal_count_30d > 0
-          ? `${recoveryScores.signal_count_30d} patient responses in 30 days`
-          : 'No scored patient responses in 30 days',
-      tone: recoveryTone,
-      statusLabel: kpiStatusLabel(recoveryTone),
-      trendDelta: computePeriodTrendDelta(weeklyTrends?.average_recovery_score),
-      unavailable: recoveryScores?.average_score_30d == null,
+        outstanding && outstanding.open_on_completed_journeys > 0
+          ? `${outstanding.open_on_completed_journeys} on completed journeys`
+          : open > 0
+            ? 'Open clinician work now'
+            : 'No open clinician work',
+      tone: toneForOutstanding(open),
     },
     {
-      key: 'review_completion',
-      label: 'Review completion rate',
-      value: formatPct(reviewCompletionRate, 0),
-      context:
-        reviews && reviews.reviews_required_30d > 0
-          ? `${reviews.reviews_completed_30d} of ${reviews.reviews_required_30d} reviews completed`
-          : reviews
-            ? 'No reviews required in 30 days'
-            : undefined,
-      tone: toneForRate(reviewCompletionRate, 0.8),
-      statusLabel: kpiStatusLabel(toneForRate(reviewCompletionRate, 0.8)),
-      unavailable: reviewCompletionRate == null,
-    },
-    {
-      key: 'escalation_rate',
-      label: 'Escalation rate',
-      value: formatPct(escalationRate30d, 0),
-      context:
-        escalations && engagement
-          ? `${escalations.alerts_generated_30d} alerts across ${engagement.enrolments_started_30d} episodes`
-          : undefined,
-      tone: escalationTone,
-      statusLabel: kpiStatusLabel(escalationTone),
-      trendDelta: computePeriodTrendDelta(weeklyTrends?.escalation_rate),
-      unavailable: escalationRate30d == null,
+      key: 'completed',
+      label: 'Journeys completed',
+      value: formatCount(completed),
+      context: `${monitoring?.journeys_started ?? data.engagement?.enrolments_started_30d ?? 0} journeys started`,
     },
   ];
 }
 
+export function buildRecoveryConcentration(data: ReportsAnalyticsData): ReportsTrendItem[] {
+  const triage = data.report?.recovery.triage;
+  if (!triage) return [];
+  const items = [
+    { key: 'low', label: 'Low / stable', count: (triage.none || 0) + (triage.low || 0), tone: 'success' as const },
+    { key: 'medium', label: 'Medium concern', count: triage.medium || 0, tone: 'neutral' as const },
+    { key: 'high', label: 'High concern', count: triage.high || 0, tone: 'warning' as const },
+    { key: 'critical', label: 'Critical triage', count: triage.critical || 0, tone: 'danger' as const },
+  ];
+  const max = Math.max(...items.map((item) => item.count), 0);
+  if (max === 0) return [];
+  return items.map((item) => ({
+    key: item.key,
+    label: item.label,
+    value: Math.round((item.count / max) * 100),
+    display: formatCount(item.count),
+    tone: item.tone,
+    context: 'Classified recovery interactions in this period',
+    trendVariant: 'bar' as const,
+    trend: [item.count],
+  }));
+}
+
+export function buildAttentionPanel(data: ReportsAnalyticsData): ReportsTrendItem[] {
+  const attention = data.report?.attention;
+  if (!attention) return [];
+  const max = Math.max(
+    attention.alerts_created,
+    attention.high_risk_alerts,
+    attention.contact_requests,
+    attention.review_required_interactions,
+    attention.escalation_events,
+    1,
+  );
+  const rows: Array<{ key: string; label: string; count: number; tone?: ReportsTrendItem['tone'] }> = [
+    { key: 'alerts', label: 'Alerts created', count: attention.alerts_created },
+    { key: 'high', label: 'High-risk alerts', count: attention.high_risk_alerts, tone: 'warning' },
+    { key: 'critical', label: 'Critical triage interactions', count: attention.critical_triage_interactions, tone: 'danger' },
+    { key: 'contact', label: 'Contact requests', count: attention.contact_requests, tone: 'warning' },
+    { key: 'review', label: 'Review-required interactions', count: attention.review_required_interactions },
+    { key: 'escalations', label: 'Escalation events', count: attention.escalation_events },
+  ];
+  return rows.map((row) => ({
+    key: row.key,
+    label: row.label,
+    value: Math.round((row.count / max) * 100),
+    display: formatCount(row.count),
+    tone: row.tone,
+    trendVariant: 'bar',
+    trend: [row.count],
+  }));
+}
+
 export function buildEngagementPanel(data: ReportsAnalyticsData): ReportsTrendItem[] {
-  const { engagement, weeklyTrends, recoveryScores, patientEngagementIndex } = data;
+  const engagement = data.report?.engagement ?? null;
+  const monitoring = data.report?.monitoring;
+  if (!engagement && !data.engagement) return [];
 
-  if (!engagement) return [];
-
-  const responseTrend = weeklySparkline(weeklyTrends?.response_rate);
-  const scoreTrend = weeklySparkline(
-    weeklyTrends?.average_recovery_score?.map((v) => (v == null ? null : v / 10)),
-  );
-  const engagementTrend = weeklySparkline(
-    weeklyTrends?.response_rate?.map((rate, index) => {
-      const sent = weeklyTrends.checkins_sent[index] ?? 0;
-      const replied = weeklyTrends.checkins_replied[index] ?? 0;
-      if (sent === 0 || rate == null) return patientEngagementIndex;
-      return rate * 0.7 + (replied / Math.max(sent, 1)) * 0.3;
-    }),
-  );
+  const sent = engagement?.checkins_sent ?? data.engagement?.checkins_sent_30d ?? 0;
+  const replies = engagement?.replies_received ?? data.engagement?.replies_received_30d ?? 0;
+  const rate = engagement?.response_rate ?? (sent > 0 ? data.engagement?.response_rate_30d ?? null : null);
 
   return [
     {
-      key: 'engagement_trend',
-      label: 'Patient engagement trend',
-      value: Math.round((patientEngagementIndex ?? 0) * 100),
-      display:
-        patientEngagementIndex != null ? formatPct(patientEngagementIndex, 0) : '—',
-      tone: toneForRate(patientEngagementIndex),
-      context: responseTrend ? 'Weekly composite over the last 4 weeks' : 'Weekly trend unavailable',
-      trend: engagementTrend,
-      trendVariant: 'line',
-    },
-    {
-      key: 'recovery_score_trend',
-      label: 'Recovery outcomes trend',
-      value: Math.round((recoveryScores?.average_score_30d ?? 0) * 10),
-      display:
-        recoveryScores?.average_score_30d != null
-          ? `${recoveryScores.average_score_30d.toFixed(1)} avg`
-          : '—',
-      tone:
-        recoveryScores?.average_score_30d != null && recoveryScores.average_score_30d <= 6
-          ? 'success'
-          : 'neutral',
-      context:
-        recoveryScores && recoveryScores.signal_count_30d > 0
-          ? `${recoveryScores.signal_count_30d} scored responses in 30 days`
-          : 'No scored responses in 30 days',
-      trend: scoreTrend,
-      trendVariant: 'line',
-    },
-    {
-      key: 'checkins_completed',
-      label: 'Check-in completion',
-      value: Math.round((engagement.replies_received_30d / Math.max(engagement.checkins_sent_30d, 1)) * 100),
-      display: `${engagement.replies_received_30d} of ${engagement.checkins_sent_30d}`,
-      context: 'Patient replies to monitoring check-ins',
+      key: 'sent',
+      label: 'Check-ins sent',
+      value: sent,
+      display: formatCount(sent),
+      context: 'Excludes cancelled and unsent scheduled check-ins',
       trend: weeklySparkline(
-        weeklyTrends?.checkins_sent.map((sent, index) => {
-          const replied = weeklyTrends.checkins_replied[index] ?? 0;
-          return sent > 0 ? replied / sent : null;
-        }),
+        data.weeklyTrends?.checkins_sent.map((value) => (value > 0 ? value / Math.max(sent, 1) : 0)),
       ),
       trendVariant: 'bar',
+    },
+    {
+      key: 'replies',
+      label: 'Replies received',
+      value: replies,
+      display: formatCount(replies),
+      context: 'Patient replies with replied_at in this period',
+      trend: weeklySparkline(
+        data.weeklyTrends?.checkins_replied.map((value) => (value > 0 ? value / Math.max(replies, 1) : 0)),
+      ),
+      trendVariant: 'bar',
+    },
+    {
+      key: 'rate',
+      label: 'Response rate',
+      value: Math.round((rate ?? 0) * 100),
+      display: formatPct(rate),
+      context:
+        sent > 0
+          ? `${engagement?.replies_among_sent ?? replies} of ${sent} sent check-ins have a reply`
+          : 'No sent check-ins — rate is not shown as 0%',
+      trend: weeklySparkline(data.weeklyTrends?.response_rate),
+      trendVariant: 'line',
+    },
+    {
+      key: 'excluded',
+      label: 'Excluded from denominator',
+      value: (engagement?.cancelled_excluded ?? 0) + (engagement?.scheduled_unsent_excluded ?? 0),
+      display: formatCount((engagement?.cancelled_excluded ?? 0) + (engagement?.scheduled_unsent_excluded ?? 0)),
+      context: `${engagement?.cancelled_excluded ?? 0} cancelled · ${engagement?.scheduled_unsent_excluded ?? 0} scheduled unsent`,
+    },
+    {
+      key: 'interactions',
+      label: 'Classified recovery interactions',
+      value: monitoring?.classified_recovery_interactions ?? 0,
+      display: formatCount(monitoring?.classified_recovery_interactions ?? 0),
+      context: 'Deduped classified conversation outcomes in this period',
     },
   ];
 }
 
 export function buildClinicalPanel(data: ReportsAnalyticsData): ReportsTrendItem[] {
-  const { escalations, reviews, engagement, clinicalPerformance, escalationRate30d, weeklyTrends } =
-    data;
+  const response = data.report?.response;
+  const outstanding = data.report?.outstanding;
+  const clinicalPerformance = data.clinicalPerformance;
 
-  if (!escalations) return [];
-
-  const reviewCompletionRate =
-    reviews && reviews.reviews_required_30d > 0
-      ? reviews.reviews_completed_30d / reviews.reviews_required_30d
-      : null;
-
-  const escalationTrend = weeklySparkline(weeklyTrends?.escalation_rate);
+  const ack = response?.median_acknowledgement_minutes ?? clinicalPerformance?.median_acknowledgement_time_minutes ?? null;
+  const resolve = response?.median_resolution_hours ?? clinicalPerformance?.median_resolution_time_hours ?? null;
+  const ackCount = response?.acknowledged_alerts ?? clinicalPerformance?.acknowledged_alerts_30d ?? 0;
+  const resolvedCount = response?.resolved_alerts ?? clinicalPerformance?.resolved_alerts_30d ?? 0;
 
   return [
     {
-      key: 'escalation_trend',
-      label: 'Escalation trend',
-      value: Math.round((escalationRate30d ?? 0) * 100),
-      display: formatPct(escalationRate30d, 0),
-      tone:
-        escalationRate30d != null && escalationRate30d <= 0.35 ? 'success' : 'warning',
-      context: `${escalations.alerts_generated_30d} alerts in 30 days`,
-      trend: escalationTrend,
-      trendVariant: 'line',
-    },
-    {
       key: 'ack_time',
-      label: 'Average clinician acknowledgement time',
-      value: Math.round(clinicalPerformance?.average_acknowledgement_time_minutes ?? 0),
-      display: formatMinutes(clinicalPerformance?.average_acknowledgement_time_minutes),
-      tone:
-        clinicalPerformance?.average_acknowledgement_time_minutes != null &&
-        clinicalPerformance.average_acknowledgement_time_minutes <= 45
-          ? 'success'
-          : clinicalPerformance?.average_acknowledgement_time_minutes != null &&
-              clinicalPerformance.average_acknowledgement_time_minutes > 60
-            ? 'warning'
-            : 'neutral',
+      label: 'Median time to acknowledgement',
+      value: Math.round(ack ?? 0),
+      display: formatMinutes(ack),
       context:
-        clinicalPerformance?.median_acknowledgement_time_minutes != null
-          ? `Median ${formatMinutes(clinicalPerformance.median_acknowledgement_time_minutes)} · ${clinicalPerformance.acknowledged_alerts_30d} acknowledged`
-          : clinicalPerformance?.acknowledged_alerts_30d
-            ? `${clinicalPerformance.acknowledged_alerts_30d} acknowledged in 30 days`
-            : 'No acknowledged alerts in 30 days',
-      indicatorLevel: ackIndicatorLevel(clinicalPerformance?.average_acknowledgement_time_minutes),
+        ackCount > 0
+          ? `${ackCount} alerts acknowledged in this period (acknowledged_at)`
+          : 'No acknowledgements in this period',
     },
     {
       key: 'resolution_time',
-      label: 'Average resolution time',
-      value: Math.round((clinicalPerformance?.average_resolution_time_hours ?? 0) * 10),
-      display: formatHours(clinicalPerformance?.average_resolution_time_hours),
-      tone:
-        clinicalPerformance?.average_resolution_time_hours != null &&
-        clinicalPerformance.average_resolution_time_hours <= 6
-          ? 'success'
-          : clinicalPerformance?.average_resolution_time_hours != null &&
-              clinicalPerformance.average_resolution_time_hours > 8
-            ? 'warning'
-            : 'neutral',
+      label: 'Median time to resolution',
+      value: Math.round((resolve ?? 0) * 10),
+      display: formatHours(resolve),
       context:
-        clinicalPerformance?.resolved_alerts_30d
-          ? `${formatPct(escalations.resolution_rate_30d, 0)} resolution rate · ${clinicalPerformance.resolved_alerts_30d} resolved`
-          : 'No resolved alerts in 30 days',
-      indicatorLevel: resolutionIndicatorLevel(clinicalPerformance?.average_resolution_time_hours),
+        resolvedCount > 0
+          ? `${resolvedCount} alerts resolved in this period (resolved_at)`
+          : 'No resolutions in this period',
     },
     {
-      key: 'review_completion_trend',
-      label: 'Review completion trend',
-      value: Math.round((reviewCompletionRate ?? 0) * 100),
-      display: formatPct(reviewCompletionRate, 0),
-      tone: toneForRate(reviewCompletionRate, 0.8),
+      key: 'open_now',
+      label: 'Open alerts now',
+      value: outstanding?.open_alerts_now ?? 0,
+      display: formatCount(outstanding?.open_alerts_now ?? 0),
+      tone: toneForOutstanding(outstanding?.open_alerts_now ?? 0),
       context:
-        reviews && reviews.reviews_required_30d > 0
-          ? `${reviews.reviews_completed_30d} of ${reviews.reviews_required_30d} reviews completed`
-          : 'No reviews required in 30 days',
-      trend: reviewCompletionRate != null ? [reviewCompletionRate * 70, reviewCompletionRate * 85, reviewCompletionRate * 95, reviewCompletionRate * 100] : null,
-      trendVariant: 'bar',
-    },
-    {
-      key: 'patient_response_trend',
-      label: 'Patient response trend',
-      value: Math.round((engagement?.response_rate_30d ?? 0) * 100),
-      display: formatPct(engagement?.response_rate_30d),
-      tone: toneForRate(engagement?.response_rate_30d ?? null),
-      context: `${engagement?.replies_received_30d ?? 0} replies received in 30 days`,
-      trend: weeklySparkline(weeklyTrends?.response_rate),
-      trendVariant: 'line',
+        outstanding && outstanding.open_on_completed_journeys > 0
+          ? `Includes ${outstanding.open_on_completed_journeys} on completed journeys`
+          : 'Point-in-time outstanding clinician work',
     },
   ];
 }
@@ -400,4 +322,4 @@ export function formatReportsAsOfLabel(asOf: string | null | undefined): string 
   })}`;
 }
 
-export { formatPct, formatScore, formatHours };
+export { formatPct, formatScore, formatHours, formatCount };
