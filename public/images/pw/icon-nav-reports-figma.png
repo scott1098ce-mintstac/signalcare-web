@@ -1,0 +1,7 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Reports Icon">
+<path id="Rectangle 44" d="M19 8.625L13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V8.625ZM13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19" stroke="var(--stroke-0, #9594A6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector 97" d="M9 13H15" stroke="var(--stroke-0, #9594A6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector 98" d="M9 17H15" stroke="var(--stroke-0, #9594A6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

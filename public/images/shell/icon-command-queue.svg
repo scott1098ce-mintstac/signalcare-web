@@ -1,0 +1,28 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="32" height="32" fill="#F5F5F5"/>
+<g id="Command Queue">
+<path d="M-204 -1614C-204 -1615.1 -203.105 -1616 -202 -1616H8451C8452.1 -1616 8453 -1615.1 8453 -1614V2250C8453 2251.1 8452.1 2252 8451 2252H-202C-203.105 2252 -204 2251.1 -204 2250V-1614Z" fill="#DEDDE6"/>
+<path d="M-202 -1616V-1615H8451V-1616V-1617H-202V-1616ZM8453 -1614H8452V2250H8453H8454V-1614H8453ZM8451 2252V2251H-202V2252V2253H8451V2252ZM-204 2250H-203V-1614H-204H-205V2250H-204ZM-202 2252V2251C-202.552 2251 -203 2250.55 -203 2250H-204H-205C-205 2251.66 -203.657 2253 -202 2253V2252ZM8453 2250H8452C8452 2250.55 8451.55 2251 8451 2251V2252V2253C8452.66 2253 8454 2251.66 8454 2250H8453ZM8451 -1616V-1615C8451.55 -1615 8452 -1614.55 8452 -1614H8453H8454C8454 -1615.66 8452.66 -1617 8451 -1617V-1616ZM-202 -1616V-1617C-203.657 -1617 -205 -1615.66 -205 -1614H-204H-203C-203 -1614.55 -202.552 -1615 -202 -1615V-1616Z" fill="black" fill-opacity="0.1"/>
+<g id="Header">
+<rect x="-43.5" y="-39.5" width="1471" height="207" rx="4.5" stroke="#9747FF" stroke-dasharray="10 5"/>
+<g id="Badge=Off">
+<g id="Container">
+<mask id="path-4-inside-1_230_15852" fill="white">
+<path d="M-24 -20H1408V52H-24V-20Z"/>
+</mask>
+<path d="M-24 -20H1408V52H-24V-20Z" fill="white"/>
+<path d="M1408 52V51H-24V52V53H1408V52Z" fill="#ECEBED" mask="url(#path-4-inside-1_230_15852)"/>
+<g id="Command Item">
+<g id="Command Icon">
+<path id="Vector" d="M10.6667 6.66718H5.33333C4.59695 6.66718 4 7.26413 4 8.00051V13.3338C4 14.0702 4.59695 14.6672 5.33333 14.6672H10.6667C11.403 14.6672 12 14.0702 12 13.3338V8.00051C12 7.26413 11.403 6.66718 10.6667 6.66718Z" stroke="black" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M4 22.6667L6.66667 25.3333L12 20" stroke="black" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M17.3333 8H27.9999" stroke="black" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M17.3333 16H27.9999" stroke="black" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_5" d="M17.3333 24H27.9999" stroke="black" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>

@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Command Icon">
+<path id="Vector" d="M10.6667 6.66719H5.33333C4.59695 6.66719 4 7.26414 4 8.00052V13.3339C4 14.0702 4.59695 14.6672 5.33333 14.6672H10.6667C11.403 14.6672 12 14.0702 12 13.3339V8.00052C12 7.26414 11.403 6.66719 10.6667 6.66719Z" stroke="var(--stroke-0, black)" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M4 22.6667L6.66667 25.3333L12 20" stroke="var(--stroke-0, black)" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M17.3332 8H27.9999" stroke="var(--stroke-0, black)" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M17.3332 16H27.9999" stroke="var(--stroke-0, black)" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_5" d="M17.3332 24H27.9999" stroke="var(--stroke-0, black)" stroke-width="2.66667" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

@@ -81,7 +81,12 @@
   --shadow-sc-card: var(--sc-shadow-card);
 }
 
-html,
+html {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+}
+
 body {
   margin: 0;
   padding: 0;
