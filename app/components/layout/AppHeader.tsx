@@ -16,7 +16,7 @@ export type AppHeaderProps = {
   title: ReactNode;
 };
 
-const PATIENTS_HEADER_ICON = '/images/pw/icon-user-group-figma.png';
+const PATIENTS_HEADER_ICON = '/images/pw/icon-user-group-figma.svg';
 
 function PatientsHeaderIcon() {
   return (

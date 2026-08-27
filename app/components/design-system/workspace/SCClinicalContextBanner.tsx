@@ -69,7 +69,7 @@ export function SCClinicalContextBanner({
   const actionFigmaIconSrc =
     variant === 'alert_acknowledged'
       ? '/images/pw/icon-file-figma.svg'
-      : '/images/pw/icon-acknowledge-figma.png';
+      : '/images/pw/icon-acknowledge-figma.svg';
 
   return (
     <section
@@ -86,7 +86,7 @@ export function SCClinicalContextBanner({
         <div className={cn(styles.alertSection, mutedAlert && styles.alertSectionMuted)}>
           <div className={cn(styles.iconCircle, styles.iconDanger)}>
             {useFigmaIcons ? (
-              <img src="/images/pw/icon-alert-figma.png" alt="" width={24} height={24} aria-hidden />
+              <img src="/images/pw/icon-alert-figma.svg" alt="" width={24} height={24} aria-hidden />
             ) : (
               <IconAlertDanger size={24} />
             )}

@@ -139,7 +139,7 @@ export function IconNavProtocols({ size = 24, ...props }: FigmaIconProps) {
 
 /** Figma nav Patients — Button/Patients */
 export function IconNavPatients({ size = 24, ...props }: FigmaIconProps) {
-  return figmaIcon('/images/pw/icon-nav-patients-figma.png', size, props);
+  return figmaIcon('/images/pw/icon-nav-patients-figma.svg', size, props);
 }
 
 /** Figma nav Reports */
