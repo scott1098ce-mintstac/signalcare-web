@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { appApiFetch } from '../../lib/api';
 import { normalizeAuMobileInput } from '../../lib/command-queue';
-import { Alert, Button, FieldLabel, Input, Modal, Select } from '../ui';
+import { Alert, Button, Checkbox, FieldLabel, Input, Modal, Select } from '../ui';
 
 type ProtocolOption = {
   id: string;
@@ -36,6 +36,7 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
   const [protocolId, setProtocolId] = useState('');
   const [practitioner, setPractitioner] = useState('');
   const [procedureDate, setProcedureDate] = useState(() => toDateInputValue(new Date()));
+  const [smsConsentRecorded, setSmsConsentRecorded] = useState(false);
   const [protocols, setProtocols] = useState<ProtocolOption[]>([]);
   const [loadingProtocols, setLoadingProtocols] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -44,6 +45,7 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
   useEffect(() => {
     if (!open) return;
     setError(null);
+    setSmsConsentRecorded(false);
     setLoadingProtocols(true);
     void appApiFetch('/app/protocols')
       .then((res) => res.json())
@@ -104,6 +106,11 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
       return;
     }
 
+    if (!smsConsentRecorded) {
+      setError('Record SMS monitoring consent before starting monitoring. Check-ins are not sent unless consent is consented.');
+      return;
+    }
+
     const startedAt = new Date(`${procedureDate}T12:00:00`).toISOString();
 
     setSubmitting(true);
@@ -111,7 +118,7 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
       const createBody: Record<string, string> = {
         name,
         mobile: normalizedMobile,
-        consent_status: 'unknown',
+        consent_status: 'consented',
         protocol_id: protocolId,
       };
       const identifier = clinicIdentifier.trim();
@@ -143,6 +150,16 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
         return;
       }
 
+      const consentRes = await appApiFetch(`/app/patients/${patientId}/consent`, {
+        method: 'POST',
+        body: { consent_status: 'consented' },
+      });
+      const consentJson = await consentRes.json().catch(() => ({}));
+      if (!consentRes.ok) {
+        setError(String(consentJson.error || 'Could not record SMS monitoring consent'));
+        return;
+      }
+
       const enrRes = await appApiFetch('/app/enrolments', {
         method: 'POST',
         body: {
@@ -163,6 +180,12 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
           setError('This patient has opted out of SMS. Restore messaging eligibility on their record before enrolling.');
           return;
         }
+        if (enrRes.status === 409 && enrJson.error === 'patient_consent_required') {
+          setError(
+            'SMS monitoring consent is not recorded. Check-ins are not sent unless consent is consented.',
+          );
+          return;
+        }
         if (enrRes.status === 400 && enrJson.error === 'patient_archived') {
           setError('This patient is archived. Restore them from the patient record before enrolling.');
           return;
@@ -176,6 +199,7 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
       setClinicIdentifier('');
       setPractitioner('');
       setProcedureDate(toDateInputValue(new Date()));
+      setSmsConsentRecorded(false);
       onSuccess();
       onClose();
     } catch (err) {
@@ -200,7 +224,7 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
             type="submit"
             form="enroll-patient-form"
             fullWidth={false}
-            disabled={submitting || loadingProtocols}
+            disabled={submitting || loadingProtocols || !smsConsentRecorded}
           >
             {submitting ? 'Starting…' : 'Start Monitoring'}
           </Button>
@@ -310,6 +334,22 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
               />
             </div>
           </div>
+        </div>
+
+        <div>
+          <h3 className="mb-3 text-[length:var(--sc-text-sm)] font-semibold uppercase tracking-wide text-[var(--sc-text-secondary)]">
+            SMS monitoring consent
+          </h3>
+          <Checkbox
+            id="enroll-sms-consent"
+            checked={smsConsentRecorded}
+            onChange={(e) => setSmsConsentRecorded(e.target.checked)}
+            label="I confirm SMS monitoring consent is recorded for this patient."
+          />
+          <p className="mt-2 text-[length:var(--sc-text-xs)] text-[var(--sc-text-secondary)]">
+            Check-ins are not sent unless consent is consented and the patient is not opted out.
+            Monitoring cannot start until this is confirmed.
+          </p>
         </div>
 
         {error ? <Alert variant="danger">{error}</Alert> : null}
