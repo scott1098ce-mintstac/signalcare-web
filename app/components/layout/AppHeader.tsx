@@ -10,6 +10,7 @@ import {
   IconQueue,
 } from '../design-system/icons';
 import { logout } from '../../lib/auth';
+import { canonicalAppPath } from '../../lib/visual-lock/canonical-path';
 import { SiteSwitcher } from './SiteSwitcher';
 
 export type AppHeaderProps = {
@@ -25,17 +26,18 @@ function PatientsHeaderIcon() {
 }
 
 function resolveHeaderIcon(pathname: string) {
-  if (pathname.startsWith('/enrolments') || pathname === '/patients') return <PatientsHeaderIcon />;
-  if (pathname.startsWith('/patient-workspace-visual') || pathname.startsWith('/patient-detail-visual')) {
+  const path = canonicalAppPath(pathname);
+  if (path.startsWith('/enrolments') || path === '/patients') return <PatientsHeaderIcon />;
+  if (path.startsWith('/patient-workspace-visual') || path.startsWith('/patient-detail-visual')) {
     return <PatientsHeaderIcon />;
   }
-  if (pathname.startsWith('/patients-visual')) return <PatientsHeaderIcon />;
-  if (pathname === '/') return <IconQueue size={32} />;
-  if (pathname.startsWith('/protocol-library-visual') || pathname.startsWith('/protocols')) {
+  if (path.startsWith('/patients-visual')) return <PatientsHeaderIcon />;
+  if (path === '/') return <IconQueue size={32} />;
+  if (path.startsWith('/protocol-library-visual') || path.startsWith('/protocols')) {
     return <IconNavProtocols size={32} />;
   }
-  if (pathname.startsWith('/reports')) return <IconNavReports size={32} />;
-  if (pathname.startsWith('/settings')) return <IconNavSettings size={32} />;
+  if (path.startsWith('/reports')) return <IconNavReports size={32} />;
+  if (path.startsWith('/settings')) return <IconNavSettings size={32} />;
   return <IconQueue size={32} />;
 }
 

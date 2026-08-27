@@ -9,6 +9,6 @@ export {
   type AppSession,
   type ClinicInfo,
 } from './session';
-export { AuthProvider, useAuth, useRequireAuth } from './auth-context';
+export { AuthProvider, VisualLockAuthProvider, useAuth, useRequireAuth } from './auth-context';
 export type { AuthContextValue } from './auth-context';
 export { logout } from './logout';

@@ -7,7 +7,12 @@
     "prebuild": "node scripts/assert-public-images.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "assert-public-images": "node scripts/assert-public-images.mjs",
+    "visual-lock": "node scripts/visual-lock/run.mjs",
+    "visual-lock:prove-fail": "node scripts/visual-lock/prove-gate-fails.mjs",
+    "live-production-qa": "node scripts/visual-lock/live-production-qa.mjs",
+    "release-verify": "node scripts/release-verify.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
@@ -22,6 +27,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.55.0",
+    "pngjs": "^7.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -87,6 +87,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/** Frozen session for visual-lock fixture routes. Does not touch Supabase or sessionStorage. */
+export function VisualLockAuthProvider({
+  session,
+  children,
+}: {
+  session: AppSession;
+  children: ReactNode;
+}) {
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      session,
+      hydrated: true,
+      refresh: () => {},
+    }),
+    [session],
+  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {

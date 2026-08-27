@@ -19,19 +19,27 @@ import { SettingsPage } from './SettingsPage';
 const CLINIC_TYPES = ['cosmetic', 'dental', 'surgical'];
 const TIMEZONES = ['Australia/Brisbane', 'Australia/Sydney', 'Australia/Melbourne', 'Australia/Perth'];
 
-export function ClinicSiteProfileContent() {
+export type ClinicSiteProfileFixture = {
+  name: string;
+  phone: string;
+  timezone: string;
+  clinic_type: string;
+};
+
+export function ClinicSiteProfileContent({ fixture }: { fixture?: ClinicSiteProfileFixture } = {}) {
   const { session } = useAuth();
   const canEdit = canMutateClinicSettings(session?.role);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [timezone, setTimezone] = useState('Australia/Brisbane');
-  const [clinicType, setClinicType] = useState('cosmetic');
-  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState(fixture?.name ?? '');
+  const [phone, setPhone] = useState(fixture?.phone ?? '');
+  const [timezone, setTimezone] = useState(fixture?.timezone ?? 'Australia/Brisbane');
+  const [clinicType, setClinicType] = useState(fixture?.clinic_type ?? 'cosmetic');
+  const [loading, setLoading] = useState(!fixture);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
+    if (fixture) return;
     let cancelled = false;
     void (async () => {
       const res = await appApiFetch('/app/clinic/settings');
@@ -51,7 +59,7 @@ export function ClinicSiteProfileContent() {
     return () => {
       cancelled = true;
     };
-  }, [session?.clinic?.id]);
+  }, [session?.clinic?.id, fixture]);
 
   async function save() {
     setSaving(true);

@@ -14,6 +14,7 @@ import {
   IconNavSettings,
 } from '../design-system/icons';
 import { BOTTOM_NAV_ITEMS, MAIN_NAV_ITEMS, type NavItem } from '../navigation/nav-config';
+import { canonicalAppPath } from '../../lib/visual-lock/canonical-path';
 
 const NAV_ICONS = {
   queue: IconNavQueue,
@@ -25,14 +26,15 @@ const NAV_ICONS = {
 } as const;
 
 function isNavItemActive(item: NavItem, pathname: string): boolean {
+  const path = canonicalAppPath(pathname);
   if (item.icon === 'profile') {
-    return pathname.startsWith('/settings/account');
+    return path.startsWith('/settings/account');
   }
   if (item.icon === 'settings') {
-    return pathname.startsWith('/settings') && !pathname.startsWith('/settings/account');
+    return path.startsWith('/settings') && !path.startsWith('/settings/account');
   }
-  if (item.href === '/') return pathname === '/';
-  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  if (item.href === '/') return path === '/';
+  return path === item.href || path.startsWith(`${item.href}/`);
 }
 
 function toSidebarItem(item: NavItem, pathname: string): SidebarNavItem {
