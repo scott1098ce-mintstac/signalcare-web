@@ -31,3 +31,11 @@ export function canManageOrganisationMembers(role?: string | null): boolean {
 export function canManageOrganisationSites(role?: string | null): boolean {
   return canMutateOrganisation(role);
 }
+
+export function canViewOrganisationBilling(role?: string | null): boolean {
+  return isKnownOrganisationRole(role);
+}
+
+export function canManageOrganisationBilling(role?: string | null): boolean {
+  return isKnownOrganisationRole(role);
+}

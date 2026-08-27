@@ -1,6 +1,6 @@
 export type SettingsPrimaryTabId = 'organisation' | 'clinic' | 'notifications' | 'account';
 export type SettingsClinicTabId = 'staff' | 'site';
-export type SettingsOrganisationTabId = 'profile' | 'sites' | 'members';
+export type SettingsOrganisationTabId = 'profile' | 'sites' | 'members' | 'billing';
 
 export type SettingsTabItem<T extends string> = {
   id: T;
@@ -28,4 +28,5 @@ export const SETTINGS_ORGANISATION_TABS: SettingsTabItem<SettingsOrganisationTab
   { id: 'profile', label: 'Profile', href: '/settings/organisation', enabled: true },
   { id: 'sites', label: 'Sites', href: '/settings/organisation/sites', enabled: true },
   { id: 'members', label: 'Members', href: '/settings/organisation/members', enabled: true },
+  { id: 'billing', label: 'Billing', href: '/settings/organisation/billing', enabled: true },
 ];
