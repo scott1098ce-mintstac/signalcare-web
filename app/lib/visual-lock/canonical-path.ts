@@ -27,7 +27,6 @@ export function resolveAuthenticatedTitle(pathname: string): string {
   if (path.startsWith('/settings/organisation')) return 'Organisation';
   if (path.startsWith('/settings/clinic')) return 'Clinic site';
   if (path.startsWith('/settings/staff')) return 'Settings';
-  if (path.startsWith('/settings/escalation')) return 'Escalation settings';
   if (path.startsWith('/settings')) return 'Settings';
   if (path.startsWith('/enrolments/')) return 'Patients';
   return 'SignalCare';

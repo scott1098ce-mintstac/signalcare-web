@@ -15,7 +15,6 @@ function resolvePageTitle(pathname: string): string {
   if (pathname.startsWith('/settings/organisation')) return 'Organisation';
   if (pathname.startsWith('/settings/clinic')) return 'Clinic site';
   if (pathname.startsWith('/settings/staff')) return 'Settings';
-  if (pathname.startsWith('/settings/escalation')) return 'Escalation settings';
   if (pathname.startsWith('/settings')) return 'Settings';
   if (pathname.startsWith('/enrolments/')) return 'Patients';
   return 'SignalCare';

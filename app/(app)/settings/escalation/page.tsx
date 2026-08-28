@@ -1,12 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { ClinicSettingsGate } from '../../../components/settings/ClinicSettingsGate';
-import { EscalationSettingsContent } from '../../../components/settings/EscalationSettingsContent';
-
+/** Legacy Figma stub. Do not render fake escalation controls in production. */
 export default function EscalationSettingsPage() {
-  return (
-    <ClinicSettingsGate>
-      <EscalationSettingsContent />
-    </ClinicSettingsGate>
-  );
+  redirect('/settings/staff');
 }

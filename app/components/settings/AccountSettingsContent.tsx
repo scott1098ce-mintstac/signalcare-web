@@ -1,52 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { logout } from '../../lib/auth';
+import { logout, useAuth } from '../../lib/auth';
+import { supabase } from '../../lib/supabase';
 import { SCButton } from '../design-system/controls/SCButton';
-import { FieldLabel } from '../ui/field-label';
-import { Input } from '../ui/input';
 import { SettingsBody } from './SettingsBody';
 import { SettingsCard } from './SettingsCard';
-import { SettingsFooter } from './SettingsFooter';
-import { SettingsFormRow, SettingsFormStack, SettingsToggleRow } from './SettingsForm';
+import { SettingsFormRow, SettingsFormStack } from './SettingsForm';
 import { SettingsHeader } from './SettingsHeader';
 import { SettingsNav } from './SettingsNav';
 import { SettingsPage } from './SettingsPage';
-import styles from './account-settings.module.css';
 
-const PLACEHOLDER_SESSIONS = [
-  {
-    id: 'session-current',
-    device: 'This device · Chrome on macOS',
-    location: 'Sydney, Australia',
-    status: 'Active now',
-    current: true,
-  },
-  {
-    id: 'session-mobile',
-    device: 'iPhone · SignalCare mobile browser',
-    location: 'Sydney, Australia',
-    status: 'Last active 2 days ago',
-    current: false,
-  },
-];
+function prettyRole(role: string | null | undefined): string {
+  const value = String(role || '').trim();
+  if (!value) return '—';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
-/** Account settings — local state only; persistence not wired. */
+/** Account — session identity and sign-out only. No profile editor in this launch. */
 export function AccountSettingsContent() {
   const router = useRouter();
-  const [name, setName] = useState('Dr. Sarah Chen');
-  const [email, setEmail] = useState('s.chen@clinic.example');
-  const [mobile, setMobile] = useState('+61 400 000 001');
-  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const { session } = useAuth();
+  const [email, setEmail] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
 
-  const initials = name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  useEffect(() => {
+    let cancelled = false;
+    void supabase.auth.getUser().then(({ data }) => {
+      if (cancelled) return;
+      const next = data.user?.email?.trim() || null;
+      setEmail(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -58,133 +47,48 @@ export function AccountSettingsContent() {
     }
   }
 
+  const clinicName = session?.clinic?.name?.trim() || '—';
+  const clinicRole = prettyRole(session?.role);
+  const organisationName = session?.organisation?.name?.trim() || null;
+  const organisationRole = session?.organisation_role
+    ? prettyRole(session.organisation_role)
+    : null;
+
   return (
     <SettingsPage width="narrow" dataNodeId="306:5817">
       <SettingsNav primaryActive="account" dataNodeId="306:5847" />
 
       <SettingsHeader
         title="Account"
-        description="Manage your personal profile, sign-in security, and active sessions."
+        description="This is your signed-in clinic session. Profile editing, password change, and device session lists are not available in this launch."
         dataNodeId="307:6562"
       />
 
       <SettingsBody>
-        <SettingsCard
-          title="Profile information"
-          description="Your name and contact details in SignalCare."
-          dataNodeId="306:5860"
-          aside={
-            <SCButton variant="outline" disabled>
-              Edit profile
-            </SCButton>
-          }
-        >
-          <div className={styles.profileIntro}>
-            <div className={styles.avatar} aria-hidden>
-              {initials}
-            </div>
-            <div>
-              <p className={styles.profileSummaryName}>{name}</p>
-              <p className={styles.profileSummaryMeta}>{email}</p>
-            </div>
-          </div>
-
-          <div className={styles.fieldGroup}>
-            <div>
-              <FieldLabel htmlFor="account-name">Name</FieldLabel>
-              <Input
-                id="account-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-              />
-            </div>
-            <div>
-              <FieldLabel htmlFor="account-email">Email</FieldLabel>
-              <Input
-                id="account-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-            <div>
-              <FieldLabel htmlFor="account-mobile">Mobile number</FieldLabel>
-              <Input
-                id="account-mobile"
-                type="tel"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                autoComplete="tel"
-              />
-            </div>
-          </div>
-        </SettingsCard>
-
-        <SettingsCard title="Security" dataNodeId="306:5879">
+        <SettingsCard title="Signed in as" dataNodeId="306:5860">
           <SettingsFormStack>
-            <SettingsFormRow
-              label="Password"
-              labelDescription="Last changed 30 days ago"
-              control={
-                <SCButton variant="outline" disabled>
-                  Change password
-                </SCButton>
-              }
-            />
-            <div>
-              <SettingsToggleRow
-                id="account-mfa"
-                label="Multi-factor authentication"
-                checked={mfaEnabled}
-                onChange={setMfaEnabled}
-                disabled
-              />
-              <p className={styles.mfaNote}>Multi-factor authentication setup is not available yet.</p>
-            </div>
+            <SettingsFormRow label="Email" control={<span>{email || '—'}</span>} />
+            <SettingsFormRow label="Clinic" control={<span>{clinicName}</span>} />
+            <SettingsFormRow label="Clinic role" control={<span>{clinicRole}</span>} />
+            {organisationName ? (
+              <SettingsFormRow label="Organisation" control={<span>{organisationName}</span>} />
+            ) : null}
+            {organisationRole ? (
+              <SettingsFormRow label="Organisation role" control={<span>{organisationRole}</span>} />
+            ) : null}
           </SettingsFormStack>
-        </SettingsCard>
-
-        <SettingsCard
-          title="Active sessions"
-          description="Devices currently signed in to your SignalCare account."
-          dataNodeId="306:5917"
-        >
-          <div className={styles.sessionList}>
-            {PLACEHOLDER_SESSIONS.map((session) => (
-              <div key={session.id} className={styles.sessionRow}>
-                <div className={styles.sessionMain}>
-                  <p className={styles.sessionTitle}>{session.device}</p>
-                  <p className={styles.sessionMeta}>
-                    {session.location} · {session.status}
-                  </p>
-                </div>
-                {session.current ? (
-                  <SCButton
-                    variant="text"
-                    type="button"
-                    disabled={signingOut}
-                    onClick={() => void handleSignOut()}
-                  >
-                    {signingOut ? 'Signing out…' : 'Sign out'}
-                  </SCButton>
-                ) : (
-                  <SCButton variant="text" disabled>
-                    Sign out
-                  </SCButton>
-                )}
-              </div>
-            ))}
+          <div style={{ marginTop: 16 }}>
+            <SCButton
+              variant="outline"
+              type="button"
+              disabled={signingOut}
+              onClick={() => void handleSignOut()}
+            >
+              {signingOut ? 'Signing out…' : 'Log out'}
+            </SCButton>
           </div>
         </SettingsCard>
       </SettingsBody>
-
-      <SettingsFooter note="Persistence wiring not implemented yet.">
-        <SCButton type="button" disabled>
-          Save settings
-        </SCButton>
-      </SettingsFooter>
     </SettingsPage>
   );
 }

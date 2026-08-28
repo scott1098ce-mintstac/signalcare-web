@@ -60,7 +60,7 @@ export function AppSidebar() {
     ? MAIN_NAV_ITEMS.map((item) => toSidebarItem(item, pathname))
     : [];
 
-  const settingsHref = canOrg && !clinical ? '/settings/organisation' : '/settings/escalation';
+  const settingsHref = canOrg && !clinical ? '/settings/organisation' : '/settings/staff';
   const bottomNav = BOTTOM_NAV_ITEMS
     .filter((item) => item.icon !== 'settings' || canViewClinicSettings(session?.role) || canOrg)
     .map((item) =>

@@ -15,6 +15,6 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
 
 /** Pinned bottom navigation — Figma Navbar footer (Settings + Profile). */
 export const BOTTOM_NAV_ITEMS: NavItem[] = [
-  { href: '/settings/escalation', label: 'Settings', shortLabel: 'Settings', icon: 'settings' },
+  { href: '/settings/staff', label: 'Settings', shortLabel: 'Settings', icon: 'settings' },
   { href: '/settings/account', label: 'Account', shortLabel: 'Profile', icon: 'profile' },
 ];
