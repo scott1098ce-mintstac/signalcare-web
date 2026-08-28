@@ -111,7 +111,7 @@ export function StaffDirectoryContent() {
     const result = await createStaffInvitation({ email: inviteEmail, role: inviteRole });
     if (!result.ok) {
       if (result.body?.error === 'invitation_created_email_failed') {
-        setNotice('Invitation saved, but email delivery failed. You can resend it after checking email configuration.');
+        setNotice('Invitation created, but the email was not accepted by the mail provider. The invitation remains pending.');
         setInviteOpen(false);
         setInviteEmail('');
         await loadDirectory();
@@ -125,7 +125,7 @@ export function StaffDirectoryContent() {
     setInviteOpen(false);
     setInviteEmail('');
     setInviteRole('doctor');
-    setNotice('Invitation sent.');
+    setNotice('Invitation created. The mail provider accepted the message.');
     await loadDirectory();
     setBusyKey(null);
   }
@@ -135,9 +135,13 @@ export function StaffDirectoryContent() {
     setNotice(null);
     const result = await resendStaffInvitation(invitation.id);
     if (!result.ok) {
-      setPageError(typeof result.body?.error === 'string' ? result.body.error : 'invitation_resend_failed');
+      if (result.body?.error === 'invitation_email_failed') {
+        setNotice('Invitation is still pending, but the mail provider did not accept the email.');
+      } else {
+        setPageError(typeof result.body?.error === 'string' ? result.body.error : 'invitation_resend_failed');
+      }
     } else {
-      setNotice('Invitation resent.');
+      setNotice('Invitation email was accepted by the mail provider.');
       await loadDirectory();
     }
     setBusyKey(null);
