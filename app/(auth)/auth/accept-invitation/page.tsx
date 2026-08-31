@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert } from '../../../components/ui/alert';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
-import { completeAuthenticatedSession, isFirstTimeInviteFlow, shouldUsePasswordSignIn } from '../../../lib/auth-routing';
+import { completeAuthenticatedSession, inferRequiresPasswordSetup, isFirstTimeInviteFlow, shouldCreatePasswordAfterAccept, shouldUsePasswordSignIn } from '../../../lib/auth-routing';
 import { clearAppSession } from '../../../lib/auth/session';
 import {
   saveInvitationContinuation,
@@ -116,6 +116,8 @@ function AcceptInvitationContent() {
       const { data } = await supabase.auth.getSession();
       const accessToken = data.session?.access_token;
       const userEmail = data.session?.user?.email ?? null;
+      const invitedAt =
+        typeof data.session?.user?.invited_at === 'string' ? data.session.user.invited_at : null;
 
       if (!accessToken) {
         if (!shouldUsePasswordSignIn({ flow, hasSession: false })) {
@@ -129,6 +131,27 @@ function AcceptInvitationContent() {
         if (invitation?.email) signInQuery.set('email', invitation.email);
         router.push(`/auth/signin?${signInQuery.toString()}`);
         return;
+      }
+
+      let priorClinicMembership = false;
+      let priorOrganisationMembership = false;
+      try {
+        const clinicsRes = await fetch(`${API_URL}/app/my-clinics`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const clinicsBody = await clinicsRes.json().catch(() => ({}));
+        priorClinicMembership = Array.isArray(clinicsBody?.clinics) && clinicsBody.clinics.length > 0;
+      } catch {
+        priorClinicMembership = false;
+      }
+      try {
+        const meRes = await fetch(`${API_URL}/app/me`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const meBody = await meRes.json().catch(() => ({}));
+        priorOrganisationMembership = Boolean(meBody?.organisation?.role || meBody?.user?.organisation_role);
+      } catch {
+        priorOrganisationMembership = false;
       }
 
       const res = await fetch(`${API_URL}/v1/staff-invitations/accept`, {
@@ -166,8 +189,16 @@ function AcceptInvitationContent() {
       }
 
       const acceptedClinicId = body?.clinic?.id ? String(body.clinic.id) : null;
+      const requiresPasswordSetup =
+        typeof body?.requires_password_setup === 'boolean'
+          ? body.requires_password_setup
+          : inferRequiresPasswordSetup({
+              invitedAt,
+              hasClinicMembership: priorClinicMembership,
+              hasOrganisationMembership: priorOrganisationMembership,
+            });
 
-      if (flow === 'invite') {
+      if (shouldCreatePasswordAfterAccept({ flow, requiresPasswordSetup })) {
         router.replace(
           `/auth/create-password?email=${encodeURIComponent(invitation?.email || '')}&inviter=${encodeURIComponent(
             invitation?.clinic_name || 'your clinic',

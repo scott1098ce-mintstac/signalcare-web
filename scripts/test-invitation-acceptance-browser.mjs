@@ -126,11 +126,31 @@ async function installFetchMock(page, sessionRef) {
           if (token === 'expired-token') return respond(409, { error: 'expired_invitation' })
           if (token === 'revoked-token') return respond(409, { error: 'revoked_invitation' })
           if (token === 'accepted-token') return respond(409, { error: 'accepted_invitation' })
-          if (token === 'pending-token') return respond(200, { ok: true, invitation: pendingInvitation })
+          if (token === 'pending-token' || token === 'existing-member-token') {
+            return respond(200, { ok: true, invitation: pendingInvitation })
+          }
           return respond(400, { error: 'invalid_invitation' })
         }
         if (url.includes('/staff-invitations/accept')) {
-          return respond(200, { ok: true, invitation: pendingInvitation, clinic: { id: 'clinic-1', name: 'Monitoring V2' } })
+          const token = (() => {
+            try {
+              return JSON.parse(String(init?.body || '{}')).token || ''
+            } catch {
+              return ''
+            }
+          })()
+          return respond(200, {
+            ok: true,
+            requires_password_setup: token !== 'existing-member-token',
+            invitation: pendingInvitation,
+            clinic: { id: 'clinic-1', name: 'Monitoring V2' },
+          })
+        }
+        if (url.includes('/app/my-clinics')) {
+          return respond(200, { clinics: [] })
+        }
+        if (url.includes('/app/me')) {
+          return respond(403, { error: 'no_clinic_resolved' })
         }
         if (url.includes('/auth/v1/')) {
           return respond(401, { message: 'unauthorized' })
@@ -152,6 +172,7 @@ async function installFetchMock(page, sessionRef) {
               aud: 'authenticated',
               role: 'authenticated',
               email: sessionEmail,
+              invited_at: '2026-08-31T02:26:17.983Z',
               app_metadata: { provider: 'email' },
               user_metadata: {},
             },
@@ -168,10 +189,11 @@ async function installFetchMock(page, sessionRef) {
   )
 }
 
-async function openAccept(page, sessionRef, token, email = null) {
+async function openAccept(page, sessionRef, token, email = null, flow = 'invite') {
   sessionRef.email = email
   await installFetchMock(page, sessionRef)
-  await page.goto(`${ORIGIN}/auth/accept-invitation?token=${encodeURIComponent(token)}&flow=invite`, {
+  const flowQuery = flow ? `&flow=${encodeURIComponent(flow)}` : ''
+  await page.goto(`${ORIGIN}/auth/accept-invitation?token=${encodeURIComponent(token)}${flowQuery}`, {
     waitUntil: 'domcontentloaded',
   })
   await page.getByRole('heading', { name: /Join / }).waitFor({ timeout: 30000 })
@@ -319,6 +341,32 @@ async function runBrowser(engine, name) {
         'new user email context → accept → create password',
         /create-password/.test(page.url()),
         /create-password/.test(page.url()) ? '' : page.url(),
+      )
+      await page.close()
+    }
+
+    {
+      const page = await context.newPage()
+      await openAccept(page, sessionRef, 'pending-token', INVITED, 'magiclink')
+      await page.getByRole('button', { name: 'Accept invitation' }).click()
+      await page.waitForURL(/create-password/, { timeout: 15000 }).catch(() => {})
+      record(
+        'new user magiclink fallback still creates password',
+        /create-password/.test(page.url()),
+        /create-password/.test(page.url()) ? '' : page.url(),
+      )
+      await page.close()
+    }
+
+    {
+      const page = await context.newPage()
+      await openAccept(page, sessionRef, 'existing-member-token', INVITED, 'magiclink')
+      await page.getByRole('button', { name: 'Accept invitation' }).click()
+      await page.waitForTimeout(800)
+      record(
+        'existing credentialed user skips create password',
+        !/create-password/.test(page.url()),
+        !/create-password/.test(page.url()) ? page.url() : 'unexpected create-password',
       )
       await page.close()
     }

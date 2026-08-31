@@ -90,6 +90,25 @@ export function shouldUsePasswordSignIn(input: { flow?: string | null; hasSessio
   return !isFirstTimeInviteFlow(input.flow);
 }
 
+/** First-time invitees must set a password; existing members must not be forced to. */
+export function inferRequiresPasswordSetup(input: {
+  invitedAt?: string | null;
+  hasClinicMembership: boolean;
+  hasOrganisationMembership: boolean;
+}): boolean {
+  if (input.hasClinicMembership || input.hasOrganisationMembership) return false;
+  return Boolean(input.invitedAt);
+}
+
+export function shouldCreatePasswordAfterAccept(input: {
+  flow?: string | null;
+  requiresPasswordSetup?: boolean | null;
+}): boolean {
+  if (input.requiresPasswordSetup === true) return true;
+  if (input.requiresPasswordSetup === false) return false;
+  return isFirstTimeInviteFlow(input.flow);
+}
+
 function toSessionPayload(result: Awaited<ReturnType<typeof getClinicForUser>>, accessToken: string): ClinicInfo {
   return {
     user_id: result.user_id as string,

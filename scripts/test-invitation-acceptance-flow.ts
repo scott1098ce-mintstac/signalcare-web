@@ -5,8 +5,10 @@ import {
   hasInboundSupabaseAuthParams,
   isAcceptInvitationDestination,
   isFirstTimeInviteFlow,
+  inferRequiresPasswordSetup,
   normalizeAcceptInvitationDestination,
   obtainSupabaseAccessToken,
+  shouldCreatePasswordAfterAccept,
   shouldUsePasswordSignIn,
 } from '../app/lib/auth-routing.ts'
 import {
@@ -258,6 +260,15 @@ async function main() {
   assert.equal(shouldUsePasswordSignIn({ flow: 'invite', hasSession: false }), false)
   assert.equal(shouldUsePasswordSignIn({ flow: 'invite', hasSession: true }), false)
   assert.equal(shouldUsePasswordSignIn({ flow: 'magiclink', hasSession: false }), true)
+
+  assert.equal(inferRequiresPasswordSetup({ invitedAt: '2026-08-31T00:00:00Z', hasClinicMembership: false, hasOrganisationMembership: false }), true)
+  assert.equal(inferRequiresPasswordSetup({ invitedAt: '2026-08-31T00:00:00Z', hasClinicMembership: true, hasOrganisationMembership: false }), false)
+  assert.equal(inferRequiresPasswordSetup({ invitedAt: '2026-08-31T00:00:00Z', hasClinicMembership: false, hasOrganisationMembership: true }), false)
+  assert.equal(inferRequiresPasswordSetup({ invitedAt: null, hasClinicMembership: false, hasOrganisationMembership: false }), false)
+  assert.equal(shouldCreatePasswordAfterAccept({ flow: 'magiclink', requiresPasswordSetup: true }), true)
+  assert.equal(shouldCreatePasswordAfterAccept({ flow: 'magiclink', requiresPasswordSetup: false }), false)
+  assert.equal(shouldCreatePasswordAfterAccept({ flow: 'invite' }), true)
+  assert.equal(shouldCreatePasswordAfterAccept({ flow: 'magiclink' }), false)
 
   assert.equal(parseAcceptInvitationPath('/auth/accept-invitation'), null)
   assert.equal(getSafeAuthNextPath('/auth/accept-invitation'), '/auth/accept-invitation')
