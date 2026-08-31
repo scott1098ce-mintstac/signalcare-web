@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert } from '../../../components/ui/alert';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
-import { completeAuthenticatedSession } from '../../../lib/auth-routing';
+import { completeAuthenticatedSession, isFirstTimeInviteFlow, shouldUsePasswordSignIn } from '../../../lib/auth-routing';
 import { clearAppSession } from '../../../lib/auth/session';
 import {
   saveInvitationContinuation,
@@ -118,6 +118,12 @@ function AcceptInvitationContent() {
       const userEmail = data.session?.user?.email ?? null;
 
       if (!accessToken) {
+        if (!shouldUsePasswordSignIn({ flow, hasSession: false })) {
+          setError(
+            'This invitation is for a new SignalCare account. Open the Accept invitation button in your email on this device. A password is not required until after you accept.',
+          );
+          return;
+        }
         const signInQuery = new URLSearchParams();
         signInQuery.set('next', nextPath);
         if (invitation?.email) signInQuery.set('email', invitation.email);
@@ -197,6 +203,10 @@ function AcceptInvitationContent() {
       /* continue with local cleanup */
     }
     clearAppSession();
+    if (isFirstTimeInviteFlow(flow)) {
+      router.replace(nextPath);
+      return;
+    }
     const signInQuery = new URLSearchParams();
     signInQuery.set('next', nextPath);
     if (invitation?.email) signInQuery.set('email', invitation.email);
@@ -265,7 +275,13 @@ function AcceptInvitationContent() {
                 onClick={handleAccept}
                 disabled={loading || !invitation || accepting || Boolean(accountMismatch)}
               >
-                {accepting ? 'Accepting…' : sessionEmail ? 'Accept invitation' : 'Sign in to continue'}
+                {accepting
+                  ? 'Accepting…'
+                  : sessionEmail
+                    ? 'Accept invitation'
+                    : isFirstTimeInviteFlow(flow)
+                      ? 'Open the invitation email'
+                      : 'Sign in to continue'}
               </Button>
               {accountMismatch ? (
                 <Button variant="secondary" onClick={handleSignOutAndSwitch} disabled={accepting}>
@@ -276,7 +292,9 @@ function AcceptInvitationContent() {
 
             {!sessionEmail ? (
               <p className="text-sm text-[var(--sc-text-secondary)]">
-                Use the secure link from your invitation email, or sign in with the invited email to continue.
+                {isFirstTimeInviteFlow(flow)
+                  ? 'First-time invitations verify your email from the message you received. You will create a password after you accept — not before.'
+                  : 'Use the secure link from your invitation email, or sign in with the invited email to continue.'}
               </p>
             ) : null}
           </div>

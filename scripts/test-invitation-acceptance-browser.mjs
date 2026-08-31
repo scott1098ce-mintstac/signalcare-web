@@ -198,7 +198,7 @@ async function runBrowser(engine, name) {
       await openAccept(page, sessionRef, 'pending-token')
       const ok =
         (await page.getByText('Not signed in').isVisible().catch(() => false)) &&
-        (await page.getByRole('button', { name: 'Sign in to continue' }).isVisible().catch(() => false))
+        (await page.getByRole('button', { name: /Open the invitation email|Sign in to continue/ }).isVisible().catch(() => false))
       record('new invited user / no prior session', ok, ok ? '' : await snapshot(page))
       await page.close()
     }
@@ -210,16 +210,15 @@ async function runBrowser(engine, name) {
       const switchBtn = page.getByRole('button', { name: 'Switch account' })
       const switchVisible = await switchBtn.isVisible().catch(() => false)
       if (switchVisible) {
-        await switchBtn.click()
-        await page.waitForURL(/\/auth\/signin/, { timeout: 15000 }).catch(() => {})
+        await switchBtn.click().catch(() => {})
+        await page.waitForTimeout(500)
       }
       const url = page.url()
-      const resumes =
-        switchVisible &&
-        /\/auth\/signin/.test(url) &&
-        decodeURIComponent(url).includes('/auth/accept-invitation') &&
-        decodeURIComponent(url).includes(INVITED)
-      record('wrong account → Switch account → invited resume', mismatch && resumes, mismatch && resumes ? 'continuation preserved' : await snapshot(page))
+      record(
+        'wrong account → Switch account → invited resume',
+        mismatch && switchVisible && /accept-invitation/.test(url) && !url.includes('/auth/signin'),
+        mismatch && switchVisible && !url.includes('/auth/signin') ? 'did not route to password login' : await snapshot(page),
+      )
       await page.close()
     }
 
@@ -281,6 +280,46 @@ async function runBrowser(engine, name) {
         /accept-invitation/.test(page.url()) &&
         (page.url().includes('pending-token') || (await page.getByText('Monitoring V2').isVisible().catch(() => false)))
       record('callback without session resumes invitation', resumed, resumed ? '' : page.url())
+      await page.close()
+    }
+
+    {
+      const page = await context.newPage()
+      sessionRef.email = null
+      await installFetchMock(page, sessionRef)
+      const next = encodeURIComponent('/auth/accept-invitation?token=pending-token&flow=invite')
+      await page.goto(`${ORIGIN}/auth/signin?next=${next}&email=${encodeURIComponent(INVITED)}`, { waitUntil: 'domcontentloaded' })
+      const noPassword = !(await page.locator('#password').isVisible().catch(() => false))
+      const noLogin = !(await page.getByRole('button', { name: 'Log In' }).isVisible().catch(() => false))
+      const firstTimeCopy = await page.getByText(/first-time invitation/i).isVisible().catch(() => false)
+      record('first-time invite must not use password login', noPassword && noLogin && firstTimeCopy)
+      await page.close()
+    }
+
+    {
+      const page = await context.newPage()
+      await openAccept(page, sessionRef, 'pending-token')
+      const primary = page.getByRole('button', { name: /Open the invitation email|Sign in to continue/ })
+      if (await primary.isVisible().catch(() => false)) {
+        await primary.click()
+      }
+      await page.waitForTimeout(500)
+      const stayedOffSignIn = !/\/auth\/signin/.test(page.url())
+      const noPassword = !(await page.locator('#password').isVisible().catch(() => false))
+      record('new user with no password stays off password login', stayedOffSignIn && noPassword, stayedOffSignIn ? '' : page.url())
+      await page.close()
+    }
+
+    {
+      const page = await context.newPage()
+      await openAccept(page, sessionRef, 'pending-token', INVITED)
+      await page.getByRole('button', { name: 'Accept invitation' }).click()
+      await page.waitForURL(/create-password/, { timeout: 15000 }).catch(() => {})
+      record(
+        'new user email context → accept → create password',
+        /create-password/.test(page.url()),
+        /create-password/.test(page.url()) ? '' : page.url(),
+      )
       await page.close()
     }
   } finally {

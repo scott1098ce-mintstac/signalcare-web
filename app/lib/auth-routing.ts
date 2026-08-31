@@ -81,6 +81,15 @@ export function isAcceptInvitationDestination(path: string | null | undefined): 
   return Boolean(path && path.startsWith('/auth/accept-invitation'));
 }
 
+export function isFirstTimeInviteFlow(flow: string | null | undefined): boolean {
+  return String(flow || '').trim().toLowerCase() === 'invite';
+}
+
+export function shouldUsePasswordSignIn(input: { flow?: string | null; hasSession: boolean }): boolean {
+  if (input.hasSession) return false;
+  return !isFirstTimeInviteFlow(input.flow);
+}
+
 function toSessionPayload(result: Awaited<ReturnType<typeof getClinicForUser>>, accessToken: string): ClinicInfo {
   return {
     user_id: result.user_id as string,
@@ -168,6 +177,10 @@ export type SupabaseAuthClientLike = {
       token_hash: string;
       type: 'invite' | 'recovery' | 'magiclink' | 'email' | 'signup';
     }) => Promise<{ data: { session: SessionLike }; error: { message?: string } | null }>;
+    setSession?: (session: {
+      access_token: string;
+      refresh_token: string;
+    }) => Promise<{ data: { session: SessionLike }; error: { message?: string } | null }>;
     signOut: (options?: { scope?: 'global' | 'local' | 'others' }) => Promise<unknown>;
     onAuthStateChange: (
       callback: (event: string, session: SessionLike) => void,
@@ -175,10 +188,21 @@ export type SupabaseAuthClientLike = {
   };
 };
 
-async function waitForInboundSession(
-  client: SupabaseAuthClientLike,
-  existingUserId: string | null,
-): Promise<SessionLike> {
+function jwtSub(token: string | null | undefined): string | null {
+  if (!token) return null;
+  const parts = token.split('.');
+  if (parts.length < 2) return null;
+  try {
+    const padded = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = typeof atob === 'function' ? atob(padded) : Buffer.from(padded, 'base64').toString('utf8');
+    const payload = JSON.parse(json) as { sub?: unknown };
+    return typeof payload.sub === 'string' && payload.sub ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
+
+async function waitForInboundSession(client: SupabaseAuthClientLike): Promise<SessionLike> {
   return new Promise((resolve) => {
     let settled = false;
     const finish = (value: SessionLike) => {
@@ -191,25 +215,16 @@ async function waitForInboundSession(
 
     const timeout = setTimeout(() => {
       void client.auth.getSession().then(({ data }) => {
-        const current = data.session;
-        const currentId = current?.user?.id || null;
-        if (current?.access_token && (!existingUserId || currentId !== existingUserId)) {
-          finish(current);
-          return;
-        }
-        finish(null);
+        finish(data.session?.access_token ? data.session : null);
       });
     }, 1500);
 
     const {
       data: { subscription },
     } = client.auth.onAuthStateChange((event, nextSession) => {
-      const nextId = nextSession?.user?.id || null;
-      const isNewUser = Boolean(nextId && (!existingUserId || nextId !== existingUserId));
       if (
         nextSession?.access_token &&
-        isNewUser &&
-        (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY' || event === 'TOKEN_REFRESHED')
+        (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY')
       ) {
         finish(nextSession);
       }
@@ -230,11 +245,12 @@ export async function obtainSupabaseAccessToken(options?: {
   const search = options?.search ?? (typeof window !== 'undefined' ? window.location.search : '');
   const hash = options?.hash ?? (typeof window !== 'undefined' ? window.location.hash : '');
   const params = new URLSearchParams(search);
+  const hashParams = new URLSearchParams(String(hash || '').replace(/^#/, ''));
   const inbound = hasInboundSupabaseAuthParams(search, hash);
   const existing = (await client.auth.getSession()).data.session;
   const existingUserId = existing?.user?.id || null;
 
-  const code = params.get('code');
+  const code = params.get('code') || hashParams.get('code');
   if (code) {
     const { data, error } = await client.auth.exchangeCodeForSession(code);
     if (!error && data.session?.access_token) {
@@ -242,10 +258,25 @@ export async function obtainSupabaseAccessToken(options?: {
     }
   }
 
-  const hashParams = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+  const accessTokenFromHash = hashParams.get('access_token');
+  const refreshTokenFromHash = hashParams.get('refresh_token') || '';
+  if (accessTokenFromHash && client.auth.setSession) {
+    const { data, error } = await client.auth.setSession({
+      access_token: accessTokenFromHash,
+      refresh_token: refreshTokenFromHash,
+    });
+    if (!error && data.session?.access_token) {
+      return data.session.access_token;
+    }
+  }
+
   const tokenHash = params.get('token_hash') || hashParams.get('token_hash');
   const otpType = String(params.get('type') || hashParams.get('type') || '').toLowerCase();
-  if (tokenHash && client.auth.verifyOtp && (otpType === 'invite' || otpType === 'recovery' || otpType === 'magiclink' || otpType === 'signup' || otpType === 'email')) {
+  if (
+    tokenHash &&
+    client.auth.verifyOtp &&
+    (otpType === 'invite' || otpType === 'recovery' || otpType === 'magiclink' || otpType === 'signup' || otpType === 'email')
+  ) {
     const { data, error } = await client.auth.verifyOtp({
       token_hash: tokenHash,
       type: otpType as 'invite' | 'recovery' | 'magiclink' | 'email' | 'signup',
@@ -255,12 +286,37 @@ export async function obtainSupabaseAccessToken(options?: {
     }
   }
 
+  const unusedOtpOrCode = Boolean(code || tokenHash);
   if (inbound) {
-    const fromUrl = await waitForInboundSession(client, existingUserId);
+    const fromUrl =
+      unusedOtpOrCode || accessTokenFromHash
+        ? await waitForInboundSession(client)
+        : null;
     if (fromUrl?.access_token) {
-      return fromUrl.access_token;
+      const inboundSub = jwtSub(accessTokenFromHash);
+      const stillStale =
+        Boolean(existingUserId && fromUrl.user?.id === existingUserId) &&
+        (unusedOtpOrCode || Boolean(inboundSub && inboundSub !== fromUrl.user?.id));
+      if (!stillStale && (!inboundSub || !fromUrl.user?.id || inboundSub === fromUrl.user.id)) {
+        return fromUrl.access_token;
+      }
     }
-    if (existingUserId) {
+
+    const current = (await client.auth.getSession()).data.session;
+    const inboundSub = jwtSub(accessTokenFromHash);
+    if (current?.access_token) {
+      if (inboundSub && current.user?.id && inboundSub !== current.user.id) {
+        await client.auth.signOut({ scope: 'local' });
+        return null;
+      }
+      if (unusedOtpOrCode && existingUserId && current.user?.id === existingUserId) {
+        await client.auth.signOut({ scope: 'local' });
+        return null;
+      }
+      return current.access_token;
+    }
+
+    if (existingUserId && (unusedOtpOrCode || Boolean(accessTokenFromHash))) {
       await client.auth.signOut({ scope: 'local' });
     }
     return null;

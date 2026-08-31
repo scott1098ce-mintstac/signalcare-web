@@ -3,9 +3,10 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
-import { completeAuthenticatedSession, getSafeAuthNextPath } from '../../../lib/auth-routing';
+import { completeAuthenticatedSession, getSafeAuthNextPath, isFirstTimeInviteFlow } from '../../../lib/auth-routing';
 import {
   invitationContinuationPath,
+  parseAcceptInvitationPath,
   readInvitationContinuation,
 } from '../../../lib/auth/invitation-continuation';
 import { accessDeniedMessage } from '../../../lib/api';
@@ -24,6 +25,8 @@ function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const invitedEmail = String(searchParams.get('email') || readInvitationContinuation()?.email || '').trim();
+  const nextPath = getSafeAuthNextPath(searchParams.get('next')) || invitationContinuationPath();
+  const firstTimeInvite = isFirstTimeInviteFlow(parseAcceptInvitationPath(nextPath)?.flow);
   const [email, setEmail] = useState(invitedEmail);
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -62,8 +65,7 @@ function SignInContent() {
         return;
       }
 
-      const next =
-        getSafeAuthNextPath(searchParams.get('next')) || invitationContinuationPath();
+      const next = nextPath;
       router.push(next || result.path);
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Sign in failed');
@@ -81,15 +83,29 @@ function SignInContent() {
           <Card>
             <div className="mb-7">
               <h2 className="text-[length:var(--sc-text-lg)] font-bold tracking-[var(--sc-tracking-heading)] text-[var(--sc-text-primary)]">
-                Log in to Signal Care
+                {firstTimeInvite ? 'Continue from your invitation email' : 'Log in to Signal Care'}
               </h2>
               <p className="mt-2 text-[length:var(--sc-text-base)] leading-relaxed text-[var(--sc-text-secondary)]">
-                {getSafeAuthNextPath(searchParams.get('next'))?.startsWith('/auth/accept-invitation')
-                  ? 'Sign in with the invited email to continue accepting your invitation.'
-                  : 'Enter your credentials to access the command center.'}
+                {firstTimeInvite
+                  ? 'This is a first-time invitation. SignalCare will verify your email from the invitation message. You create a password after you accept — not on this page.'
+                  : nextPath?.startsWith('/auth/accept-invitation')
+                    ? 'Sign in with the invited email to continue accepting your invitation.'
+                    : 'Enter your credentials to access the command center.'}
               </p>
             </div>
 
+            {firstTimeInvite ? (
+              <div className="space-y-5">
+                {invitedEmail ? (
+                  <p className="text-[length:var(--sc-text-sm)] text-[var(--sc-text-secondary)]">
+                    Invited email: {invitedEmail}
+                  </p>
+                ) : null}
+                <a href={nextPath || '/auth/accept-invitation'}>
+                  <Button type="button">Return to invitation</Button>
+                </a>
+              </div>
+            ) : (
             <form onSubmit={handleSignIn} className="space-y-5">
               <div>
                 <label htmlFor="email" className={FIELD_LABEL_CLASS}>
@@ -148,6 +164,7 @@ function SignInContent() {
                 {loading ? 'Signing in…' : 'Log In'}
               </Button>
             </form>
+            )}
           </Card>
 
           <AuthSecurityFooter />

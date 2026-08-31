@@ -4,8 +4,10 @@ import {
   getAuthCallbackDestination,
   hasInboundSupabaseAuthParams,
   isAcceptInvitationDestination,
+  isFirstTimeInviteFlow,
   normalizeAcceptInvitationDestination,
   obtainSupabaseAccessToken,
+  shouldUsePasswordSignIn,
 } from '../app/lib/auth-routing.ts'
 import {
   buildAcceptInvitationPath,
@@ -35,15 +37,18 @@ function mockClient({
   exchanged = null,
   exchangeError = null,
   verified = null,
+  hashSession = null,
   inboundEvents = [],
 }: {
   existing?: SessionLike
   exchanged?: SessionLike
   exchangeError?: string | null
   verified?: SessionLike
+  hashSession?: SessionLike
   inboundEvents?: Array<[string, SessionLike]>
 } = {}) {
   let session = existing
+  let signedOut = false
   return {
     auth: {
       getSession: async () => ({ data: { session } }),
@@ -56,7 +61,12 @@ function mockClient({
         if (verified) session = verified
         return { data: { session: verified }, error: verified ? null : { message: 'verify_failed' } }
       },
+      setSession: async () => {
+        if (hashSession) session = hashSession
+        return { data: { session: hashSession }, error: hashSession ? null : { message: 'set_session_failed' } }
+      },
       signOut: async () => {
+        signedOut = true
         session = null
       },
       onAuthStateChange: (callback: (event: string, session: SessionLike) => void) => {
@@ -66,6 +76,7 @@ function mockClient({
         return { data: { subscription: { unsubscribe() {} } } }
       },
     },
+    signedOut: () => signedOut,
   }
 }
 
@@ -118,6 +129,11 @@ assert.deepEqual(parseAcceptInvitationPath('/auth/accept-invitation?token=signal
 })
 assert.equal(parseAcceptInvitationPath('/auth/signin'), null)
 assert.equal(buildAcceptInvitationPath(''), null)
+
+function fakeJwt(sub: string) {
+  const payload = Buffer.from(JSON.stringify({ sub })).toString('base64url')
+  return `eyJhbGciOiJub25lIn0.${payload}.x`
+}
 
 async function main() {
   {
@@ -185,6 +201,63 @@ async function main() {
     })
     assert.equal(token, 'pkce-token')
   }
+
+  {
+    const gmail = { access_token: 'gmail-token', user: { id: 'gmail-id', email: 'admin@example.com' } }
+    const invited = { access_token: 'invited-token', user: { id: 'invited-id', email: 'staff@example.com' } }
+    const client = mockClient({ existing: gmail, hashSession: invited })
+    const token = await obtainSupabaseAccessToken({
+      client,
+      search: '?next=/auth/accept-invitation?token=abc&flow=invite',
+      hash: '#access_token=invited-token&refresh_token=refresh&type=invite',
+    })
+    assert.equal(token, 'invited-token')
+    assert.equal(client.signedOut(), false)
+    assert.equal((await client.auth.getSession()).data.session?.user?.id, 'invited-id')
+  }
+
+  {
+    const invited = { access_token: 'invited-token', user: { id: 'invited-id', email: 'staff@example.com' } }
+    const client = mockClient({ existing: invited })
+    const token = await obtainSupabaseAccessToken({
+      client,
+      search: '?type=invite&next=/auth/accept-invitation',
+      hash: '',
+    })
+    assert.equal(token, 'invited-token')
+    assert.equal(client.signedOut(), false)
+  }
+
+  {
+    const invited = { access_token: 'invited-token', user: { id: 'invited-id', email: 'staff@example.com' } }
+    const client = mockClient({ existing: invited })
+    const token = await obtainSupabaseAccessToken({
+      client,
+      search: '?type=invite&next=/auth/accept-invitation',
+      hash: '#access_token=invited-token&refresh_token=refresh&type=invite',
+    })
+    assert.equal(token, 'invited-token')
+    assert.equal(client.signedOut(), false)
+  }
+
+  {
+    const gmail = { access_token: 'gmail-token', user: { id: 'gmail-id', email: 'admin@example.com' } }
+    const invitedJwt = fakeJwt('invited-id')
+    const client = mockClient({ existing: gmail })
+    const token = await obtainSupabaseAccessToken({
+      client,
+      search: '?next=/auth/accept-invitation',
+      hash: `#access_token=${invitedJwt}&refresh_token=refresh&type=invite`,
+    })
+    assert.equal(token, null)
+    assert.equal(client.signedOut(), true)
+  }
+
+  assert.equal(isFirstTimeInviteFlow('invite'), true)
+  assert.equal(isFirstTimeInviteFlow('magiclink'), false)
+  assert.equal(shouldUsePasswordSignIn({ flow: 'invite', hasSession: false }), false)
+  assert.equal(shouldUsePasswordSignIn({ flow: 'invite', hasSession: true }), false)
+  assert.equal(shouldUsePasswordSignIn({ flow: 'magiclink', hasSession: false }), true)
 
   assert.equal(parseAcceptInvitationPath('/auth/accept-invitation'), null)
   assert.equal(getSafeAuthNextPath('/auth/accept-invitation'), '/auth/accept-invitation')
