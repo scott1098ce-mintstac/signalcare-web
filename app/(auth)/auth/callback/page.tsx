@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import {
   completeAuthenticatedSession,
   getAuthCallbackDestination,
+  isAcceptInvitationDestination,
   obtainSupabaseAccessToken,
 } from '../../../lib/auth-routing';
+import { parseAcceptInvitationPath, saveInvitationContinuation } from '../../../lib/auth/invitation-continuation';
 
 /**
  * Supabase Auth redirect target for invite, recovery, and email confirmation.
@@ -20,8 +22,17 @@ export default function AuthCallbackPage() {
     const run = async () => {
       try {
         const destination = getAuthCallbackDestination();
+        const continuation = parseAcceptInvitationPath(destination);
+        if (continuation) {
+          saveInvitationContinuation(continuation);
+        }
+
         const accessToken = await obtainSupabaseAccessToken();
         if (!accessToken) {
+          if (isAcceptInvitationDestination(destination) && destination) {
+            router.replace(destination);
+            return;
+          }
           setErr('No session found. Open the link from your email again, or return to sign in.');
           return;
         }

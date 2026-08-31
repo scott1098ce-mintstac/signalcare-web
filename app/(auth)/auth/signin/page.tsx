@@ -4,6 +4,10 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import { completeAuthenticatedSession, getSafeAuthNextPath } from '../../../lib/auth-routing';
+import {
+  invitationContinuationPath,
+  readInvitationContinuation,
+} from '../../../lib/auth/invitation-continuation';
 import { accessDeniedMessage } from '../../../lib/api';
 import { AuthBrandingPanel } from '../../../components/auth/AuthBrandingPanel';
 import { AuthSecurityFooter } from '../../../components/auth/AuthSecurityFooter';
@@ -19,7 +23,8 @@ const FIELD_LABEL_CLASS =
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState('');
+  const invitedEmail = String(searchParams.get('email') || readInvitationContinuation()?.email || '').trim();
+  const [email, setEmail] = useState(invitedEmail);
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,7 +62,8 @@ function SignInContent() {
         return;
       }
 
-      const next = getSafeAuthNextPath(searchParams.get('next'));
+      const next =
+        getSafeAuthNextPath(searchParams.get('next')) || invitationContinuationPath();
       router.push(next || result.path);
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Sign in failed');
@@ -78,7 +84,9 @@ function SignInContent() {
                 Log in to Signal Care
               </h2>
               <p className="mt-2 text-[length:var(--sc-text-base)] leading-relaxed text-[var(--sc-text-secondary)]">
-                Enter your credentials to access the command center.
+                {getSafeAuthNextPath(searchParams.get('next'))?.startsWith('/auth/accept-invitation')
+                  ? 'Sign in with the invited email to continue accepting your invitation.'
+                  : 'Enter your credentials to access the command center.'}
               </p>
             </div>
 

@@ -6,6 +6,10 @@ import { Alert } from '../../../components/ui/alert';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
 import { completeAuthenticatedSession } from '../../../lib/auth-routing';
+import { clearAppSession } from '../../../lib/auth/session';
+import {
+  saveInvitationContinuation,
+} from '../../../lib/auth/invitation-continuation';
 import { supabase } from '../../../lib/supabase';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
@@ -29,6 +33,7 @@ function AcceptInvitationContent() {
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [accountMismatch, setAccountMismatch] = useState<string | null>(null);
 
   const nextPath = useMemo(
     () => `/auth/accept-invitation?token=${encodeURIComponent(token)}${flow ? `&flow=${encodeURIComponent(flow)}` : ''}`,
@@ -67,8 +72,28 @@ function AcceptInvitationContent() {
           return;
         }
 
-        setInvitation(body?.invitation ?? null);
-        setSessionEmail(sessionRes.data.session?.user?.email ?? null);
+        const resolved = body?.invitation ?? null;
+        const signedInEmail = sessionRes.data.session?.user?.email ?? null;
+        setInvitation(resolved);
+        setSessionEmail(signedInEmail);
+        if (token) {
+          saveInvitationContinuation({
+            token,
+            flow,
+            email: resolved?.email || null,
+          });
+        }
+        if (
+          signedInEmail &&
+          resolved?.email &&
+          signedInEmail.toLowerCase() !== String(resolved.email).toLowerCase()
+        ) {
+          setAccountMismatch(
+            `You're signed in as ${signedInEmail}. Sign in with ${resolved.email} to accept this invitation.`,
+          );
+        } else {
+          setAccountMismatch(null);
+        }
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : 'Failed to load invitation');
@@ -82,7 +107,7 @@ function AcceptInvitationContent() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, flow]);
 
   async function handleAccept() {
     setAccepting(true);
@@ -93,7 +118,10 @@ function AcceptInvitationContent() {
       const userEmail = data.session?.user?.email ?? null;
 
       if (!accessToken) {
-        router.push(`/auth/signin?next=${encodeURIComponent(nextPath)}`);
+        const signInQuery = new URLSearchParams();
+        signInQuery.set('next', nextPath);
+        if (invitation?.email) signInQuery.set('email', invitation.email);
+        router.push(`/auth/signin?${signInQuery.toString()}`);
         return;
       }
 
@@ -110,7 +138,7 @@ function AcceptInvitationContent() {
       if (!res.ok) {
         const code = typeof body?.error === 'string' ? body.error : 'invitation_accept_failed';
         if (code === 'invitation_email_mismatch') {
-          setError(
+          setAccountMismatch(
             `You're signed in as ${userEmail || 'another account'}. Sign in with ${invitation?.email || 'the invited email'} to accept this invitation.`,
           );
           return;
@@ -156,8 +184,23 @@ function AcceptInvitationContent() {
   }
 
   async function handleSignOutAndSwitch() {
-    await supabase.auth.signOut();
-    router.push(`/auth/signin?next=${encodeURIComponent(nextPath)}`);
+    if (token) {
+      saveInvitationContinuation({
+        token,
+        flow,
+        email: invitation?.email || null,
+      });
+    }
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {
+      /* continue with local cleanup */
+    }
+    clearAppSession();
+    const signInQuery = new URLSearchParams();
+    signInQuery.set('next', nextPath);
+    if (invitation?.email) signInQuery.set('email', invitation.email);
+    router.replace(`/auth/signin?${signInQuery.toString()}`);
   }
 
   return (
@@ -179,6 +222,12 @@ function AcceptInvitationContent() {
             {error ? (
               <Alert variant="danger" title="Invitation unavailable">
                 {error}
+              </Alert>
+            ) : null}
+
+            {accountMismatch ? (
+              <Alert variant="danger" title="Wrong account">
+                {accountMismatch}
               </Alert>
             ) : null}
 
@@ -212,10 +261,13 @@ function AcceptInvitationContent() {
             ) : null}
 
             <div className="flex flex-wrap gap-3">
-              <Button onClick={handleAccept} disabled={loading || !invitation || accepting}>
+              <Button
+                onClick={handleAccept}
+                disabled={loading || !invitation || accepting || Boolean(accountMismatch)}
+              >
                 {accepting ? 'Accepting…' : sessionEmail ? 'Accept invitation' : 'Sign in to continue'}
               </Button>
-              {sessionEmail && invitation && sessionEmail.toLowerCase() !== invitation.email.toLowerCase() ? (
+              {accountMismatch ? (
                 <Button variant="secondary" onClick={handleSignOutAndSwitch} disabled={accepting}>
                   Switch account
                 </Button>
