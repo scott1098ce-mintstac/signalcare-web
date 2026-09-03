@@ -34,6 +34,13 @@ export type WorkspaceInterpretation = {
   review_required: boolean;
   taxonomy_review: boolean;
   score_review: boolean;
+  /** Exact patient free-text concern when present (v5+ projection). */
+  patient_reported_concern?: string | null;
+  recovery_concern?: {
+    patient_reported: string;
+    safety_screen: string | null;
+    disposition: string | null;
+  } | null;
 };
 
 export type WorkspaceCurrentStep = {
@@ -101,6 +108,7 @@ export type WorkspaceEvidence = {
     reply_type: string | null;
     received_at: string | null;
     text: string | null;
+    concern_text?: string | null;
   } | null;
   latest_signal: {
     severity: string | null;
@@ -114,6 +122,12 @@ export type WorkspaceEvidence = {
     accompanying_text: string | null;
     source?: string | null;
   }>;
+  recovery_concern?: {
+    patient_reported: string;
+    safety_screen: string | null;
+    disposition: string | null;
+    concern_class?: string | null;
+  } | null;
 };
 
 export type WorkspaceTimelinePreviewItem = {

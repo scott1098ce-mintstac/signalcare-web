@@ -393,14 +393,26 @@ export function persistedInterpretationAssessment(
   interpretation: WorkspaceInterpretation | null | undefined,
   row: MonitoringRow,
 ): { status: string; text: string } {
-  if (interpretation?.clinical_summary) {
+  if (interpretation?.clinical_summary || interpretation?.patient_reported_concern) {
     const status =
       severityStatusLabel(interpretation.severity) ?? clinicalAiAssessmentStatus(row);
-    const parts = [interpretation.clinical_summary.trim()];
+    const parts: string[] = [];
+    if (interpretation.patient_reported_concern?.trim()) {
+      parts.push(`Patient reported: "${interpretation.patient_reported_concern.trim()}"`);
+      if (interpretation.recovery_concern?.safety_screen) {
+        parts.push(`Safety screen: ${interpretation.recovery_concern.safety_screen}`);
+      }
+      if (interpretation.recovery_concern?.disposition) {
+        parts.push(`Disposition: ${interpretation.recovery_concern.disposition}`);
+      }
+    }
+    if (interpretation.clinical_summary?.trim()) {
+      parts.push(interpretation.clinical_summary.trim());
+    }
     if (
       interpretation.recommended_action &&
       interpretation.recommended_action.trim() &&
-      !interpretation.clinical_summary.includes(interpretation.recommended_action)
+      !parts.join(' ').includes(interpretation.recommended_action.trim())
     ) {
       parts.push(interpretation.recommended_action.trim());
     }
