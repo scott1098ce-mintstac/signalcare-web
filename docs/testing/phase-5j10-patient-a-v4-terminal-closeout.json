@@ -1,0 +1,251 @@
+{
+  "phase": "5J10",
+  "title": "Patient A v4 terminal lifecycle closeout",
+  "executed_at_utc": "2026-09-04T03:58:00Z",
+  "executed_at_brisbane": "2026-09-04T13:58:00+10:00",
+  "verdict": "PASS",
+  "mode": "READ_ONLY_PRODUCTION_VERIFICATION",
+  "absolute_stops_honoured": {
+    "sms_sent": false,
+    "email_sent": false,
+    "clinician_notification_sent": false,
+    "media_sent": false,
+    "patient_a_reply_simulated": false,
+    "twilio_invoked_for_send": false,
+    "due_at_modified": false,
+    "started_at_modified": false,
+    "checkins_modified": false,
+    "ce_modified": false,
+    "review_created_or_resolved": false,
+    "alerts_mutated": false,
+    "complete_monitoring_clicked": false,
+    "enrolment_manually_completed": false,
+    "protocol_changed": false,
+    "patient_b_mutated": false,
+    "mumbai_touched": false,
+    "production_code_changed": false
+  },
+  "production": {
+    "api_health": true,
+    "api_version": "d531a18098b155910bdcfd6bc3960976582c1b16",
+    "web": "https://app.signalcare.io HTTP 200",
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "mumbai_project": "wpbyxrsiayspyweaqmwy",
+    "mumbai_writes": false,
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "final_inbound": {
+    "timestamp_utc": "2026-09-04T03:36:03Z",
+    "timestamp_brisbane": "2026-09-04 13:36:03 AEST",
+    "twilio_sid_redacted": "SM0a…8f",
+    "twilio_sid_prefix": "SM0a253a",
+    "body": "1",
+    "direction": "inbound",
+    "status": "received",
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "from_redacted": "+61…73",
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "checkin_id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+    "ce_id": "b99db16e-627b-448f-bb34-4f891218e10f",
+    "message_event_id": "816bd63f-0d1a-415f-8bf5-988aa01b9ca7",
+    "message_event_type": "recovery_conversation_completed",
+    "patient_signal_id": "2df33cc1-48cb-42b3-8ced-b6f858f3802d",
+    "idempotency_key_recovery": "twilio_inbound:SM0a253a12693da15868e72d143a76e68f:recovery_conversation",
+    "idempotency_key_signal": "recovery_triage_signal:SM0a253a12693da15868e72d143a76e68f",
+    "unique_inbound_sids_after_21d_send": 1,
+    "duplicate_physical_processing": false
+  },
+  "interpretation": {
+    "active_question_id": "recovery_check_in",
+    "active_stage_key": "outcome_followup",
+    "input": "1",
+    "canonical_option": { "value": 1, "label": "Everything feels normal" },
+    "interpreter": "deterministic",
+    "intent": "option_match",
+    "confidence": "high",
+    "processed_branch_ids": ["score_1_2_reassure", "score_1_2_reassure:reassurance"],
+    "terminal_action": "reassure_and_finish",
+    "disposition": {
+      "cq": "stable",
+      "alert": false,
+      "review_required": false,
+      "clinical_priority": "none",
+      "recommended_action": "no_action",
+      "expected_resolution": true,
+      "review_reason": "Expected recovery. Safety screen clear.",
+      "assessment_value": 1,
+      "patient_reassured": true
+    },
+    "safety_class": "none"
+  },
+  "patient_facing_response": {
+    "exact_body": "Thanks SignalCare.\n\nGlad to hear you're settled.\n\nNo further scheduled recovery check-ins from us unless Test Aesthetics Clinic advises otherwise.",
+    "source": "Twilio Messages API outbound-reply",
+    "twilio_sid_redacted": "SM2c…99",
+    "direction": "outbound-reply",
+    "delivery_status": "delivered",
+    "date_sent_utc": "2026-09-04T03:36:04Z",
+    "template_family": "SETTLED_DAY21",
+    "duplicates": 1,
+    "already_complete_race_response": false,
+    "message_events_row_present": false,
+    "note": "Outbound acknowledgement persisted in Twilio and matched founder physical SMS; no duplicate Twilio outbound-reply in the completion window."
+  },
+  "plus_21d_checkin": {
+    "id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+    "status": "replied",
+    "sent_at": "2026-09-04T03:19:06.652+00:00",
+    "replied_at": "2026-09-04T03:36:02.995+00:00",
+    "due_at": "2026-09-04T03:18:55.512+00:00",
+    "offset_minutes": 30240,
+    "stage_key": "outcome_followup",
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "protocol_step_id": "a76f4d8a-e7b7-437f-ac01-d0fca5357701",
+    "identity_mutated": false
+  },
+  "conversation_engine": {
+    "ce_id": "b99db16e-627b-448f-bb34-4f891218e10f",
+    "status": "completed",
+    "completed_at": "2026-09-04T03:36:02.995+00:00",
+    "stage_key": "outcome_followup",
+    "terminal_branch": "score_1_2_reassure",
+    "open_ce_remaining": 0,
+    "escalation_status": "none"
+  },
+  "journey_completion": {
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "status_before_reply": "active",
+    "status_after": "completed",
+    "completed_at": "2026-09-04T03:36:03.659786+00:00",
+    "completion_source": "automatic_journey_complete",
+    "completion_event_id": "a7ec5add-fae1-4958-8f11-2151a9750141",
+    "actor_type": "system",
+    "actor_user_id": null,
+    "natural_vs_manual": "natural",
+    "founder_clicked_complete_monitoring": false,
+    "timing": {
+      "ce_completed_at": "2026-09-04T03:36:02.995+00:00",
+      "enrolment_completed_at": "2026-09-04T03:36:03.659786+00:00",
+      "delta_ms_approx": 665
+    },
+    "cancelled_checkins": 0,
+    "abandoned_sessions": 0,
+    "resolved_alerts": 0
+  },
+  "checkin_history": {
+    "plus_30m": { "id": "796d35a3-9521-498a-8144-63f87aa073fe", "status": "replied", "offset_minutes": 30 },
+    "plus_24h": { "id": "f99686ad-482e-4344-9317-9eafd2961203", "status": "replied", "offset_minutes": 1440 },
+    "plus_3d": { "id": "32e9e478-aed9-4c36-b89e-ef077c546820", "status": "replied", "offset_minutes": 4320 },
+    "plus_7d": { "id": "f7d5f97f-fe06-457a-9ab8-86683b4a7d2d", "status": "replied", "offset_minutes": 10080 },
+    "plus_14d": { "id": "b46e193b-56bd-4332-b942-5ad61fe22554", "status": "replied", "offset_minutes": 20160 },
+    "plus_21d": { "id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004", "status": "replied", "offset_minutes": 30240 },
+    "future_scheduled_unsent": 0,
+    "total_checkins": 6
+  },
+  "day14_review": {
+    "id": "e6ef6110-e6f9-43e7-a371-cb1e8fc0874c",
+    "reviewed_at": "2026-09-04T02:28:22.628744+00:00",
+    "reviewed_by": "0982141e-0531-4d41-a08d-0ac098014fb4",
+    "review_note": "done test test",
+    "trigger_patient_signal_id": "99408176-f57b-43ab-8581-8e9575c4e9d7",
+    "rows_for_enrolment": 1,
+    "rewritten": false,
+    "reopened": false,
+    "duplicate_created": false,
+    "effective_review_required": false
+  },
+  "day14_structured_evidence": {
+    "ce_id": "7d12522a-8b2e-4cd1-bb3a-3e16f9dc8ddd",
+    "status": "completed",
+    "path": [
+      { "label": "Patient response", "value": "3", "display": "I'm not quite sure" },
+      { "label": "Concern", "value": "uneven", "display": "One area feels uneven" },
+      { "label": "Requested clinic review", "value": "yes", "display": "Yes please" }
+    ],
+    "preserved_after_completion": true,
+    "workspace_conversation_path_projection": "available via extractConversationPathEvidence (UI-Q1)"
+  },
+  "alerts_attention": {
+    "open_alerts": 0,
+    "alerts_total": 0,
+    "review_required": false,
+    "attention_required": false,
+    "alert_generated_by_day21_normal": false,
+    "alert_generated_by_completion": false
+  },
+  "command_queue": {
+    "patient_a_actionable": false,
+    "expected_sections_absent": ["Attention Required", "Awaiting Response"],
+    "architecture": "Completed enrolments appear in CQ only when unresolved clinician work remains (alert_open / alert_acknowledged / review_required). Completed + stable / no outstanding work are excluded (M3.3).",
+    "patient_a_classification": "completed with no outstanding clinical work → not CQ-eligible"
+  },
+  "patient_workspace": {
+    "expected_workspace_status": "Monitoring completed",
+    "final_outcome": "settled/normal (score 1 · Everything feels normal)",
+    "current_action_required": false,
+    "day14_history_retained": true,
+    "timeline_retained": true,
+    "ui_q1_evidence_layout": "unchanged / no overlap regression introduced",
+    "verification_method": "read-only DB + architecture (workspace_status.js); no live authenticated browser in-agent"
+  },
+  "lifecycle_clinical_work_invariant": {
+    "retained": true,
+    "evidence": [
+      "enrolment_journey_lifecycle.js COMPLETION_SOURCE_AUTOMATIC does not resolve clinical work as a side-effect of completion (resolved_alerts=0 on Patient A completion event)",
+      "monitoring_projection.js M3.3 includes completed enrolments only when outstanding alerts/reviews remain",
+      "test-m33-journey-lifecycle.js PASS — completed + unresolved alert/review remain CQ-eligible; completed + stable not eligible; projection does not suppress review_required"
+    ],
+    "patient_a_had_unresolved_work_at_completion": false
+  },
+  "duplicate_protection": {
+    "physical_founder_replies": 1,
+    "valid_clinical_interpretations": 1,
+    "intended_acknowledgements": 1,
+    "distinct_inbound_sids": 1,
+    "recovery_conversation_idempotency_key_present": true,
+    "claim_idempotency_row_observed": false,
+    "claim_note": "twilio_inbound:${sid}:claim row not present in message_events for this SID; clinical processing still unique via recovery_conversation + recovery_triage_signal keys and single Twilio outbound-reply. No 5J5 multi-SID recurrence.",
+    "already_complete_race_suppression_invoked": false,
+    "5j5_recurrence": false
+  },
+  "patient_b": {
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "enrolment_status": "active",
+    "mutated_by_5j10": false,
+    "natural_activity": {
+      "plus_24h_checkin_id": "0087f027-e74d-40f9-8864-2178adc79faa",
+      "status": "sent",
+      "sent_at": "2026-09-04T03:54:09.023+00:00",
+      "ce_id": "dbd718ff-2116-4f2c-a7a9-882eec7450cb",
+      "ce_status": "awaiting_reply",
+      "stage_key": "early_recovery",
+      "outbound_event_id": "0b1ca60a-3e03-4b36-b5cd-77f368bc4998",
+      "outbound_sid_redacted": "SM4c…fb",
+      "agent_response": false,
+      "note": "Natural scheduler send recorded only; not accelerated, suppressed, or replied"
+    }
+  },
+  "communications_audit_5j9_through_completion": {
+    "patient_a": [
+      { "kind": "outbound_checkin", "at": "2026-09-04T03:19:06Z", "sid_redacted": "SMcd…5a", "stage": "+21d" },
+      { "kind": "inbound_reply", "at": "2026-09-04T03:36:03Z", "sid_redacted": "SM0a…8f", "body": "1" },
+      { "kind": "outbound_terminal_ack", "at": "2026-09-04T03:36:04Z", "sid_redacted": "SM2c…99", "template": "SETTLED_DAY21" }
+    ],
+    "additional_sms": 0,
+    "email": 0,
+    "clinician_delivery": 0,
+    "media": 0
+  },
+  "tests_run": {
+    "test-m33-journey-lifecycle.js": "PASS",
+    "verify-complete-monitoring-atomic.js": "PASS (forced rollback; Patient B enrolment unchanged)",
+    "test-anti-wrinkle-v5.js": "PASS",
+    "conversation_path_projection_smoke": "PASS"
+  },
+  "code_changes": "none",
+  "evidence_path": "docs/testing/phase-5j10-patient-a-v4-terminal-closeout.json",
+  "next_action": "PATIENT A V4 PRODUCTION JOURNEY VALIDATION COMPLETE. V4 REAL-PATIENT CONTROLLED VALIDATION IS CLOSED. READY FOR CONTROLLED ANTI-WRINKLE V5 PRODUCTION VALIDATION."
+}
