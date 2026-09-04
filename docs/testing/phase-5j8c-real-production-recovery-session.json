@@ -1,0 +1,195 @@
+{
+  "phase": "5J8C",
+  "title": "Real production recovery session failure — Continue gate + OTP error surfacing",
+  "executed_at_utc": "2026-09-04T01:38:44Z",
+  "executed_at_brisbane": "2026-09-04T11:38:44+10:00",
+  "verdict": "PASS",
+  "pass_standard": "REAL production URL → WebKit → Continue → verifyOtp → session in localStorage → reset form → password update → logout/login (disposable user). Founder link generated but not consumed.",
+  "reclassification_of_5j8b": {
+    "automated_e2e": "PASS",
+    "real_founder_e2e": "FAIL",
+    "reason": "5J8B Chromium E2E used a clean browser, a single fresh token_hash URL, and auto-verify on mount. Real founder Safari/Mail path failed verifyOtp (invalidated or already-consumed OTP) while UI only showed opaque 'No session found'."
+  },
+  "real_founder_11_21_trace": {
+    "approx_click_brisbane": "2026-09-04 11:21",
+    "approx_click_utc": "2026-09-04T01:21:00Z",
+    "email_generated_utc": "2026-09-04T01:18:34Z",
+    "note_prior_email_same_window": "Another recovery was also generated at ~01:18:02Z; newer generateLink invalidates older hashed_token (proven in 5J8C).",
+    "callback_hit": "yes — failure copy is AuthCallbackPage obtain-null path, not reset-password expired copy",
+    "parameter_shape_expected_from_5j8b_mail": {
+      "pathname": "/auth/callback",
+      "query_keys": ["token_hash", "type"],
+      "type": "recovery",
+      "token_hash": "[REDACTED — never logged]"
+    },
+    "verifyOtp": {
+      "called": "yes (auto on mount in dfc2a2d)",
+      "result": "failure — no access_token returned to callback",
+      "most_likely_error_code": "otp_expired",
+      "why_ui_said_no_session_found": "obtainSupabaseAccessToken swallowed verifyOtp errors; getAuthCallbackErrorMessage only mapped URL hash errors from /auth/v1/verify, not verifyOtp API failures; existing same-user session path signed out and returned null"
+    },
+    "session_returned": false,
+    "storage": "browser supabase-js localStorage (sb-*-auth-token) — never established for this click",
+    "navigation_to_reset_password": false,
+    "reset_page_session": "n/a — never reached",
+    "failure_point": "callback obtainSupabaseAccessToken returned null after verifyOtp failure (otp consumed/invalidated), before /auth/reset-password"
+  },
+  "proven_repros": {
+    "newer_generateLink_invalidates_older_token": true,
+    "older_email_with_existing_session": {
+      "token_obtained": false,
+      "session_after": false,
+      "matches_founder_copy": true
+    },
+    "js_preview_then_real_click": {
+      "preview_verify_ok": true,
+      "real_click_ok": false
+    },
+    "existing_session_plus_valid_recovery": {
+      "token_obtained": true
+    },
+    "newest_clean_browser": {
+      "token_obtained": true
+    },
+    "pkce_client_verifyOtp_returns_session": {
+      "access_token_present": true,
+      "refresh_token_present": true,
+      "expires_at_present": true,
+      "user_present": true
+    }
+  },
+  "storage_model": [
+    {
+      "flow": "sign-in",
+      "client_type": "browser createClient singleton (app/lib/supabase.ts)",
+      "session_storage": "localStorage",
+      "next_route_expectation": "localStorage session present for app bootstrap"
+    },
+    {
+      "flow": "invitation acceptance",
+      "client_type": "same browser singleton",
+      "session_storage": "localStorage (+ sessionStorage invitation continuation)",
+      "next_route_expectation": "inbound invite credentials win over pre-existing session"
+    },
+    {
+      "flow": "recovery callback (after 5J8C)",
+      "client_type": "same browser singleton",
+      "session_storage": "localStorage after explicit Continue → verifyOtp",
+      "next_route_expectation": "persist confirmed then /auth/reset-password"
+    },
+    {
+      "flow": "reset-password",
+      "client_type": "same browser singleton",
+      "session_storage": "reads localStorage via getSession + onAuthStateChange hydrate",
+      "next_route_expectation": "session required to show password form"
+    },
+    {
+      "flow": "authenticated app",
+      "client_type": "same browser singleton",
+      "session_storage": "localStorage",
+      "next_route_expectation": "clinic/org session from access_token"
+    }
+  ],
+  "not_cookie_vs_localStorage_mismatch": true,
+  "root_cause": {
+    "class": "one-time recovery OTP already invalid at real human verify + opaque error mapping; auto-verify on mount still unsafe against JS-executing previews",
+    "exact": "After 5J8B, email used app callback?token_hash&type=recovery. verifyOtp only runs in browser JS, but (1) mounting the callback auto-called verifyOtp so any JS preview/prerender could burn the OTP; (2) a second generateLink in the 5J8B send window invalidated the prior token; (3) verifyOtp otp_expired was swallowed and rendered as 'No session found', including when an existing Safari localStorage session was cleared. Storage handoff itself works when OTP is valid.",
+    "5j8b_test_discrepancy": [
+      "Chromium only (founder uses Safari/Mail)",
+      "clean context — no existing localStorage session",
+      "single fresh token — no double generateLink invalidation",
+      "HTTP prefetch without JS — does not exercise auto-verify burn",
+      "did not assert verifyOtp error-code UX (only URL hash otp_expired)"
+    ]
+  },
+  "fix": {
+    "web_commit": "b70c713",
+    "web_deploy": "dpl_FExbJnuRVZGzEP6qkEskASpge3WF (signalcare-web-3qwn-n9e5mwrek) → https://app.signalcare.io",
+    "api_commit_runtime": "d1487cd (password recovery link architecture unchanged this phase)",
+    "api_test_commit": "e95ca82 (+ follow-up push for E2E wait fix if needed)",
+    "behaviour": [
+      "Recovery token_hash callbacks show Continue gate; verifyOtp only after explicit click",
+      "resolveInboundSupabaseSession returns failureReason/errorCode; otp_expired mapped to clear copy",
+      "waitForPersistedSession before router.replace('/auth/reset-password')",
+      "strip token_hash from URL after success",
+      "reset-password hydrates via getSession + onAuthStateChange",
+      "privacy-safe console diagnostics [signalcare.auth] — no tokens"
+    ],
+    "files": [
+      "signalcare-web/app/(auth)/auth/callback/page.tsx",
+      "signalcare-web/app/(auth)/auth/reset-password/page.tsx",
+      "signalcare-web/app/lib/auth-routing.ts",
+      "signalcare-web/app/lib/auth-diagnostics.ts",
+      "signalcare-api/scripts/test-password-recovery-5j8c-webkit-chromium.js"
+    ]
+  },
+  "webkit_production_e2e": {
+    "target": "https://app.signalcare.io",
+    "engine": "playwright webkit",
+    "continue_gate": true,
+    "without_continue_token_intact": true,
+    "otp_verification": true,
+    "session_localStorage": true,
+    "reset_form": true,
+    "password_update": true,
+    "logout_login": true,
+    "reused_token_fails_clear_message": true,
+    "http_prefetch_does_not_burn": true,
+    "cleaned_disposable_user": true,
+    "result": "PASS"
+  },
+  "chromium_regression": {
+    "engine": "playwright chromium",
+    "same_matrix": true,
+    "result": "PASS"
+  },
+  "security": {
+    "tokens_logged": false,
+    "token_hash_stripped_after_verify": true,
+    "no_access_token_in_app_urls_after_handoff": true,
+    "http_scanner_prefetch_safe": true,
+    "js_preview_safe_with_continue_gate": true,
+    "open_redirects": "unchanged getSafeAuthNextPath allowlist",
+    "anti_enumeration": "POST /app/auth/password-recovery returns {ok:true}",
+    "invitation_acceptance": "unchanged auto path for non-recovery",
+    "mumbai": "untouched"
+  },
+  "production": {
+    "web": "https://app.signalcare.io — b70c713 / dpl_FExbJnuRVZGzEP6qkEskASpge3WF",
+    "api": "https://api.signalcare.io — Sydney (password-recovery 200)",
+    "sydney": true,
+    "mumbai": "untouched"
+  },
+  "new_founder_email": {
+    "triggered": true,
+    "email": "scott1098ce@gmail.com",
+    "via": "POST https://api.signalcare.io/app/auth/password-recovery",
+    "http_status": 200,
+    "provider_status": "accepted_at_api_boundary ({ok:true}); founder must use ONLY this newest email",
+    "timestamp_utc": "2026-09-04T01:38:44Z",
+    "clicked_by_agent": false,
+    "consumed_by_agent": false
+  },
+  "patient_clinical_state": {
+    "patient_a_reviewed": false,
+    "cq_changed": false,
+    "plus_21d_accelerated_or_sent": false,
+    "patient_b_touched": false,
+    "protocols_changed": false,
+    "read_only_check": "sydney enrolments head ok; no clinical mutations performed"
+  },
+  "founder_action_required": {
+    "open_only": "newest recovery email from ~2026-09-04T01:38:44Z",
+    "expected": "Continue to reset password → Set a new password form",
+    "then": "STOP after form appears (or complete password if intended); do not use older recovery emails"
+  },
+  "evidence_path": "docs/testing/phase-5j8c-real-production-recovery-session.json",
+  "commits": {
+    "web": "b70c713",
+    "api_tests": "e95ca82"
+  },
+  "push": {
+    "web": "origin/main",
+    "api": "origin/main"
+  }
+}
