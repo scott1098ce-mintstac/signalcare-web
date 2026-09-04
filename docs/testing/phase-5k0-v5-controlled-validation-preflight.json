@@ -1,0 +1,321 @@
+{
+  "phase": "5K0",
+  "title": "Anti-Wrinkle v5 controlled test preflight",
+  "executed_at_utc": "2026-09-04T04:15:00Z",
+  "mode": "INSPECT_ONLY",
+  "verdict": "PASS",
+  "communications": 0,
+  "clinical_production_mutations": 0,
+  "code_changes": "none",
+  "absolute_stops_honoured": {
+    "patient_c_created": false,
+    "v5_enrolment_created": false,
+    "sms_sent": false,
+    "checkin_accelerated": false,
+    "scheduler_invoked": false,
+    "inbound_simulated": false,
+    "patient_a_mutated": false,
+    "patient_b_mutated": false,
+    "patient_b_replied": false,
+    "review_created": false,
+    "alert_created": false,
+    "v5_logic_changed": false,
+    "deployed": false,
+    "media_enabled": false,
+    "clinician_notifications_enabled": false,
+    "mumbai_touched": false
+  },
+  "production": {
+    "api_health": true,
+    "api_health_body": { "ok": true },
+    "api_version": "91bdbad343cba1000a384f2a65950912bf315a75",
+    "api_version_includes_v5_library": true,
+    "web": "https://app.signalcare.io HTTP 200",
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "mumbai_project": "wpbyxrsiayspyweaqmwy",
+    "mumbai_writes": false,
+    "ecs_task_definition": "signalcare-api:206",
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "global_v5": {
+    "protocol_id": "fee74dc7-0043-4cd3-b7a1-d6589f1d9150",
+    "canonical_protocol": "anti_wrinkle",
+    "pathway": "anti_wrinkle_cpd_v5",
+    "clinical_pathway_version": 5,
+    "protocol_version_id": "a1050505-0001-4000-8000-000000000001",
+    "version_number": 5,
+    "status": "published",
+    "published_at": "2026-09-03T21:52:49.843195+00:00",
+    "supersedes_v4_version_id": "a1040404-0001-4000-8000-000000000001",
+    "v4_status": "archived",
+    "stages": [
+      { "stage_key": "immediate_safety", "offset_minutes": 30, "label": "+30m" },
+      { "stage_key": "early_recovery", "offset_minutes": 1440, "label": "+24h" },
+      { "stage_key": "early_effect", "offset_minutes": 4320, "label": "+3d" },
+      { "stage_key": "effect_developing", "offset_minutes": 10080, "label": "+7d" },
+      { "stage_key": "outcome_assessment", "offset_minutes": 20160, "label": "+14d" },
+      { "stage_key": "outcome_followup", "offset_minutes": 30240, "label": "+21d" }
+    ],
+    "silent_migration_of_existing_enrolments": false,
+    "runtime_ce_source": "clinical-library/anti-wrinkle-v5 via resolveConversationStage(isAntiWrinkleV5Context)",
+    "db_patient_conversation": "governance snapshot pin (schema_version anti_wrinkle_cpd_v5, clinical_pathway_version 5); full branch graph resolved from code library"
+  },
+  "test_clinic_v5": {
+    "clinic_name": "Test Aesthetics Clinic",
+    "protocol_id": "3bff4985-bc49-409e-b4e1-b885c34f6481",
+    "published_version_id": "6ec89fa8-9c0d-4ef0-af23-0364a1771764",
+    "version_number": 1,
+    "status": "published",
+    "is_active": true,
+    "archived_at": null,
+    "source_protocol_id": "fee74dc7-0043-4cd3-b7a1-d6589f1d9150",
+    "source_protocol_version_id": "a1050505-0001-4000-8000-000000000001",
+    "source_pin": "global v5",
+    "six_active_stages": true,
+    "eligible_for_new_enrolment": true,
+    "existing_enrolments_on_clinic_v5": 0,
+    "existing_enrolments_on_clinic_v4": 2,
+    "altered": false
+  },
+  "patient_a": {
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "mobile_tail": "4173",
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "status": "completed",
+    "completed_at": "2026-09-04T03:36:03.659786+00:00",
+    "active_enrolments": 0,
+    "mutated": false,
+    "journey": "v4 COMPLETED AND CLOSED"
+  },
+  "patient_b": {
+    "patient_id": "f4d48a58-447c-4664-887b-5465ca0b0922",
+    "mobile_tail": "4704",
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "status": "active",
+    "journey": "v4 ACTIVE",
+    "mutated": false,
+    "natural_activity": {
+      "plus_30m": { "checkin_id": "4541bd61-8ca3-40fe-9fca-2d3666b57f75", "status": "replied" },
+      "plus_24h": {
+        "checkin_id": "0087f027-e74d-40f9-8864-2178adc79faa",
+        "status": "sent",
+        "sent_at": "2026-09-04T03:54:09.023+00:00"
+      },
+      "ce": {
+        "id": "dbd718ff-2116-4f2c-a7a9-882eec7450cb",
+        "status": "awaiting_reply",
+        "stage_key": "early_recovery",
+        "current_question_id": "recovery_check_in"
+      },
+      "agent_reply": false,
+      "agent_acceleration": false
+    }
+  },
+  "mobile_uniqueness": {
+    "constraint": "patients_mobile_unique",
+    "one_active_enrolment_per_patient": true,
+    "guard": "lib/patient_enrolment_guard.js → active_enrolment_exists",
+    "patient_a_mobile_rows": 1,
+    "patient_b_mobile_rows": 1,
+    "concurrent_active_recovery_journeys_supported": false,
+    "reuse_patient_a_mobile_after_completion": {
+      "technically_possible_after_completed": true,
+      "recommended_for_v5_controlled_test": false,
+      "reasons": [
+        "Would mix completed v4 historical evidence with new v5 validation on same patient identity",
+        "Inbound Twilio still routes by mobile to a single patient row — preferred clean subject is Patient C",
+        "Founder preference and brief: fresh synthetic Patient C with third controlled AU mobile"
+      ]
+    }
+  },
+  "test_patient_requirement": {
+    "fresh_patient_c_required": true,
+    "mobile_required": true,
+    "mobile_invented": false,
+    "waiting_for": "FOUNDER_CONTROLLED_PATIENT_C_AUSTRALIAN_MOBILE",
+    "do_not_create_patient_c_yet": true
+  },
+  "exact_live_v5_test_path": {
+    "selected_stage": "immediate_safety",
+    "stage_label": "+30m",
+    "offset_minutes": 30,
+    "why_stage": "Shortest early check-in; score-4 concern + eyelid functional screen available on all recovery stages",
+    "runtime_resolution": "isAntiWrinkleV5Context → getAntiWrinkleV5ConversationStage('immediate_safety')",
+    "opening_sms_summary": {
+      "education_starts": "Hi {{first_name}}, we're checking in after your anti-wrinkle treatment today.",
+      "prompt": "How are you feeling right now?",
+      "options": [
+        "1 Everything feels normal",
+        "2 Mostly what I expected",
+        "3 I'm not quite sure",
+        "4 Something doesn't feel right",
+        "5 I'd like my clinic to contact me"
+      ]
+    },
+    "founder_reply_1": "4",
+    "signalcare_response_1": "Thanks. / Please tell us briefly what you are noticing so {{clinic_name}} can support you. / Reply with a short message.",
+    "free_text_point": {
+      "question_id": "tell_us_more",
+      "founder_reply_2": "One of my eyelids feels a little heavy"
+    },
+    "signalcare_response_2_safety_screen": {
+      "question_id": "functional_safety_screen",
+      "prompt": "Just to be sure — are you having any trouble keeping an eye open, any change in vision (including double vision), or drooping that seems obvious or getting worse?",
+      "options": [
+        "1 No — none of those",
+        "2 Difficulty keeping an eye open",
+        "3 Change in vision",
+        "4 New double vision",
+        "5 Obvious or progressive drooping"
+      ],
+      "note": "Eyelid/brow language routes to functional_safety_screen (not the full red_flag_screen). Generic unknown free text uses red_flag_screen instead."
+    },
+    "clear_screen_response": "1",
+    "expected_final_acknowledgement": "Thanks. You haven't reported any of the urgent symptoms we screen for.\n\nBecause we can't confidently class what you've described as expected at this stage, we've asked {{clinic_name}} to review it and follow up if needed.\n\nIf symptoms become severe or sudden before you hear from them, don't wait — seek urgent medical help.",
+    "offline_path_verified": true,
+    "offline_script": "scripts/test-anti-wrinkle-v5.js + local CE advanceConversationState score4 eyelid path"
+  },
+  "expected_clinical_result": {
+    "classification": "eyelid_brow_concern",
+    "unclassified_concern": true,
+    "safety_class": "none",
+    "screens_clear": true,
+    "disposition": "routine_review / clinic_review_clear / unclassified_review patient closing",
+    "allow_reassurance": false,
+    "risk_clinical_priority": "medium",
+    "not_automatic_high": true,
+    "review_required": true,
+    "attention_required": true,
+    "alert": false,
+    "open_alert": false,
+    "cq": "review_required",
+    "branch_id": "functional_clear"
+  },
+  "eyelid_brow_governance": {
+    "do_not_claim_au_xeomin_pi_lists_heavy_eyelid": true,
+    "au_pi_language_reference": "heavy feeling of frontal area (not heavy eyelid)",
+    "mild_heavy_eyelid_is_not_ptosis_functional": true,
+    "concern_class": "eyelid_brow_concern",
+    "routes_to": "functional_safety_screen",
+    "clear_screen_outcome": "unclassified clinician review — no automatic reassurance",
+    "escalates_when": [
+      "eye_hard_to_open",
+      "visual_disturbance",
+      "double_vision",
+      "progressive_droop"
+    ],
+    "evidence": [
+      "clinical-library/anti-wrinkle-v5/classify.js",
+      "clinical-library/anti-wrinkle-v5/conversation.js eyelidBrowScreenBranch",
+      "scripts/test-anti-wrinkle-v5.js"
+    ]
+  },
+  "three_way_policy": {
+    "A_known_expected_mild_safety_clear": {
+      "outcome": "reassurance permitted",
+      "tests": ["redness", "tenderness", "bumps", "mild headache via score3 expected paths", "score 1/2"]
+    },
+    "B_known_nonurgent_or_unknown_unclassified_safety_clear": {
+      "outcome": "clinician review; routine/nonurgent; no automatic reassurance; no fake emergency alert",
+      "tests": [
+        "One of my eyelids feels a little heavy + functional clear",
+        "generic unknown free text + screen clear",
+        "score 4 unknown"
+      ]
+    },
+    "C_urgent_emergency_red_flag": {
+      "outcome": "established escalation (emergency/immediate/urgent) with alert where mapped",
+      "evidence": "BY_CLASS in disposition.js + safetyClassBranches + redFlagFollowUps + functional escalate test"
+    }
+  },
+  "score_semantics": {
+    "score_3": "clarification / uncertainty path",
+    "score_4": "concern path; unknown/unclassified + safety clear → routine clinician review; NOT automatic HIGH solely because score=4",
+    "score_5": "clinic contact intent preserved (patient_requested_contact when screen clear)"
+  },
+  "workspace_expectation": {
+    "raw_free_text_key": "tell_us_more",
+    "raw_free_text_exact": "One of my eyelids feels a little heavy",
+    "conversation_path": true,
+    "safety_screen_result": "functional_safety_screen=none → No defined urgent symptoms reported",
+    "review_disposition": "Clinician review required",
+    "clinical_priority": "medium",
+    "no_ai_paraphrase_replacement": true,
+    "api": "lib/workspace_evidence.js extractRecoveryConcernEvidence + extractConversationPathEvidence",
+    "ui_q1": "conversation_path + evidence hierarchy present in production web"
+  },
+  "command_queue_expectation": {
+    "review_required": true,
+    "attention_required": true,
+    "v2_status": "review_required",
+    "cq": "review_required",
+    "alert_open": false,
+    "ui_distinction": "UI-Q1 warning/review styling vs stable recession; not danger/emergency"
+  },
+  "review_workflow_expectation": {
+    "action": "Mark reviewed (real UI)",
+    "execute_in_5k0": false,
+    "expected_after": {
+      "enrolment_reviews_append_only": true,
+      "review_suppression": true,
+      "attention_clears": true,
+      "cq_clears": true,
+      "no_patient_communication": true,
+      "journey_remains_active": true,
+      "future_scheduled_checkins_intact": true
+    }
+  },
+  "automated_safety_coverage": {
+    "v5_suite": "scripts/test-anti-wrinkle-v5.js PASS",
+    "covered_explicitly": [
+      "eyelid heaviness ≠ ptosis_functional",
+      "functional escalate (eye hard to open) → alert",
+      "unclassified + clear → review, allow_reassurance false",
+      "score 4 unknown → review, not high",
+      "score 5 contact path"
+    ],
+    "coded_but_not_individually_asserted_in_v5_suite": [
+      "breathing difficulty / airway",
+      "swallowing difficulty",
+      "speech weakness",
+      "vision/diplopia free-text classifier paths",
+      "thunderclap / sudden severe headache",
+      "severe swelling/allergy/anaphylaxis",
+      "conditional infection"
+    ],
+    "coverage_assessment": "Adequate for skipping live emergency-path SMS: emergency/immediate/urgent mappings exist in disposition BY_CLASS + CE branches; ptosis escalate covered; do not recommend live emergency SMS in 5K1",
+    "recommend_live_emergency_sms": false
+  },
+  "expected_recovery_coverage": {
+    "covered": true,
+    "paths": ["score 1/2 reassurance", "score3 expected redness/tenderness/bumps/mild headache"],
+    "v5_did_not_become_review_everything": true,
+    "recommend_live_expected_recovery_sms": false
+  },
+  "minimum_live_test_plan_5k1": {
+    "execute": false,
+    "steps": [
+      "Founder supplies third AU mobile (controlled)",
+      "Create Patient C in Test Aesthetics Clinic with consent + SMS monitoring consent",
+      "Enrol Patient C on clinic v5 protocol version 6ec89fa8-9c0d-4ef0-af23-0364a1771764",
+      "Confirm six check-ins materialised (30/1440/4320/10080/20160/30240)",
+      "Controlled-accelerate immediate_safety (+30m) check-in only (audit CONTROLLED_SYNTHETIC_JOURNEY_TIME_ACCELERATION)",
+      "Real scheduler send (job_send_due_checkins)",
+      "Founder reply sequence: 4 → One of my eyelids feels a little heavy → 1",
+      "Verify patient SMS ack = UNCLASSIFIED_CONCERN_REVIEW (no generic reassurance)",
+      "Verify backend: CE completed branch functional_clear; review_required; alert false; cq review_required; concern_class eyelid_brow_concern; tell_us_more exact",
+      "Verify CQ actionable review_required (not alert_open)",
+      "Verify Workspace shows exact free text + conversation_path + safety clear + review disposition",
+      "Founder Mark reviewed",
+      "Verify review clears CQ/attention; journey still active; remaining check-ins intact; no patient SMS from review"
+    ],
+    "do_not_touch": ["Patient A", "Patient B", "Mumbai", "media flag", "clinician notification flag"]
+  },
+  "blockers": [],
+  "next_action": "WAITING FOR FOUNDER-CONTROLLED PATIENT C MOBILE NUMBER. DO NOT CREATE PATIENT C YET."
+}
