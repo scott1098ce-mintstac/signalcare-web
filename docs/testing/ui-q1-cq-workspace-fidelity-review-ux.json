@@ -1,0 +1,197 @@
+{
+  "phase": "UI-Q1",
+  "title": "Command Queue + Patient Workspace fidelity + Review UX",
+  "executed_at_utc": "2026-09-04T02:55:00Z",
+  "verdict": "PASS",
+  "mode": "INSPECT → IMPLEMENT → TEST → VISUAL QA → FIX → DEPLOY → PRODUCTION QA → DOCUMENT → CLOSEOUT",
+  "absolute_stops_honoured": {
+    "patient_a_review_reopened": false,
+    "patient_a_clinical_state_mutated": false,
+    "patient_b_altered": false,
+    "plus_21d_sent": false,
+    "patient_communications_sent": false,
+    "clinical_risk_logic_changed": false,
+    "ce_changed": false,
+    "review_suppression_semantics_changed": false,
+    "mumbai_touched": false,
+    "media_enabled": false,
+    "clinician_notification_delivery_enabled": false,
+    "db_migration": false
+  },
+  "ui_001_command_queue": {
+    "before": "Flat black/white/grey table rows; review rows visually near-identical to stable; insufficient severity hierarchy.",
+    "after": "Attention open-alert rows retain danger tint + severity bar; review_required rows use warning tint/bar/icon + score; stable/awaiting recede (muted simple rows); All Clear! banner with clinically accurate copy; Immediate Action when ≥3 alert_open.",
+    "figma_fidelity": "Substantially restored to approved CQ visual language (hierarchy, severity treatment, section separation, action prominence, all-clear).",
+    "severity_hierarchy": "Uses existing v2_status/risk/open_alert_severity — no new clinical classification.",
+    "sections": ["Attention required", "Awaiting response", "Stable"],
+    "all_clear": {
+      "title": "All Clear!",
+      "body": "No episodes currently require clinical attention. Monitoring continues for enrolled recoveries.",
+      "note": "Avoids inaccurate 'no active alerts' wording when attention may include reviews."
+    },
+    "immediate_action_support": {
+      "supported": true,
+      "semantics": "Existing isOverloadedView: ≥3 rows with v2_status === alert_open",
+      "copy": "N patients require immediate action",
+      "faked": false
+    },
+    "filters_preserved": ["Procedure", "Risk Level", "Status", "Assigned to", "Clear All"]
+  },
+  "ui_002_patient_workspace": {
+    "overlap_defect": {
+      "before": "SCMetricEvidenceStrip used fixed 160px/474px columns causing Protocol step / Patient response / Outcome Assessment collision.",
+      "after": "Responsive 3-column CSS grid with wrap; no overlap at 1440×900 or 1280×800.",
+      "fixed": true
+    },
+    "evidence_hierarchy": "Patient concern path → alert/review context → evidence strip → assessment → timeline/notes.",
+    "structured_concern_path": {
+      "api": "signalcare-api/lib/workspace_evidence.js extractConversationPathEvidence from decision_snapshot.answers",
+      "web": "Workspace evidence.conversation_path + PatientWorkspaceBody Patient concern path",
+      "labels": "Canonical CE option labels (not AI paraphrase)",
+      "example": [
+        { "label": "Patient response", "display": "I'm not quite sure" },
+        { "label": "Concern", "display": "One area feels uneven" },
+        { "label": "Requested clinic review", "display": "Yes please" }
+      ]
+    },
+    "risk_status_presentation": {
+      "decision": "Legitimate different concepts — labeled distinctly; algorithms unchanged.",
+      "queue_risk": "clinicalRiskBadge → 'Queue risk: …' (monitoring projection risk_level)",
+      "interpretation_priority": "SCAiAssessmentCard statusBadge → 'Disposition: …' from interpretation.severity (Low/Moderate/High clinical priority)",
+      "not_same_concept": true
+    },
+    "timeline": "Preserved; review history remains append-only.",
+    "responsive": "Evidence strip stacks to single column under ~1100px; split view verified at 1440 and 1280."
+  },
+  "ui_003_review_ux": {
+    "before": "window.prompt for Mark reviewed; clinical note easily mistaken for review completion (5J8 founder incident).",
+    "after": "MarkReviewedModal (existing Modal pattern): required review note ≥10 chars, Cancel, Confirm review; Clinical notes hint clarifies notes do not clear review.",
+    "add_note_distinction": "ClinicalNotesSection hint + modal copy state notes ≠ Mark reviewed.",
+    "mark_reviewed_workflow": "openReviewModal → Confirm review → POST /app/enrolments/:id/review → success only after backend OK.",
+    "success_feedback": "Restrained status banner: Clinical review recorded…",
+    "failure_feedback": "Error stays in modal; queue/attention not cleared optimistically.",
+    "surfaces": ["Command Queue WorkspacePanel", "Enrolment detail page"]
+  },
+  "figma_comparison": {
+    "matched": [
+      "Attention vs awaiting vs stable hierarchy",
+      "Danger treatment for open alerts",
+      "Warning treatment for routine/review attention",
+      "Stable recession",
+      "All Clear! positive state",
+      "Immediate action overload when ≥3 open alerts",
+      "Action button prominence (Acknowledge / Review)",
+      "Split workspace architecture preserved"
+    ],
+    "intentional_deviations": [
+      {
+        "item": "Immediate Action rows also remain listed under Attention required",
+        "why": "Existing CQ architecture; UI pass does not change grouping semantics"
+      },
+      {
+        "item": "Figma mock assignment/activity fields not fabricated",
+        "why": "Only render when production model has data"
+      },
+      {
+        "item": "Empty clinic uses CommandQueueEmptyState, not All Clear!",
+        "why": "All Clear applies when monitoring exists but attention is zero"
+      }
+    ]
+  },
+  "files_changed": {
+    "web": [
+      "app/components/command-queue/AllClearBanner.tsx",
+      "app/components/command-queue/CommandQueuePanel.tsx",
+      "app/components/command-queue/ImmediateActionPanel.tsx",
+      "app/components/command-queue/QueueRow.tsx",
+      "app/components/command-queue/WorkspacePanel.tsx",
+      "app/components/command-queue/command-queue.module.css",
+      "app/components/command-queue/workspace.module.css",
+      "app/components/design-system/queue/SCQueueRow.module.css",
+      "app/components/design-system/workspace/SCMetricEvidenceStrip.module.css",
+      "app/components/design-system/workspace/SCMetricEvidenceStrip.tsx",
+      "app/components/design-system/workspace/SCNotesSection.module.css",
+      "app/components/workspace/ClinicalNotesSection.tsx",
+      "app/components/workspace/MarkReviewedModal.tsx",
+      "app/components/workspace/PatientWorkspaceBody.tsx",
+      "app/components/workspace/patient-workspace.module.css",
+      "app/hooks/use-workspace-panel.ts",
+      "app/lib/conversation-path-display.ts",
+      "app/lib/workspace-display.ts",
+      "app/lib/workspace-types.ts",
+      "app/lib/visual-lock/fixtures.ts",
+      "app/visual-lock/VisualLockCommandQueue.tsx",
+      "app/visual-lock/VisualLockWorkspace.tsx",
+      "app/visual-lock/command-queue/page.tsx",
+      "app/(app)/enrolments/[id]/page.tsx",
+      "visual-lock/baselines/**/command-queue.png",
+      "visual-lock/baselines/**/workspace.png"
+    ],
+    "api": ["lib/workspace_evidence.js"]
+  },
+  "functional_tests": {
+    "typescript": "npx tsc --noEmit PASS",
+    "api_anti_wrinkle_v5": "PASS",
+    "api_command_queue_active_monitoring": "PASS",
+    "api_m303_conversation_matrix": "PASS 72",
+    "clinical_semantics_unchanged": [
+      "attention calculation",
+      "risk calculation",
+      "review suppression",
+      "alert state",
+      "journey lifecycle",
+      "check-in scheduling",
+      "CE",
+      "tenant isolation"
+    ]
+  },
+  "visual_qa": {
+    "chromium": "PASS",
+    "webkit": "PASS",
+    "viewports": ["1440x900", "1280x800"],
+    "visual_lock_gate": "PASS (28/28) after intentional CQ+workspace baseline update",
+    "evidence_dir": ".presentation-qa/ui-q1/"
+  },
+  "baselines": {
+    "updated": [
+      "visual-lock/baselines/{chromium,webkit}/{1440x900,1280x800}/command-queue.png",
+      "visual-lock/baselines/{chromium,webkit}/{1440x900,1280x800}/workspace.png"
+    ],
+    "unchanged": [
+      "command-queue-empty",
+      "patients",
+      "protocols",
+      "reports",
+      "settings"
+    ],
+    "rationale": "UI-Q1 founder-authorised fidelity pass for CQ hierarchy + workspace evidence/concern path; other locked surfaces pixel-stable.",
+    "approval": "UPDATE_VISUAL_LOCK_BASELINES=1 with SIGNALCARE_FOUNDER_BASELINE_APPROVAL=I-approve-locked-baseline-update (authorised by UI-Q1 brief)"
+  },
+  "production": {
+    "web_deploy": "pending_commit_push_vercel",
+    "api_deploy": "required for conversation_path projection — pending commit/push to main (ECS workflow)",
+    "app": "https://app.signalcare.io",
+    "region": "Sydney",
+    "mumbai": "untouched"
+  },
+  "patient_a": {
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "state_expected": "stable / review completed (5J8)",
+    "mutation": false
+  },
+  "patient_b": {
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "mutation": false,
+    "natural_scheduler": "may operate normally; no response on behalf of patient"
+  },
+  "sydney_mumbai": {
+    "sydney": "production target",
+    "mumbai": "untouched"
+  },
+  "remaining_product_gaps": [
+    "Resolve-alert still uses window.prompt (out of UI-Q1 Mark reviewed scope)",
+    "Immediate Action panel duplicates alert_open rows also listed under Attention required (architecture lock)"
+  ],
+  "blockers": [],
+  "next_action": "READY TO RESUME PHASE 5 WITH PATIENT A +21D FINAL V4 CHECK-IN. DO NOT SEND +21D."
+}
