@@ -116,7 +116,10 @@
     "provider": "twilio",
     "twilio_sid_redacted": "SMcd…5a",
     "twilio_status_final": "delivered",
-    "status_callback_sequence": ["sent", "delivered"],
+    "status_callback_sequence": [
+      "sent",
+      "delivered"
+    ],
     "body_len": 580,
     "duplicates_checkin_sent": 1,
     "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
@@ -137,11 +140,26 @@
       "id": "recovery_check_in",
       "prompt": "Is anything still unresolved about your recovery or result?",
       "options": [
-        { "value": 1, "label": "Everything feels normal" },
-        { "value": 2, "label": "Mostly what I expected" },
-        { "value": 3, "label": "I'm not quite sure" },
-        { "value": 4, "label": "Something doesn't feel right" },
-        { "value": 5, "label": "I'd like my clinic to contact me" }
+        {
+          "value": 1,
+          "label": "Everything feels normal"
+        },
+        {
+          "value": 2,
+          "label": "Mostly what I expected"
+        },
+        {
+          "value": 3,
+          "label": "I'm not quite sure"
+        },
+        {
+          "value": 4,
+          "label": "Something doesn't feel right"
+        },
+        {
+          "value": 5,
+          "label": "I'd like my clinic to contact me"
+        }
       ]
     },
     "expected_recovery_branches": {
@@ -228,8 +246,8 @@
   },
   "repository_deployment": {
     "web": "UI-Q1 already on production (no 5J9 redeploy)",
-    "api": "3a6e93b live; evidence-only commit for 5J9",
-    "evidence_commit": "pending"
+    "api": "3a6e93b live; evidence-only commits for 5J9",
+    "evidence_path": "docs/testing/phase-5j9-patient-a-21d-final-v4-real-send.json"
   },
   "next_action": "WAITING FOR FOUNDER PHYSICAL +21D PHONE CONFIRMATION. DO NOT process or instruct a reply inside Cursor."
 }
