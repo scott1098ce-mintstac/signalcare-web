@@ -1,0 +1,223 @@
+{
+  "phase": "5K1",
+  "title": "Patient A sequential v5 re-enrolment + +30m real send",
+  "executed_at_utc": "2026-09-04T04:28:00Z",
+  "verdict": "PASS",
+  "mode": "CONTROLLED_PRODUCTION_MUTATION_AUTHORISED",
+  "communications": {
+    "authorised": "ONE real v5 +30m check-in SMS to mobile ending 4173",
+    "actual_outbound_sms": 1,
+    "founder_reply_by_agent": false,
+    "inbound_simulated": false,
+    "patient_b_communication": false,
+    "email": false,
+    "clinician_notification": false,
+    "media": false
+  },
+  "code_changes": "none",
+  "absolute_stops_honoured": {
+    "duplicate_patient_created": false,
+    "mobile_changed": false,
+    "v4_mutated": false,
+    "founder_reply_sent_or_simulated": false,
+    "patient_b_mutated": false,
+    "stages_accelerated_other_than_v5_30m": false,
+    "sender_manually_invoked": false,
+    "v5_logic_changed": false,
+    "media_enabled": false,
+    "clinician_notifications_enabled": false,
+    "mumbai_touched": false
+  },
+  "reenrolment_safety_gates": {
+    "A_product_guard": {
+      "pass": true,
+      "evidence": "lib/patient_enrolment_guard.js active_enrolment_exists only when status in (active,monitoring); completed enrolment does not block",
+      "assertPatientEnrolable_pre": { "ok": true }
+    },
+    "B_database_constraints": {
+      "pass": true,
+      "lifetime_one_enrolment_per_patient": false,
+      "unique_indexes_noted": [
+        "checkins_enrolment_step_unique (enrolment_id, protocol_step_id)",
+        "ux_recovery_conversation_sessions_open_enrolment (enrolment_id) WHERE awaiting_reply",
+        "patients_mobile_unique (mobile) — patient identity, not enrolment"
+      ]
+    },
+    "C_mobile_uniqueness": {
+      "pass": true,
+      "constraint": "patients_mobile_unique",
+      "patients_with_mobile_ending_4173": 1,
+      "duplicate_patient_created": false,
+      "reused_patient_id": "48463849-d278-483e-bb6a-329f2ffac54d"
+    },
+    "D_inbound_routing": {
+      "pass": true,
+      "code": "api/routes/twilio.js — enrolments where status in (active,monitoring) ORDER BY created_at DESC LIMIT 1",
+      "completed_excluded": true,
+      "post_v5_active_selection": "b139a43f-55d0-4e63-a8bf-f876c00c787d",
+      "open_ce_count_patient_a": 1,
+      "open_ce_enrolment": "b139a43f-55d0-4e63-a8bf-f876c00c787d",
+      "note": "5J0 defect applied only to concurrent ACTIVE enrolments; sequential completed+active is the documented safe path"
+    },
+    "E_reply_token_sid_routing": {
+      "pass": true,
+      "rule": "SID/reply_token matches gated to enrolmentScope = active enrolment only",
+      "v4_outbound_sid_match_when_v5_active": false,
+      "v5_outbound_sid_match_when_v5_active": true,
+      "implication": "Founder replies to new v5 SMS bind to v5; replies to historical v4 SMS fail-closed/unlinked (acceptable; not in test path)"
+    },
+    "F_historical_isolation": {
+      "pass": true,
+      "v4_byte_compare_after_enrolment_create": true,
+      "v4_completed_at_unchanged": "2026-09-04T03:36:03.659786+00:00",
+      "v4_protocol_version_unchanged": "6db2d89c-d33a-4395-881b-9318da10dacb",
+      "day14_review_retained": "e6ef6110-e6f9-43e7-a371-cb1e8fc0874c"
+    },
+    "G_cq_workspace": {
+      "pass": true,
+      "v4_in_command_queue": false,
+      "v5_v2_status": "awaiting_response",
+      "v5_attention_required": false,
+      "v5_review_required": false,
+      "workspace_http": 200,
+      "workspace_status": "awaiting_response"
+    },
+    "overall": "PASS — sequential re-enrolment architecturally safe"
+  },
+  "production": {
+    "api_health": true,
+    "api_version_at_send": "observed post-send /version 8884873 (docs commit; v5 library retained)",
+    "web": "https://app.signalcare.io HTTP 200",
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "mumbai_project": "wpbyxrsiayspyweaqmwy",
+    "mumbai_writes": false,
+    "scheduler": {
+      "rule": "signalcare-send-due-checkins",
+      "state": "ENABLED",
+      "schedule": "rate(1 minute)",
+      "manual_invoke": false
+    },
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "existing_patient": {
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "mobile_tail": "4173",
+    "name": "SignalCare Test Patient A",
+    "consent_status": "consented",
+    "sms_opt_out": false
+  },
+  "completed_v4": {
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "status": "completed",
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "completed_at": "2026-09-04T03:36:03.659786+00:00",
+    "historical_integrity": "immutable — unchanged by v5 enrolment/send",
+    "day14_review_id": "e6ef6110-e6f9-43e7-a371-cb1e8fc0874c",
+    "future_scheduled_checkins": 0,
+    "open_ce": 0,
+    "open_alerts": 0
+  },
+  "new_v5_enrolment": {
+    "creation_path": "POST https://api.signalcare.io/app/enrolments (live production API; clinic admin session via auth.admin.generateLink + verifyOtp; no password storage)",
+    "id": "b139a43f-55d0-4e63-a8bf-f876c00c787d",
+    "status": "active",
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "clinic_id": "f8d5b902-3c4e-5e6b-c7d8-9e0f1a2b3c4d",
+    "protocol_id": "3bff4985-bc49-409e-b4e1-b885c34f6481",
+    "protocol_version_id": "6ec89fa8-9c0d-4ef0-af23-0364a1771764",
+    "source_pin": "a1050505-0001-4000-8000-000000000001",
+    "pathway": "anti_wrinkle_cpd_v5",
+    "started_at": "2026-09-04T04:19:00.131+00:00",
+    "created_at": "2026-09-04T04:19:00.174297+00:00",
+    "stages": [
+      { "offset_minutes": 30, "checkin_id": "1a249800-fcc6-4dc2-9f56-4d906aac80a6", "step_id": "2c940d87-6528-46c0-8ce1-e0c4d4750c70", "stage_key": "immediate_safety" },
+      { "offset_minutes": 1440, "checkin_id": "f30ee189-a43b-4fcd-b8e9-e27eac2dc285", "step_id": "a0eab917-bfec-4750-8728-8df5f622a1e8", "stage_key": "early_recovery" },
+      { "offset_minutes": 4320, "checkin_id": "0ee47791-a777-40b1-bde6-f7ed19b25556", "step_id": "107ba971-2b10-46e9-bc68-e35529a830e0", "stage_key": "early_effect" },
+      { "offset_minutes": 10080, "checkin_id": "b35c71a2-a665-43f2-a0d7-de072dc5ca36", "step_id": "4eafd55b-8502-4501-9c0d-20b57afddf73", "stage_key": "effect_developing" },
+      { "offset_minutes": 20160, "checkin_id": "10a6c88a-d84e-4f45-b32c-a7d57dd684a3", "step_id": "859a90e0-b6d1-4c86-a80b-668ba80b965f", "stage_key": "outcome_assessment" },
+      { "offset_minutes": 30240, "checkin_id": "d736bedb-39f7-4baa-af77-7c6f4ba45fff", "step_id": "769baf5d-ad17-4a48-bb09-02bdfd6d02ae", "stage_key": "outcome_followup" }
+    ]
+  },
+  "v5_plus_30m": {
+    "checkin_id": "1a249800-fcc6-4dc2-9f56-4d906aac80a6",
+    "stage_key": "immediate_safety",
+    "offset_minutes": 30,
+    "protocol_version_id": "6ec89fa8-9c0d-4ef0-af23-0364a1771764",
+    "protocol_step_id": "2c940d87-6528-46c0-8ce1-e0c4d4750c70",
+    "original_due_at": "2026-09-04T04:49:00.131+00:00",
+    "accelerated_due_at": "2026-09-04T04:25:15.576+00:00",
+    "acceleration": {
+      "script": "scripts/controlled-accelerate-checkin-due.js",
+      "reason": "CONTROLLED_SYNTHETIC_JOURNEY_TIME_ACCELERATION",
+      "dry_run_first": true,
+      "allow_enrolment": "b139a43f-55d0-4e63-a8bf-f876c00c787d",
+      "only_due_at_changed": true,
+      "started_at_unchanged": true,
+      "other_stages_unchanged": true
+    }
+  },
+  "real_scheduler": {
+    "job": "job_send_due_checkins",
+    "job_run_id": "job_send_due_checkins_1788495969237_75df1832e33e2",
+    "send_timestamp_utc": "2026-09-04T04:26:10.929+00:00",
+    "manual_invoke": false
+  },
+  "outbound": {
+    "message_event_id": "050079b5-ff45-48ab-8dc7-770b45b3ff9c",
+    "event_type": "checkin_sent",
+    "provider": "twilio",
+    "sid_prefix": "SM898a4c",
+    "sid_redacted": "SM89…0f",
+    "delivery_status": "delivered",
+    "delivery_source": "Twilio Messages API",
+    "to_tail": "4173",
+    "duplicates": 0,
+    "body_len": 816
+  },
+  "exact_sms": {
+    "source": "Twilio Messages API fetch of provider SID (body_len matches message_events.meta.body_len=816)",
+    "body": "Hi SignalCare, we're checking in after your anti-wrinkle treatment today.\n\nA little redness, tenderness or small bumps around the injection sites can happen shortly after treatment. Mild headache can also occur for some people. These early changes often settle as the day goes on.\n\nThe treatment effect develops gradually over the next several days, so you may not notice much change in movement yet.\n\nHow are you feeling right now?\n\nReply:\n\n1 Everything feels normal\n\n2 Mostly what I expected\n\n3 I'm not quite sure\n\n4 Something doesn't feel right\n\n5 I'd like my clinic to contact me\n\nSignalCare is a recovery check-in service and is not continuously monitored emergency care. If you develop severe or sudden symptoms, do not wait for a reply here. Follow the urgent advice shown to you, or call 000 in an emergency."
+  },
+  "pre_reply_state": {
+    "checkin_status": "sent",
+    "ce_id": "5113e92c-50fe-4a4a-8f0d-80f608bbc818",
+    "ce_status": "awaiting_reply",
+    "stage_key": "immediate_safety",
+    "current_question_id": "recovery_check_in",
+    "pathway_version_in_answers": 5,
+    "enrolment_status": "active",
+    "review_required": false,
+    "attention_required": false,
+    "open_alerts": 0,
+    "cq_v2_status": "awaiting_response"
+  },
+  "v4_v5_isolation": {
+    "patient_has_completed_v4_and_active_v5": true,
+    "v4_immutable": true,
+    "cq_points_to_active_v5_only": true,
+    "inbound_scopes_to_active_v5": true
+  },
+  "patient_b": {
+    "mutated": false,
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "status": "active",
+    "natural_activity": {
+      "plus_24h_checkin": "0087f027-e74d-40f9-8864-2178adc79faa",
+      "plus_24h_status": "sent",
+      "ce_id": "dbd718ff-2116-4f2c-a7a9-882eec7450cb",
+      "ce_status": "awaiting_reply",
+      "stage_key": "early_recovery"
+    }
+  },
+  "intended_founder_path_do_not_execute": {
+    "reply_1": "4",
+    "reply_2": "One of my eyelids feels a little heavy",
+    "reply_3": "1",
+    "expected": "unclassified eyelid_brow_concern + clear functional screen → routine review, no auto-reassure, no alert"
+  },
+  "blockers": [],
+  "next_action": "WAITING FOR FOUNDER PHYSICAL V5 +30M SMS CONFIRMATION. FOUNDER'S FIRST INTENDED REPLY AFTER CONFIRMATION: 4. DO NOT SEND OR SIMULATE THE REPLY."
+}
