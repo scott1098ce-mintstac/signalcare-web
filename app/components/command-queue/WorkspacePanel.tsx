@@ -17,6 +17,7 @@ import {
 import { IconStatusCheck } from '../design-system/icons';
 import { PatientWorkspaceActions } from '../workspace/PatientWorkspaceActions';
 import { PatientWorkspaceBody } from '../workspace/PatientWorkspaceBody';
+import { MarkReviewedModal } from '../workspace/MarkReviewedModal';
 import {
   fetchAssignableClinicians,
   type AssignableClinician,
@@ -35,13 +36,18 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     loadingTimeline,
     timelineError,
     workspaceData,
+    conversationPath,
     actionError,
+    reviewSuccess,
+    reviewModalOpen,
+    openReviewModal,
+    closeReviewModal,
+    submitEnrolmentReview,
     currentUserId,
     currentUserRole,
     reviewSubmitting,
     completeSubmitting,
     ownershipSubmitting,
-    markEnrolmentReviewed,
     completeMonitoring,
     claimAlertOwnership,
     assignAlertToClinician,
@@ -154,6 +160,12 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         </div>
       ) : null}
 
+      {reviewSuccess ? (
+        <div className={styles.actionSuccess} role="status">
+          {reviewSuccess}
+        </div>
+      ) : null}
+
       <div className={styles.scroll}>
         <div className={styles.content}>
           <PatientWorkspaceBody
@@ -167,6 +179,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
             interpretation={workspaceData?.interpretation ?? null}
             currentStepLabel={workspaceData?.currentStepLabel ?? null}
             recoveryPhase={workspaceData?.recoveryPhase ?? null}
+            conversationPath={conversationPath}
             clinicalNotes={clinicalNotesHook.notes}
             clinicalNotesLoading={clinicalNotesHook.loading}
             clinicalNotesError={clinicalNotesHook.error}
@@ -260,7 +273,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
                     ? void runAlertAction(alertId, selected.enrolment_id, 'resolve')
                     : undefined
                 }
-                onMarkReviewed={() => void markEnrolmentReviewed(selected.enrolment_id)}
+                onMarkReviewed={() => openReviewModal()}
                 onCompleteMonitoring={() => void completeMonitoring(selected.enrolment_id)}
                 />
               </>
@@ -268,6 +281,17 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
           />
         </div>
       </div>
+
+      <MarkReviewedModal
+        open={reviewModalOpen}
+        busy={reviewSubmitting}
+        error={actionError}
+        onClose={closeReviewModal}
+        onConfirm={async (note) => {
+          if (!selected) return;
+          await submitEnrolmentReview(selected.enrolment_id, note);
+        }}
+      />
 
       <SCActionBar
         start={

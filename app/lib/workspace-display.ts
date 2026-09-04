@@ -299,7 +299,9 @@ export function clinicalRiskBadge(row: MonitoringRow): string {
     row.latest_score != null && Number.isFinite(row.latest_score)
       ? `Recovery score ${row.latest_score}/5`
       : null;
-  return score ? `${risk} · ${score}` : risk;
+  // Explicit "Queue risk" so clinicians do not confuse with interpretation priority.
+  const riskPart = `Queue risk: ${risk}`;
+  return score ? `${riskPart} · ${score}` : riskPart;
 }
 
 export function clinicalPatientResponseLabel(row: MonitoringRow): string | undefined {
@@ -374,13 +376,13 @@ export function clinicalAiAssessmentText(row: MonitoringRow): string {
 function severityStatusLabel(severity: string | null | undefined): string | null {
   switch (String(severity ?? '').toLowerCase()) {
     case 'urgent':
-      return 'Urgent attention required';
+      return 'Urgent clinical priority';
     case 'high':
-      return 'High concern';
+      return 'High clinical priority';
     case 'medium':
-      return 'Moderate concern';
+      return 'Moderate clinical priority';
     case 'low':
-      return 'Low concern';
+      return 'Low clinical priority';
     case 'none':
       return 'Stable monitoring';
     default:

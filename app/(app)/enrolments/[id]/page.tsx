@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PatientWorkspaceActions } from '../../../components/workspace/PatientWorkspaceActions';
 import { PatientWorkspaceBody } from '../../../components/workspace/PatientWorkspaceBody';
+import { MarkReviewedModal } from '../../../components/workspace/MarkReviewedModal';
 import { AccessDeniedState } from '../../../components/AccessDeniedState';
 import { SCButton } from '../../../components/design-system';
 import { LoadingState } from '../../../components/ui';
@@ -21,6 +22,7 @@ import {
   type EnrolmentPageViewModel,
 } from '../../../lib/workspace';
 import type { WorkspaceInterpretation, WorkspaceLatestReview } from '../../../lib/workspace-types';
+import type { ConversationPathStep } from '../../../lib/conversation-path-display';
 import { useClinicalNotes } from '../../../hooks/use-clinical-notes';
 import styles from '../../../components/workspace/patient-workspace.module.css';
 
@@ -76,6 +78,9 @@ export default function EnrolmentDetailPage() {
   const [ownershipError, setOwnershipError] = useState<string | null>(null);
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState<string | null>(null);
+  const [conversationPath, setConversationPath] = useState<ConversationPathStep[] | null>(null);
   const [completeLoading, setCompleteLoading] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
 
@@ -140,6 +145,7 @@ export default function EnrolmentDetailPage() {
                 setAlertId(null);
                 setLatestReview(null);
                 setWorkspaceActions(null);
+                setConversationPath(null);
                 setNotFound(true);
                 setError(null);
               } else {
@@ -158,6 +164,16 @@ export default function EnrolmentDetailPage() {
           setAlertId(view.alertId);
           setLatestReview(view.latestReview);
           setWorkspaceActions(view.actions);
+          setConversationPath(
+            workspaceResult.data.evidence?.conversation_path?.length
+              ? workspaceResult.data.evidence.conversation_path.map((step) => ({
+                  key: step.key,
+                  label: step.label,
+                  value: step.value,
+                  display: step.display || step.value,
+                }))
+              : null,
+          );
           setError(null);
           setNotFound(false);
 
@@ -179,6 +195,7 @@ export default function EnrolmentDetailPage() {
             setAlertId(null);
             setLatestReview(null);
             setWorkspaceActions(null);
+            setConversationPath(null);
             setError(e instanceof Error ? e.message : 'load_failed');
           }
         } finally {
@@ -311,26 +328,21 @@ export default function EnrolmentDetailPage() {
     }
   }
 
-  async function markReviewed() {
+  async function submitEnrolmentReview(review_note: string) {
     pausePollingRef.current = true;
     setReviewLoading(true);
     setReviewError(null);
     try {
-      const note = window.prompt(
-        'Enter a clinical review note (required, minimum 10 characters).',
-        '',
-      );
-      const review_note = String(note ?? '').trim();
-      if (!review_note || review_note.length < 10) {
-        setReviewError('Clinical review note is required (minimum 10 characters).');
-        return;
-      }
       const res = await appApiFetch(`/app/enrolments/${encodeURIComponent(enrolmentId)}/review`, {
         method: 'POST',
         body: { review_note },
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(String(json?.error || res.statusText || 'review_failed'));
+      setReviewModalOpen(false);
+      setReviewSuccess(
+        'Clinical review recorded. Queue attention will clear if no newer trigger remains.',
+      );
       await loadAll(true);
     } catch (e) {
       setReviewError(e instanceof Error ? e.message : 'review_failed');
@@ -338,6 +350,12 @@ export default function EnrolmentDetailPage() {
       setReviewLoading(false);
       pausePollingRef.current = false;
     }
+  }
+
+  function openReviewModal() {
+    setReviewError(null);
+    setReviewSuccess(null);
+    setReviewModalOpen(true);
   }
 
   async function completeMonitoring() {
@@ -366,9 +384,13 @@ export default function EnrolmentDetailPage() {
     }
   }
 
-  const actionErrors = [ownershipError, ackError, resError, reviewError, completeError].filter(
-    Boolean,
-  );
+  const actionErrors = [
+    ownershipError,
+    ackError,
+    resError,
+    reviewModalOpen ? null : reviewError,
+    completeError,
+  ].filter(Boolean);
 
   return (
     <div className={styles.page}>
@@ -410,6 +432,13 @@ export default function EnrolmentDetailPage() {
               ))}
             </div>
           ) : null}
+          {reviewSuccess ? (
+            <div className={styles.feedback}>
+              <div className={styles.feedbackNeutral} role="status">
+                {reviewSuccess}
+              </div>
+            </div>
+          ) : null}
           <PatientWorkspaceBody
             row={monitoringRow}
             currentUserId={session?.user_id ?? null}
@@ -421,6 +450,7 @@ export default function EnrolmentDetailPage() {
             interpretation={interpretation}
             currentStepLabel={summary.current_step_label}
             recoveryPhase={summary.recovery_phase}
+            conversationPath={conversationPath}
             clinicalNotes={clinicalNotes}
             clinicalNotesLoading={clinicalNotesLoading}
             clinicalNotesError={clinicalNotesError}
@@ -458,10 +488,19 @@ export default function EnrolmentDetailPage() {
                 onTakeOwnership={() => void takeAlertOwnership()}
                 onAcknowledge={() => void acknowledgeAlert()}
                 onResolve={() => void resolveAlert()}
-                onMarkReviewed={() => void markReviewed()}
+                onMarkReviewed={() => openReviewModal()}
                 onCompleteMonitoring={() => void completeMonitoring()}
               />
             }
+          />
+          <MarkReviewedModal
+            open={reviewModalOpen}
+            busy={reviewLoading}
+            error={reviewError}
+            onClose={() => {
+              if (!reviewLoading) setReviewModalOpen(false);
+            }}
+            onConfirm={(note) => void submitEnrolmentReview(note)}
           />
         </>
       )}

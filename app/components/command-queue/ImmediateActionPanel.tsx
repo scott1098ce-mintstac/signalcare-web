@@ -24,7 +24,7 @@ export function ImmediateActionPanel({
   return (
     <section aria-label="Immediate action required">
       <SCOverloadBanner>
-        {rows.length} episode{rows.length === 1 ? '' : 's'} require immediate action
+        {rows.length} patient{rows.length === 1 ? '' : 's'} require immediate action
       </SCOverloadBanner>
       {rows.map((row) => (
         <QueueRow

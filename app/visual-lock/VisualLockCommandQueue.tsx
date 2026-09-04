@@ -6,16 +6,22 @@ import { WorkspacePanel } from '../components/command-queue/WorkspacePanel';
 import {
   DEFAULT_QUEUE_FILTERS,
   groupQueueRows,
+  immediatePriorityRows,
   isOverloadedView,
   uniqueAssignees,
   uniqueProcedures,
 } from '../lib/command-queue';
 import type { MonitoringRow } from '../lib/types';
 import { VISUAL_LOCK_USER_ID } from '../lib/visual-lock/constants';
-import { VISUAL_LOCK_QUEUE_ROWS } from '../lib/visual-lock/fixtures';
+import {
+  VISUAL_LOCK_ALL_CLEAR_ROWS,
+  VISUAL_LOCK_OVERLOAD_ROWS,
+  VISUAL_LOCK_QUEUE_ROWS,
+} from '../lib/visual-lock/fixtures';
 
 function frozenQueue(monitoring: MonitoringRow[]) {
   const groups = groupQueueRows(monitoring);
+  const showOverloaded = isOverloadedView(monitoring);
   return {
     monitoring,
     monitoringCount: monitoring.length,
@@ -30,8 +36,8 @@ function frozenQueue(monitoring: MonitoringRow[]) {
     filtered: monitoring,
     isEmpty: monitoring.length === 0,
     showAllClear: monitoring.length > 0 && groups.needsAttention.length === 0,
-    showOverloaded: isOverloadedView(monitoring),
-    immediateRows: [] as MonitoringRow[],
+    showOverloaded,
+    immediateRows: showOverloaded ? immediatePriorityRows(monitoring) : ([] as MonitoringRow[]),
     queueNow: null,
     engagementMetrics: null,
     reviewsMetrics: null,
@@ -51,7 +57,13 @@ const idleWorkspace = {
   loadingTimeline: false,
   timelineError: null as string | null,
   workspaceData: null,
+  conversationPath: null,
   actionError: null as string | null,
+  reviewSuccess: null as string | null,
+  reviewModalOpen: false,
+  openReviewModal: () => {},
+  closeReviewModal: () => {},
+  submitEnrolmentReview: async () => ({ ok: false as const }),
   reviewSubmitting: false,
   completeSubmitting: false,
   ownershipSubmitting: false,
@@ -65,8 +77,24 @@ const idleWorkspace = {
   currentUserRole: 'admin',
 };
 
-export function VisualLockCommandQueue({ empty = false }: { empty?: boolean }) {
-  const queue = frozenQueue(empty ? [] : VISUAL_LOCK_QUEUE_ROWS);
+export type VisualLockCommandQueueMode = 'populated' | 'empty' | 'all-clear' | 'overload';
+
+export function VisualLockCommandQueue({
+  empty = false,
+  mode = empty ? 'empty' : 'populated',
+}: {
+  empty?: boolean;
+  mode?: VisualLockCommandQueueMode;
+}) {
+  const rows =
+    mode === 'empty'
+      ? []
+      : mode === 'all-clear'
+        ? VISUAL_LOCK_ALL_CLEAR_ROWS
+        : mode === 'overload'
+          ? VISUAL_LOCK_OVERLOAD_ROWS
+          : VISUAL_LOCK_QUEUE_ROWS;
+  const queue = frozenQueue(rows);
   return (
     <CommandQueueSplitLayout
       queue={

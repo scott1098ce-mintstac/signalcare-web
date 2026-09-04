@@ -98,6 +98,10 @@ export function ClinicalNotesSection({
   return (
     <section className={noteStyles.section}>
       <h3 className={noteStyles.title}>Clinical notes</h3>
+      <p className={noteStyles.hint}>
+        Notes document clinical context. They do not complete or clear an outstanding review —
+        use Mark reviewed for that.
+      </p>
 
       {(error || localError) && (
         <p className={styles.error} role="alert">

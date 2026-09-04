@@ -14,6 +14,28 @@ import {
 } from '../lib/workspace';
 import type { WorkspaceActions, WorkspaceInterpretation } from '../lib/workspace-types';
 import { assignAlert } from '../lib/command-queue-actions';
+import {
+  type ConversationPathStep,
+} from '../lib/conversation-path-display';
+
+function normalizeConversationPath(
+  raw: WorkspaceEvidenceConversationPath | null | undefined,
+): ConversationPathStep[] | null {
+  if (!raw || !Array.isArray(raw) || raw.length === 0) return null;
+  return raw.map((step) => ({
+    key: step.key,
+    label: step.label,
+    value: step.value,
+    display: step.display || step.value,
+  }));
+}
+
+type WorkspaceEvidenceConversationPath = Array<{
+  key: string;
+  label: string;
+  value: string;
+  display: string;
+}>;
 
 type WorkspacePanelData = {
   actions: WorkspaceActions | null;
@@ -48,6 +70,11 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
   const [completeSubmitting, setCompleteSubmitting] = useState(false);
   const [ownershipSubmitting, setOwnershipSubmitting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState<string | null>(null);
+  const [conversationPath, setConversationPath] = useState<
+    Array<{ key: string; label: string; value: string; display: string }> | null
+  >(null);
 
   const loadEpisodeData = useCallback(async (enrolmentId: string) => {
     setTimelineError(null);
@@ -88,13 +115,18 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
           reviewedAt: view.summary.reviewed_at,
           reviewedBy: view.summary.reviewed_by,
         });
+        setConversationPath(
+          normalizeConversationPath(workspaceResult.data.evidence?.conversation_path),
+        );
       } else {
         setWorkspaceData(null);
+        setConversationPath(null);
         setTimelineError(workspaceResult.error || 'Failed to load patient workspace');
       }
     } catch {
       setTimeline([]);
       setWorkspaceData(null);
+      setConversationPath(null);
       setTimelineError('Failed to load episode data');
     } finally {
       setLoadingTimeline(false);
@@ -106,32 +138,40 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
     setSelectedEnrolmentId(null);
     setTimeline([]);
     setWorkspaceData(null);
+    setConversationPath(null);
     setActionError(null);
+    setReviewSuccess(null);
+    setReviewModalOpen(false);
   }, [session?.clinic?.id]);
 
   useEffect(() => {
     if (!selectedEnrolmentId) {
       setTimeline([]);
       setWorkspaceData(null);
+      setConversationPath(null);
+      setReviewSuccess(null);
+      setReviewModalOpen(false);
       return;
     }
     void loadEpisodeData(selectedEnrolmentId);
   }, [selectedEnrolmentId, loadEpisodeData]);
 
-  const markEnrolmentReviewed = useCallback(
-    async (enrolmentId: string) => {
+  const openReviewModal = useCallback(() => {
+    setActionError(null);
+    setReviewSuccess(null);
+    setReviewModalOpen(true);
+  }, []);
+
+  const closeReviewModal = useCallback(() => {
+    if (reviewSubmitting) return;
+    setReviewModalOpen(false);
+  }, [reviewSubmitting]);
+
+  const submitEnrolmentReview = useCallback(
+    async (enrolmentId: string, review_note: string) => {
       setReviewSubmitting(true);
       setActionError(null);
       try {
-        const note = window.prompt(
-          'Enter a clinical review note (required, minimum 10 characters).',
-          '',
-        );
-        const review_note = String(note ?? '').trim();
-        if (!review_note || review_note.length < 10) {
-          setActionError('Clinical review note is required (minimum 10 characters).');
-          return;
-        }
         const res = await appApiFetch(`/app/enrolments/${encodeURIComponent(enrolmentId)}/review`, {
           method: 'POST',
           body: { review_note },
@@ -139,15 +179,27 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
         const json = await res.json().catch(() => ({}));
         if (!res.ok) {
           setActionError(String(json?.error || res.statusText || 'review_failed'));
-          return;
+          return { ok: false as const };
         }
+        setReviewModalOpen(false);
+        setReviewSuccess('Clinical review recorded. Queue attention will clear if no newer trigger remains.');
         await onRefreshQueue();
         void loadEpisodeData(enrolmentId);
+        return { ok: true as const };
       } finally {
         setReviewSubmitting(false);
       }
     },
     [loadEpisodeData, onRefreshQueue],
+  );
+
+  /** @deprecated Prefer openReviewModal + submitEnrolmentReview */
+  const markEnrolmentReviewed = useCallback(
+    async (enrolmentId: string) => {
+      openReviewModal();
+      void enrolmentId;
+    },
+    [openReviewModal],
   );
 
   const completeMonitoring = useCallback(
@@ -298,7 +350,13 @@ export function useWorkspacePanel({ session, onRefreshQueue }: UseWorkspacePanel
     loadingTimeline: loadingTimeline || loadingWorkspace,
     timelineError,
     workspaceData,
+    conversationPath,
     actionError,
+    reviewSuccess,
+    reviewModalOpen,
+    openReviewModal,
+    closeReviewModal,
+    submitEnrolmentReview,
     reviewSubmitting,
     completeSubmitting,
     ownershipSubmitting,

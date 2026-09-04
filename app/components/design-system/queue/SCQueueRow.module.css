@@ -57,6 +57,18 @@
   padding: var(--ds-queue-row-padding-y-simple) var(--ds-queue-row-padding-right)
     var(--ds-queue-row-padding-y-simple) var(--ds-queue-row-padding-left);
   border-bottom-color: var(--ds-border-subtle);
+  opacity: 0.92;
+}
+
+.contentSimple .title,
+.contentSimple .metaText,
+.contentSimple .metaSecondary {
+  color: var(--ds-text-secondary);
+}
+
+.contentSimple .title {
+  text-decoration-color: var(--ds-border-subtle);
+  font-weight: var(--ds-font-weight-medium);
 }
 
 .contentDangerColored {
@@ -71,8 +83,8 @@
 }
 
 .contentReview {
-  background: var(--ds-surface-base);
-  border-bottom-color: var(--ds-border-subtle);
+  background: var(--ds-alert-warning-bg);
+  border-bottom-color: var(--ds-alert-warning-icon);
   padding: var(--ds-queue-row-padding-y) var(--ds-queue-row-padding-right)
     var(--ds-queue-row-padding-y) var(--ds-queue-row-padding-left);
   min-height: var(--ds-queue-row-height-expanded);
@@ -118,8 +130,8 @@
 }
 
 .iconWrapNeutral {
-  background: var(--ds-surface-muted);
-  color: var(--ds-text-secondary);
+  background: var(--ds-alert-warning-bg);
+  color: var(--ds-alert-warning-icon);
 }
 
 .icon {

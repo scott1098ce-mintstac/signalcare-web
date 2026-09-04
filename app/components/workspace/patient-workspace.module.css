@@ -114,6 +114,69 @@
   color: var(--ds-text-muted);
 }
 
+.conversationPath {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: 5px;
+  background: var(--ds-surface-base);
+}
+
+.conversationPathTitle {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-3);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+
+.conversationPathSubtitle {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  color: var(--ds-text-secondary);
+}
+
+.conversationPathList {
+  margin: var(--ds-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.conversationPathItem {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+  gap: var(--ds-space-3);
+  align-items: baseline;
+}
+
+.conversationPathLabel {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-text-secondary);
+}
+
+.conversationPathValue {
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-text-primary);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .conversationPathItem {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
 .figmaPage {
   display: flex;
   min-height: 0;

@@ -46,6 +46,16 @@
   color: var(--ds-alert-danger-text);
 }
 
+.actionSuccess {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border-bottom: 1px solid var(--ds-alert-success-border);
+  background: var(--ds-alert-success-bg);
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  color: var(--ds-alert-success-text);
+}
+
 .scroll {
   min-height: 0;
   flex: 1;

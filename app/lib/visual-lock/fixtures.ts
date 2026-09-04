@@ -72,6 +72,20 @@ export const VISUAL_LOCK_QUEUE_ROWS: MonitoringRow[] = [
     last_response_at: hoursAgo(4),
   }),
   row({
+    enrolment_id: 'enrol-awaiting',
+    patient_id: 'patient-awaiting',
+    patient_name: 'Riley Patel',
+    procedure: 'Facelift',
+    recovery_day: 1,
+    latest_score: null,
+    risk_level: 'none',
+    attention_required: false,
+    v2_status: 'awaiting_response',
+    last_response_at: null,
+    last_checkin_at: hoursAgo(8),
+    attention_reason: null,
+  }),
+  row({
     enrolment_id: 'enrol-stable',
     patient_id: 'patient-stable',
     patient_name: 'Sam Okonkwo',
@@ -86,21 +100,53 @@ export const VISUAL_LOCK_QUEUE_ROWS: MonitoringRow[] = [
   }),
 ];
 
+/** Stable-only queue — All Clear banner (attention cleared, monitoring continues). */
+export const VISUAL_LOCK_ALL_CLEAR_ROWS: MonitoringRow[] = [
+  VISUAL_LOCK_QUEUE_ROWS.find((r) => r.v2_status === 'stable')!,
+];
+
+/** ≥3 open alerts — Immediate Action / overload banner (existing semantics). */
+export const VISUAL_LOCK_OVERLOAD_ROWS: MonitoringRow[] = [
+  VISUAL_LOCK_QUEUE_ROWS[0]!,
+  row({
+    enrolment_id: 'enrol-alert-open-2',
+    patient_id: 'patient-alert-open-2',
+    patient_name: 'Casey Ng',
+    procedure: 'Rhinoplasty',
+    recovery_day: 3,
+    latest_score: 5,
+    risk_level: 'high',
+    attention_required: true,
+    v2_status: 'alert_open',
+    open_alert_id: 'alert-open-2',
+    open_alert_severity: 'high',
+    attention_reason: 'urgent concern response',
+    reply_type: 'urgent_red_flag',
+    last_checkin_at: hoursAgo(0.5),
+    last_response_at: hoursAgo(0.5),
+  }),
+  row({
+    enrolment_id: 'enrol-alert-open-3',
+    patient_id: 'patient-alert-open-3',
+    patient_name: 'Morgan Lee',
+    procedure: 'Blepharoplasty',
+    recovery_day: 1,
+    latest_score: 4,
+    risk_level: 'high',
+    attention_required: true,
+    v2_status: 'alert_open',
+    open_alert_id: 'alert-open-3',
+    open_alert_severity: 'high',
+    attention_reason: 'high concern response',
+    reply_type: 'numeric_score_plus_text',
+    last_checkin_at: hoursAgo(0.25),
+    last_response_at: hoursAgo(0.25),
+  }),
+  VISUAL_LOCK_QUEUE_ROWS.find((r) => r.v2_status === 'stable')!,
+];
+
 export const VISUAL_LOCK_DIRECTORY_ROWS: MonitoringRow[] = [
   ...VISUAL_LOCK_QUEUE_ROWS,
-  row({
-    enrolment_id: 'enrol-awaiting',
-    patient_id: 'patient-awaiting',
-    patient_name: 'Riley Patel',
-    procedure: 'Facelift',
-    recovery_day: 1,
-    latest_score: null,
-    risk_level: 'none',
-    v2_status: 'awaiting_response',
-    last_response_at: null,
-    last_checkin_at: hoursAgo(8),
-    attention_reason: null,
-  }),
 ];
 
 export const VISUAL_LOCK_WORKSPACE_ROW = VISUAL_LOCK_QUEUE_ROWS[0];
@@ -113,7 +159,34 @@ export const VISUAL_LOCK_WORKSPACE_INTERPRETATION: WorkspaceInterpretation = {
   review_required: true,
   taxonomy_review: false,
   score_review: true,
+  patient_reported_concern: 'One area feels uneven',
+  recovery_concern: {
+    patient_reported: 'One area feels uneven',
+    safety_screen: 'clear',
+    disposition: 'Clinician review required',
+  },
 };
+
+export const VISUAL_LOCK_CONVERSATION_PATH = [
+  {
+    key: 'recovery_check_in',
+    label: 'Patient response',
+    value: '3',
+    display: "I'm not quite sure",
+  },
+  {
+    key: 'outcome_uncertainty_context',
+    label: 'Concern',
+    value: 'uneven',
+    display: 'One area feels uneven',
+  },
+  {
+    key: 'unsure_want_review',
+    label: 'Requested clinic review',
+    value: 'yes',
+    display: 'Yes please',
+  },
+];
 
 export const VISUAL_LOCK_WORKSPACE_TIMELINE: AuditTimelineItem[] = [
   {

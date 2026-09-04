@@ -45,6 +45,12 @@ import type { ClinicalNote } from '../../lib/types/clinical-notes';
 import styles from './patient-workspace.module.css';
 import { PatientMediaEvidence } from './PatientMediaEvidence';
 
+export type ConversationPathStepView = {
+  key: string;
+  label: string;
+  display: string;
+};
+
 function clinicalVariant(status: MonitoringRow['v2_status']): SCClinicalContextVariant {
   if (status === 'stable') return 'stable';
   return status;
@@ -125,6 +131,7 @@ export type PatientWorkspaceBodyProps = {
   }>;
   figmaLayout?: boolean;
   evidenceConfig?: PatientWorkspaceEvidenceConfig | null;
+  conversationPath?: ConversationPathStepView[] | null;
   trajectoryConfig?: PatientWorkspaceTrajectoryConfig | null;
   clinicalOverrides?: PatientWorkspaceClinicalOverrides;
   hideBelowFold?: boolean;
@@ -157,6 +164,7 @@ export function PatientWorkspaceBody({
   signals = [],
   figmaLayout = false,
   evidenceConfig = null,
+  conversationPath = null,
   trajectoryConfig = null,
   clinicalOverrides,
   hideBelowFold = false,
@@ -277,6 +285,24 @@ export function PatientWorkspaceBody({
     />
   );
 
+  const conversationPathBlock =
+    conversationPath && conversationPath.length > 0 ? (
+      <section className={styles.conversationPath} aria-label="Patient conversation path">
+        <h3 className={styles.conversationPathTitle}>Patient concern path</h3>
+        <p className={styles.conversationPathSubtitle}>
+          Structured replies from this check-in (exact option labels).
+        </p>
+        <ol className={styles.conversationPathList}>
+          {conversationPath.map((step) => (
+            <li key={step.key} className={styles.conversationPathItem}>
+              <span className={styles.conversationPathLabel}>{step.label}</span>
+              <span className={styles.conversationPathValue}>{step.display}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ) : null;
+
   const trajectoryOrAi = trajectoryConfig ? (
     <SCHemoglobinTrajectoryCard
       status={trajectoryConfig.status}
@@ -284,7 +310,7 @@ export function PatientWorkspaceBody({
     />
   ) : (
     <SCAiAssessmentCard
-      statusBadge={`Status: ${assessment.status}`}
+      statusBadge={`Disposition: ${assessment.status}`}
       statusTone={
         row.risk_level === 'high' || interpretation?.severity === 'urgent'
           ? 'dangerSubtle'
@@ -299,6 +325,11 @@ export function PatientWorkspaceBody({
         {
           label: 'Recovery score now',
           value: row.latest_score != null ? `${row.latest_score}/5` : '—',
+          tone: row.risk_level === 'high' ? 'danger' : 'default',
+        },
+        {
+          label: 'Queue risk',
+          value: row.risk_level ? String(row.risk_level) : '—',
           tone: row.risk_level === 'high' ? 'danger' : 'default',
         },
       ]}
@@ -370,6 +401,7 @@ export function PatientWorkspaceBody({
         </div>
         <div className={styles.figmaScroll}>
           <div className={styles.figmaContent}>
+            {conversationPathBlock}
             {evidenceStrip}
             {trajectoryOrAi}
             {belowFold}
@@ -383,6 +415,7 @@ export function PatientWorkspaceBody({
     <div className={styles.body}>
       {patientHeader}
       {clinicalBanner}
+      {conversationPathBlock}
       {evidenceStrip}
       {trajectoryOrAi}
       {belowFold}

@@ -42,6 +42,14 @@
   color: var(--ds-text-secondary);
 }
 
+.hint {
+  margin: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-body-sm);
+  line-height: 18px;
+  color: var(--ds-text-secondary);
+}
+
 .meta {
   margin: 0;
   font-family: var(--ds-font-family);

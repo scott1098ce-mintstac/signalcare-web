@@ -16,7 +16,7 @@ export type SCMetricEvidenceStripProps = {
   className?: string;
 };
 
-/** Figma 297:7573 — Evidence / response metrics strip. */
+/** Figma 297:7573 — Evidence / response metrics strip (responsive grid). */
 export function SCMetricEvidenceStrip({
   title = 'Evidence supporting this escalation',
   subtitle = 'Only metrics directly linked to the active protocol step are shown.',
@@ -32,22 +32,10 @@ export function SCMetricEvidenceStrip({
       <div className={styles.card}>
         <div className={styles.row}>
           {metrics.map((metric, index) => (
-            <div key={metric.label} className={styles.metricRowItem}>
+            <div key={`${metric.label}-${index}`} className={styles.metricRowItem}>
               {index > 0 ? <div className={styles.divider} aria-hidden /> : null}
-              <div
-                className={cn(
-                  styles.metricGroup,
-                  index === metrics.length - 1 && metrics.length === 3 && styles.metricGroupLast,
-                )}
-              >
-                <span
-                  className={cn(
-                    styles.label,
-                    index === metrics.length - 1 && metrics.length === 3 && styles.labelLast,
-                  )}
-                >
-                  {metric.label}
-                </span>
+              <div className={styles.metricGroup}>
+                <span className={styles.label}>{metric.label}</span>
                 <div className={styles.valueWrap}>
                   <span className={styles.value}>
                     {metric.value}

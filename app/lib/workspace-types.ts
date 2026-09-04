@@ -128,6 +128,13 @@ export type WorkspaceEvidence = {
     disposition: string | null;
     concern_class?: string | null;
   } | null;
+  /** Structured CE option path (persisted answers → human labels). */
+  conversation_path?: Array<{
+    key: string;
+    label: string;
+    value: string;
+    display: string;
+  }> | null;
 };
 
 export type WorkspaceTimelinePreviewItem = {

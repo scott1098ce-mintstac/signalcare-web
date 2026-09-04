@@ -14,7 +14,6 @@ import {
 } from '../design-system';
 import {
   IconAlertDanger,
-  IconAlertNeutral,
   IconAlertWarning,
 } from '../design-system/icons';
 
@@ -69,12 +68,19 @@ function scoreIsDanger(row: MonitoringRow, variant: SCQueueRowVariant): boolean 
 function iconForRow(row: MonitoringRow, variant: SCQueueRowVariant) {
   if (variant === 'simple') return null;
   if (variant === 'review') {
-    return { icon: <IconAlertNeutral />, tone: 'neutral' as const };
+    return { icon: <IconAlertWarning />, tone: 'warning' as const };
   }
   if (variant === 'assigned' && row.risk_level === 'medium') {
     return { icon: <IconAlertWarning />, tone: 'warning' as const };
   }
   return { icon: <IconAlertDanger />, tone: 'danger' as const };
+}
+
+function severityToneForRow(row: MonitoringRow, variant: SCQueueRowVariant): 'danger' | 'warning' | 'success' | 'neutral' {
+  if (variant === 'review') return 'warning';
+  if (variant === 'assigned' && row.risk_level === 'medium') return 'warning';
+  if (variant === 'dangerColored' || variant === 'assigned') return 'danger';
+  return 'neutral';
 }
 
 export function QueueRow({
@@ -95,11 +101,14 @@ export function QueueRow({
   const showResolve =
     row.v2_status === 'alert_acknowledged' && row.open_alert_id && !ownedByAnother;
   const showReview = row.v2_status === 'review_required';
-  const showScore = variant === 'dangerColored' || variant === 'assigned';
-  const showBar = variant === 'dangerColored' || variant === 'assigned';
+  const showScore =
+    variant === 'dangerColored' || variant === 'assigned' || variant === 'review';
+  const showBar =
+    variant === 'dangerColored' || variant === 'assigned' || variant === 'review';
   const assignee = row.acknowledged_by?.trim();
   const assigneeTime = formatAssigneeTime(row.acknowledged_at);
   const iconSpec = iconForRow(row, variant);
+  const severityTone = severityToneForRow(row, variant);
 
   async function handleAcknowledge(e: React.MouseEvent) {
     e.stopPropagation();
@@ -143,7 +152,7 @@ export function QueueRow({
       variant={variant}
       selected={selected}
       showSeverityBar={showBar}
-      severityTone="danger"
+      severityTone={severityTone}
       icon={iconSpec?.icon}
       iconTone={iconSpec?.tone}
       title={row.patient_name ?? 'Unnamed patient'}

@@ -6,6 +6,7 @@ import { formatDate, formatRelativeAttempt } from '../lib/command-queue-display'
 import { VISUAL_LOCK_USER_ID } from '../lib/visual-lock/constants';
 import {
   VISUAL_LOCK_CLINICAL_NOTES,
+  VISUAL_LOCK_CONVERSATION_PATH,
   VISUAL_LOCK_WORKSPACE_INTERPRETATION,
   VISUAL_LOCK_WORKSPACE_ROW,
   VISUAL_LOCK_WORKSPACE_SIGNALS,
@@ -28,6 +29,7 @@ export function VisualLockWorkspace() {
         interpretation={VISUAL_LOCK_WORKSPACE_INTERPRETATION}
         currentStepLabel="Day 2 check-in"
         recoveryPhase="early"
+        conversationPath={VISUAL_LOCK_CONVERSATION_PATH}
         clinicalNotes={VISUAL_LOCK_CLINICAL_NOTES}
         clinicalNotesLoading={false}
         clinicalNotesError={null}

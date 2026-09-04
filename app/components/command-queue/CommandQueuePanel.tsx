@@ -91,7 +91,7 @@ export function CommandQueuePanel({
             />
 
             <QueueSection
-              title="awaiting response"
+              title="Awaiting response"
               titleNodeId="267:2568"
               count={groups.awaitingResponse.length}
               rows={groups.awaitingResponse}
@@ -102,7 +102,7 @@ export function CommandQueuePanel({
             />
 
             <QueueSection
-              title="stable"
+              title="Stable"
               titleNodeId="267:2573"
               count={groups.stable.length}
               rows={groups.stable}
