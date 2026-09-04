@@ -4,11 +4,16 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreatePasswordScreen } from '../../../components/auth-onboarding-visual/CreatePasswordScreen';
 import { completeAuthenticatedSession } from '../../../lib/auth-routing';
+import {
+  createAuthRequestId,
+  detectBrowserFamily,
+  logAuthDiag,
+} from '../../../lib/auth-diagnostics';
 import { supabase } from '../../../lib/supabase';
 
 /**
- * Password recovery completion — reached via /auth/callback?next=/auth/reset-password
- * (or type=recovery). Updates the password, then boots the normal app session.
+ * Password recovery completion — reached via /auth/callback?type=recovery
+ * after verifyOtp. Updates the password, then boots the normal app session.
  */
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -19,20 +24,67 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     let cancelled = false;
-    const load = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (error || !data.session) {
+    let settled = false;
+    const requestId = createAuthRequestId();
+
+    const applySession = (session: { access_token?: string; user?: { email?: string | null } | null } | null) => {
+      if (cancelled || settled) return;
+      settled = true;
+      if (!session?.access_token) {
+        logAuthDiag({
+          requestId,
+          route: '/auth/reset-password',
+          phase: 'no_session',
+          sessionPresent: false,
+          userPresent: false,
+          storageMode: 'localStorage',
+          browserFamily: detectBrowserFamily(),
+        });
         setErr('This reset link is invalid or has expired. Request a new one from forgot password.');
         setReady(true);
         return;
       }
-      setEmail(data.session.user.email ?? '');
+      logAuthDiag({
+        requestId,
+        route: '/auth/reset-password',
+        phase: 'session_ready',
+        sessionPresent: true,
+        userPresent: Boolean(session.user?.email),
+        storageMode: 'localStorage',
+        browserFamily: detectBrowserFamily(),
+        authEventType: 'PASSWORD_RECOVERY',
+      });
+      setEmail(session.user?.email ?? '');
       setReady(true);
     };
-    void load();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (
+        session?.access_token &&
+        (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY' || event === 'INITIAL_SESSION')
+      ) {
+        applySession(session);
+      }
+    });
+
+    void (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.access_token) {
+        applySession(data.session);
+        return;
+      }
+      // Brief hydrate wait for callback → reset-password navigation.
+      await new Promise((r) => setTimeout(r, 1200));
+      if (cancelled || settled) return;
+      const again = await supabase.auth.getSession();
+      applySession(again.data.session);
+    })();
+
     return () => {
       cancelled = true;
+      subscription.unsubscribe();
     };
   }, []);
 

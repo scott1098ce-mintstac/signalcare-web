@@ -6,9 +6,12 @@ import {
   hasInboundSupabaseAuthParams,
   isAcceptInvitationDestination,
   isFirstTimeInviteFlow,
+  isRecoveryTokenHashCallback,
   inferRequiresPasswordSetup,
+  messageForAuthFailureReason,
   normalizeAcceptInvitationDestination,
   obtainSupabaseAccessToken,
+  resolveInboundSupabaseSession,
   shouldCreatePasswordAfterAccept,
   shouldUsePasswordSignIn,
 } from '../app/lib/auth-routing.ts'
@@ -62,7 +65,10 @@ function mockClient({
       },
       verifyOtp: async () => {
         if (verified) session = verified
-        return { data: { session: verified }, error: verified ? null : { message: 'verify_failed' } }
+        return {
+          data: { session: verified },
+          error: verified ? null : { message: 'Email link is invalid or has expired', code: 'otp_expired' },
+        }
       },
       setSession: async () => {
         if (hashSession) session = hashSession
@@ -106,6 +112,12 @@ assert.equal(
   'This reset link is invalid or has already been used. Request a new one from forgot password.',
 )
 assert.equal(getAuthCallbackErrorMessage('?code=abc', ''), null)
+assert.equal(isRecoveryTokenHashCallback('?token_hash=abc&type=recovery', ''), true)
+assert.equal(isRecoveryTokenHashCallback('?token_hash=abc&type=invite', ''), false)
+assert.equal(
+  messageForAuthFailureReason('otp_expired'),
+  'This reset link is invalid or has already been used. Request a new one from forgot password.',
+)
 assert.equal(isAcceptInvitationDestination('/auth/accept-invitation?token=abc'), true)
 assert.equal(isAcceptInvitationDestination('/auth/signin'), false)
 
@@ -258,6 +270,21 @@ async function main() {
       hash: `#access_token=${invitedJwt}&refresh_token=refresh&type=invite`,
     })
     assert.equal(token, null)
+    assert.equal(client.signedOut(), true)
+  }
+
+  {
+    const existing = { access_token: 'existing-token', user: { id: 'same-user', email: 'user@example.com' } }
+    const client = mockClient({ existing })
+    const detailed = await resolveInboundSupabaseSession({
+      client,
+      search: '?token_hash=stale&type=recovery',
+      hash: '',
+    })
+    assert.equal(detailed.accessToken, null)
+    assert.equal(detailed.failureReason, 'otp_expired')
+    assert.equal(detailed.verifyOtpAttempted, true)
+    assert.equal(detailed.verifyOtpSuccess, false)
     assert.equal(client.signedOut(), true)
   }
 
