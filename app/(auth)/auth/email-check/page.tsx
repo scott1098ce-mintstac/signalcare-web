@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EmailCheckScreen } from '../../../components/auth-onboarding-visual/EmailCheckScreen';
 import { getPasswordRecoverySendErrorMessage } from '../../../lib/password-recovery-errors';
-import { supabase } from '../../../lib/supabase';
+import { requestPasswordRecoveryEmail } from '../../../lib/password-recovery';
 
 function EmailCheckContent() {
   const router = useRouter();
@@ -21,10 +21,8 @@ function EmailCheckContent() {
     setErr(null);
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`,
-      });
-      if (error) setErr(getPasswordRecoverySendErrorMessage(error));
+      const result = await requestPasswordRecoveryEmail(email);
+      if (!result.ok) setErr(getPasswordRecoverySendErrorMessage(result.error));
     } catch (e) {
       setErr(
         getPasswordRecoverySendErrorMessage(

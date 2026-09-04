@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ForgotPasswordScreen } from '../../../components/auth-onboarding-visual/ForgotPasswordScreen';
 import { getPasswordRecoverySendErrorMessage } from '../../../lib/password-recovery-errors';
-import { supabase } from '../../../lib/supabase';
+import { requestPasswordRecoveryEmail } from '../../../lib/password-recovery';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -18,11 +18,9 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`,
-      });
-      if (error) {
-        setErr(getPasswordRecoverySendErrorMessage(error));
+      const result = await requestPasswordRecoveryEmail(email);
+      if (!result.ok) {
+        setErr(getPasswordRecoverySendErrorMessage(result.error));
         return;
       }
       router.push(`/auth/email-check?email=${encodeURIComponent(email)}`);
