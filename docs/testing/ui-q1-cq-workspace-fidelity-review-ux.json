@@ -168,29 +168,58 @@
     "approval": "UPDATE_VISUAL_LOCK_BASELINES=1 with SIGNALCARE_FOUNDER_BASELINE_APPROVAL=I-approve-locked-baseline-update (authorised by UI-Q1 brief)"
   },
   "production": {
-    "web_deploy": "pending_commit_push_vercel",
-    "api_deploy": "required for conversation_path projection — pending commit/push to main (ECS workflow)",
+    "web_deploy": "dpl_AqWN1zRRzKAxao4pfrn7Hx6wndN1 (signalcare-web-3qwn-jvw8c162z) → https://app.signalcare.io (GitHub→Vercel on push de39f79)",
+    "web_cli_note": "Local vercel --prod upload failed assert-public-images (no .git in upload); Git-connected production deploy succeeded",
+    "api_deploy": "ECS workflow run 33831229576 SUCCESS — BUILD_SHA 3a6e93b5146f9e4683a803796312f156941656c0",
+    "api_health": "https://api.signalcare.io/health → {\"ok\":true}",
+    "api_version": "https://api.signalcare.io/version → build 3a6e93b…",
     "app": "https://app.signalcare.io",
-    "region": "Sydney",
-    "mumbai": "untouched"
+    "region": "Sydney (kfwfcgfirsdpqpiiemaq)",
+    "mumbai": "untouched",
+    "verification": {
+      "patient_a_read_only": {
+        "enrolment_status": "active",
+        "enrolment_reviews": 1,
+        "open_alerts": 0,
+        "plus_21d_checkin": "scheduled, unsent (due 2026-09-24T03:37:04Z)",
+        "mutation": false
+      },
+      "patient_b_read_only": {
+        "enrolment_status": "active",
+        "plus_1d_checkin": "scheduled, unsent at verify time (due 2026-09-04T03:53:56Z) — natural scheduler may send; no agent response",
+        "mutation": false
+      },
+      "live_browser_signin": "SKIPPED — .patient-directory-e2e.json credentials are signalcare.test, not production founder; no clinical mutation attempted",
+      "deterministic_visual_states": "PASS via visual-lock fixtures (Chromium+WebKit 1440/1280)",
+      "public_shell": "app.signalcare.io serves Inter CSS variable class on documentElement"
+    }
   },
   "patient_a": {
     "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
-    "state_expected": "stable / review completed (5J8)",
+    "state": "active; review recorded; no open alerts; +21d scheduled unsent",
     "mutation": false
   },
   "patient_b": {
     "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "state": "active; +30m replied; subsequent check-ins scheduled",
     "mutation": false,
-    "natural_scheduler": "may operate normally; no response on behalf of patient"
+    "natural_scheduler": "Day+1 due ~2026-09-04T03:53:56Z — may send naturally; agent did not respond"
   },
   "sydney_mumbai": {
-    "sydney": "production target",
+    "sydney": "production target — reads only for UI-Q1 closeout",
     "mumbai": "untouched"
   },
+  "commits": {
+    "web": ["295f22f", "574fcb7", "de39f79"],
+    "api": ["3a6e93b"],
+    "pushed_origin_main": true
+  },
+  "evidence_path": "docs/testing/ui-q1-cq-workspace-fidelity-review-ux.json",
+  "screenshots_path": ".presentation-qa/ui-q1/",
   "remaining_product_gaps": [
     "Resolve-alert still uses window.prompt (out of UI-Q1 Mark reviewed scope)",
-    "Immediate Action panel duplicates alert_open rows also listed under Attention required (architecture lock)"
+    "Immediate Action panel duplicates alert_open rows also listed under Attention required (architecture lock)",
+    "Authenticated live browser QA on app.signalcare.io not completed in-agent (no production founder credentials)"
   ],
   "blockers": [],
   "next_action": "READY TO RESUME PHASE 5 WITH PATIENT A +21D FINAL V4 CHECK-IN. DO NOT SEND +21D."
