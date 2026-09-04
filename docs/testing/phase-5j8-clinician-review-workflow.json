@@ -1,0 +1,249 @@
+{
+  "phase": "5J8",
+  "title": "Clinician review workflow — real founder UI action verification",
+  "executed_at_utc": "2026-09-04T02:25:00Z",
+  "executed_at_brisbane": "2026-09-04T12:25:00+10:00",
+  "verdict": "FAIL",
+  "mode": "VERIFY_ONLY",
+  "absolute_stops_honoured": {
+    "cq_ui_changed": false,
+    "workspace_ui_changed": false,
+    "plus_21d_accelerated": false,
+    "plus_21d_sent": false,
+    "v5_enrolment": false,
+    "protocols_changed": false,
+    "mumbai_writes": false,
+    "application_code_changed": false,
+    "redeployed": false
+  },
+  "targets": {
+    "patient_a_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "clinic_id": "f8d5b902-3c4e-5e6b-c7d8-9e0f1a2b3c4d",
+    "clinic_name": "Test Aesthetics Clinic",
+    "plus_14d_checkin_id": "b46e193b-56bd-4332-b942-5ad61fe22554",
+    "plus_21d_checkin_id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+    "day14_signal_id": "99408176-f57b-43ab-8581-8e9575c4e9d7",
+    "day14_ce_session_id": "7d12522a-8b2e-4cd1-bb3a-3e16f9dc8ddd",
+    "expected_reviewer_id": "0982141e-0531-4d41-a08d-0ac098014fb4",
+    "expected_reviewer_email": "scott1098ce@gmail.com"
+  },
+  "founder_ui_action_claimed": {
+    "actor": "founder (not Cursor)",
+    "surface": "Command Queue → Patient A → Patient Workspace → Mark reviewed (claimed)",
+    "note_claimed_entered": true,
+    "password_recovery_access_regained": true
+  },
+  "founder_ui_action_observed_in_db": {
+    "kind": "enrolment_clinical_note (NOT enrolment_reviews)",
+    "note_id": "2c094e40-5464-4cf6-9583-4bdc960cd847",
+    "revision_id": "cf86ce06-1ffa-4e5a-b00a-13f185db8ee6",
+    "author_user_id": "0982141e-0531-4d41-a08d-0ac098014fb4",
+    "author_is_founder": true,
+    "clinic_id": "f8d5b902-3c4e-5e6b-c7d8-9e0f1a2b3c4d",
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "created_at": "2026-09-04T02:19:17.169024+00:00",
+    "revised_at": "2026-09-04T02:19:17.225265+00:00",
+    "brisbane": "2026-09-04T12:19:17+10:00",
+    "body_excerpt": "Controlled SignalCare production validation — Day 14 outcome concern reviewed…",
+    "body_matches_authorised_test_note": true,
+    "clears_review_required": false,
+    "interpretation": "Founder successfully wrote the authorised clinical note via Workspace clinical-notes path. This does not create enrolment_reviews and does not suppress queue_review_required."
+  },
+  "review_record": {
+    "found": false,
+    "enrolment_reviews_rows_for_patient_a": 0,
+    "enrolment_reviews_rows_sydney_total": 0,
+    "id": null,
+    "created_at": null,
+    "reviewed_at": null,
+    "reviewed_by": null,
+    "clinic_id_match": null,
+    "note_present": false,
+    "append_only_integrity": "n/a — Mark reviewed /enrolment_reviews insert not observed",
+    "blocker": "No enrolment_reviews row. Founder note landed in enrolment_clinical_notes instead. Review suppression architecture keys off enrolment_reviews.reviewed_at, not clinical notes."
+  },
+  "review_suppression": {
+    "before_expected": {
+      "trigger_created_at": "2026-09-03T23:57:23.092592+00:00",
+      "review_required": true,
+      "queue_review_required": true
+    },
+    "after_observed": {
+      "latest_review_reviewed_at": null,
+      "reviewed_at_gte_trigger": false,
+      "review_suppressed": false,
+      "queue_review_required": true,
+      "episode_review_required": true,
+      "taxonomy_review": true,
+      "score_review": false,
+      "flags_source": "persisted"
+    },
+    "pass": false
+  },
+  "attention": {
+    "before": true,
+    "after": true,
+    "attention_required": true,
+    "reason_still_true": "queue_review_required remains true because no suppressing enrolment_reviews row exists",
+    "pass": false
+  },
+  "command_queue": {
+    "before": {
+      "section": "ATTENTION REQUIRED",
+      "v2_status": "review_required",
+      "risk_level": "medium",
+      "attention_reason": "Reply may need review"
+    },
+    "after": {
+      "v2_status": "review_required",
+      "attention_required": true,
+      "queue_review_required": true,
+      "risk_level": "medium",
+      "open_alert_count": 0,
+      "cleared_from_attention": false
+    },
+    "pass": false
+  },
+  "patient_workspace": {
+    "review_completed_in_data": false,
+    "review_timestamp": null,
+    "reviewer": null,
+    "review_note": null,
+    "historical_evidence_retained": true,
+    "day14_signal_score": 3,
+    "structured_answers_persisted": {
+      "recovery_check_in": 3,
+      "outcome_uncertainty_context": "uneven",
+      "unsure_want_review": "yes"
+    },
+    "structured_path_readable_in_ui": false,
+    "day14_ce_status": "completed",
+    "day14_ce_completed_at": "2026-09-03T23:57:22.663+00:00",
+    "pass": false
+  },
+  "alerts": {
+    "open_alerts": 0,
+    "review_did_not_manufacture_alert": true,
+    "note": "No review persist occurred; open alerts remain 0 as before."
+  },
+  "communication_side_effects": {
+    "since_utc": "2026-09-04T01:00:00Z",
+    "patient_sms_outbound": 0,
+    "patient_sms_inbound": 0,
+    "email": 0,
+    "clinician_notification_delivered": 0,
+    "media": 0,
+    "pass": true,
+    "note": "No messaging side effects observed in window; consistent with review not completing and notifications delivery disabled in clinic flags."
+  },
+  "journey_independence": {
+    "enrolment_status": "active",
+    "completed_at": null,
+    "started_at": "2026-09-03T03:37:04+00:00",
+    "started_at_unchanged": true,
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "protocol_unchanged": true,
+    "monitoring_completed": false,
+    "future_checkins_cancelled": false,
+    "pass": true
+  },
+  "plus_21d": {
+    "checkin_id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+    "stage_key": "outcome_followup",
+    "step_label": "Outcome Follow-up",
+    "offset_minutes": 30240,
+    "status": "scheduled",
+    "sent_at": null,
+    "due_at": "2026-09-24T03:37:04+00:00",
+    "mutated": false,
+    "accelerated": false,
+    "pass": true
+  },
+  "historical_stages": {
+    "plus_30m": { "id": "796d35a3-9521-498a-8144-63f87aa073fe", "offset_minutes": 30, "status": "replied" },
+    "plus_24h": { "id": "f99686ad-482e-4344-9317-9eafd2961203", "offset_minutes": 1440, "status": "replied" },
+    "plus_3d": { "id": "32e9e478-aed9-4c36-b89e-ef077c546820", "offset_minutes": 4320, "status": "replied" },
+    "plus_7d": { "id": "f7d5f97f-fe06-457a-9ab8-86683b4a7d2d", "offset_minutes": 10080, "status": "replied" },
+    "plus_14d": { "id": "b46e193b-56bd-4332-b942-5ad61fe22554", "offset_minutes": 20160, "status": "replied", "stage_key": "outcome_assessment" },
+    "plus_21d": { "id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004", "offset_minutes": 30240, "status": "scheduled", "stage_key": "outcome_followup" },
+    "day14_ce_completed": true,
+    "unexpected_historical_mutation": false,
+    "pass": true
+  },
+  "patient_b": {
+    "patient_id": "f4d48a58-447c-4664-887b-5465ca0b0922",
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "enrolment_status": "active",
+    "plus_24h": {
+      "id": "0087f027-e74d-40f9-8864-2178adc79faa",
+      "status": "scheduled",
+      "sent_at": null,
+      "due_at": "2026-09-04T03:53:56.908+00:00",
+      "due_brisbane": "2026-09-04 13:53:56 AEST",
+      "natural_send_elapsed": false,
+      "note": "Due still in future at verification (~12:25 Brisbane). Not mutated. Not responded to."
+    },
+    "altered_by_5j8": false
+  },
+  "ui_debt": {
+    "UI-001": {
+      "title": "COMMAND QUEUE APPROVED-FIGMA FIDELITY / VISUAL HIERARCHY",
+      "classification": "pre-first-clinic product-quality correction",
+      "finding": "Production CQ reads flat (black/white/grey thin rows). Patient A requiring clinician review does not sufficiently stand out from Patient B / stable work. Weakens 'What requires my clinical attention right now?'. Approved Figma distinguishes ATTENTION REQUIRED / AWAITING RESPONSE / STABLE, overloaded critical banner, and All Clear positive state with clinical severity treatments.",
+      "source_of_truth": "Approved Figma Command Queue (normal / overloaded / all-clear)",
+      "constraints": [
+        "restore approved fidelity — do not redesign",
+        "preserve 80px sidebar, 72px header, Inter",
+        "preserve CQ architecture, filters, sections, semantics, clinical status logic",
+        "no gradients, decorative cards, arbitrary colour proliferation, consumer-app styling"
+      ],
+      "implement_in_5j8": false
+    },
+    "UI-002": {
+      "title": "PATIENT WORKSPACE CLINICAL EVIDENCE HIERARCHY / LAYOUT",
+      "classification": "pre-first-clinic product-quality correction",
+      "finding": "Workflow functional and Mark reviewed action understandable, but visual hierarchy weaker than intended; Protocol step / Patient response / Outcome Assessment evidence appears crowded/overlapping; structured Day14 path (I'm not quite sure → One area feels uneven → requested clinic review) is persisted on patient_signal answers but not clearly presented — clinician must infer from generic 'Patient requested clinician review.'",
+      "persisted_path_evidence": {
+        "recovery_check_in": 3,
+        "outcome_uncertainty_context": "uneven",
+        "unsure_want_review": "yes"
+      },
+      "implement_in_5j8": false
+    }
+  },
+  "sydney_mumbai": {
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "sydney_reads": true,
+    "sydney_writes_by_5j8_agent": false,
+    "mumbai_writes": false
+  },
+  "pass_criteria": {
+    "real_founder_ui_review_recorded": false,
+    "authentic_reviewer": false,
+    "append_only_review": false,
+    "review_requirement_clears_naturally": false,
+    "attention_clears_naturally": false,
+    "cq_clears_naturally": false,
+    "no_inappropriate_alert": true,
+    "no_patient_communication": true,
+    "original_evidence_retained": true,
+    "enrolment_remains_active": true,
+    "plus_21d_scheduled_unsent": true,
+    "ui_findings_documented": true
+  },
+  "blockers": [
+    {
+      "id": "5J8-REVIEW-PERSIST",
+      "severity": "blocking",
+      "summary": "Mark reviewed did not persist to enrolment_reviews (Sydney table empty). Founder did persist the authorised note as enrolment_clinical_notes at 2026-09-04T02:19:17Z, which does not suppress review_required / attention / CQ.",
+      "next": "Founder clicks Mark reviewed once (prompted clinical review note ≥10 chars). Agent verifies enrolment_reviews insert + natural CQ clear. Do not treat clinical-notes-only as review completion. If Mark reviewed UI succeeds without enrolment_reviews row, investigate POST /app/enrolments/:id/review."
+    }
+  ],
+  "next_action": "FAIL — complete real Mark reviewed → enrolment_reviews before UI-001/UI-002 or +21d. Clinical note already captured; do not duplicate unless Mark reviewed requires its own note.",
+  "repository_state": {
+    "evidence_path": "docs/testing/phase-5j8-clinician-review-workflow.json",
+    "code_remediation": false,
+    "redeploy_required": false
+  }
+}
