@@ -1,0 +1,235 @@
+{
+  "phase": "5J9",
+  "title": "Patient A accelerated +21d final v4 real send",
+  "executed_at_utc": "2026-09-04T03:21:30Z",
+  "executed_at_brisbane": "2026-09-04T13:21:30+10:00",
+  "verdict": "PASS",
+  "mode": "FINAL_V4_JOURNEY_STAGE → PREFLIGHT → CONTROLLED_DUE_AT_ACCELERATION → REAL_SCHEDULER_SEND → VERIFY → STOP_BEFORE_PATIENT_REPLY",
+  "absolute_stops_honoured": {
+    "patient_a_reply_processed": false,
+    "manual_complete_monitoring": false,
+    "patient_b_accelerated": false,
+    "patient_b_reply": false,
+    "manual_sender_invoke": false,
+    "v5_enrolment": false,
+    "v4_protocol_changed": false,
+    "day14_review_reopened": false,
+    "notifications_enabled": false,
+    "media_enabled": false,
+    "mumbai_writes": false,
+    "ui_changed_during_5j9": false,
+    "redeploy_for_evidence": false
+  },
+  "production_preflight": {
+    "api_health": true,
+    "api_version": "3a6e93b5146f9e4683a803796312f156941656c0",
+    "web": "https://app.signalcare.io HTTP 200",
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "scheduler_send_due": {
+      "name": "signalcare-send-due-checkins",
+      "state": "ENABLED",
+      "schedule": "rate(1 minute)"
+    },
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    },
+    "brisbane_hour_at_acceleration": 13,
+    "in_messaging_window": true,
+    "mumbai": "rollback-only / untouched"
+  },
+  "ui_q1_semantic_sanity": {
+    "api_change_in_scope": "lib/workspace_evidence.js conversation_path projection only (commit 3a6e93b)",
+    "monitoring_projection_changed": false,
+    "risk_logic_changed": false,
+    "attention_logic_changed": false,
+    "review_suppression_changed": false,
+    "ce_changed": false,
+    "scheduler_eligibility_changed": false,
+    "journey_lifecycle_changed": false,
+    "preflight_clinical_state_consistent_with_5j8": true,
+    "note": "Pre-acceleration: active enrolment, Day14 review present, no open alerts, no CE awaiting_reply, all prior stages replied, +21d scheduled — UI-Q1 did not alter clinical semantics."
+  },
+  "patient_a_preflight": {
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "patient_name": "SignalCare Test Patient A",
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "enrolment_status": "active",
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "plus_14d_status": "replied",
+    "day14_ce_id": "7d12522a-8b2e-4cd1-bb3a-3e16f9dc8ddd",
+    "day14_ce_status": "completed",
+    "day14_review_id": "e6ef6110-e6f9-43e7-a371-cb1e8fc0874c",
+    "day14_review_present": true,
+    "attention_required": false,
+    "open_alerts": 0,
+    "ce_awaiting_reply": 0,
+    "sent_unreplied_checkins": 0,
+    "plus_21d_pre": {
+      "id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+      "status": "scheduled",
+      "sent_at": null,
+      "due_at": "2026-09-24T03:37:04+00:00"
+    }
+  },
+  "plus_21d_identity": {
+    "checkin_id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+    "stage_key": "outcome_followup",
+    "step_label": "Outcome Follow-up",
+    "offset_minutes": 30240,
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "protocol_step_id": "a76f4d8a-e7b7-437f-ac01-d0fca5357701",
+    "pathway_snapshot_stage_key": "outcome_followup",
+    "pre_status": "scheduled",
+    "pre_sent_at": null,
+    "original_due_at": "2026-09-24T03:37:04+00:00"
+  },
+  "acceleration": {
+    "audit_label": "CONTROLLED_SYNTHETIC_JOURNEY_TIME_ACCELERATION",
+    "tool": "scripts/controlled-accelerate-checkin-due.js",
+    "dry_run_ok": true,
+    "applied": true,
+    "rows_changed": 1,
+    "original_due_at": "2026-09-24T03:37:04+00:00",
+    "accelerated_due_at": "2026-09-04T03:18:55.512Z",
+    "accelerated_due_brisbane": "2026-09-04 13:18:55 AEST",
+    "apply_timestamp": "2026-09-04T03:10:56.050Z",
+    "offset_minutes_unchanged": true,
+    "started_at_unchanged": true,
+    "protocol_unchanged": true,
+    "snapshot_unchanged": true,
+    "stage_key_unchanged": true
+  },
+  "scheduler_execution": {
+    "manual_invoke": false,
+    "rule": "signalcare-send-due-checkins",
+    "job_run_id": "job_send_due_checkins_1788491944985_1b6d7296268f2",
+    "sent_at": "2026-09-04T03:19:06.652+00:00",
+    "sent_brisbane": "2026-09-04 13:19:06 AEST",
+    "result": "PASS"
+  },
+  "outbound": {
+    "message_event_id": "2cf3575e-a2ff-4494-84d5-7c594aa47c76",
+    "event_type": "checkin_sent",
+    "direction": "outbound",
+    "channel": "sms",
+    "provider": "twilio",
+    "twilio_sid_redacted": "SMcd…5a",
+    "twilio_status_final": "delivered",
+    "status_callback_sequence": ["sent", "delivered"],
+    "body_len": 580,
+    "duplicates_checkin_sent": 1,
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "checkin_id": "dbcb40fa-382d-45af-bdbc-dcb7d37e7004",
+    "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
+    "stage_key": "outcome_followup",
+    "clinical_stage": "+21d",
+    "to_last4_redacted": "…73"
+  },
+  "exact_plus_21d_sms": "Hi SignalCare, this is your final scheduled recovery check-in after your anti-wrinkle treatment.\n\nBy this stage the result should be established enough for you to identify anything that still feels unresolved.\n\nIf anything changes later, contact Test Aesthetics Clinic.\n\nIs anything still unresolved about your recovery or result?\n\nReply:\n\n1 Everything feels normal\n\n2 Mostly what I expected\n\n3 I'm not quite sure\n\n4 Something doesn't feel right\n\n5 I'd like my clinic to contact me\n\nIf you develop severe or sudden symptoms, don't wait for a reply here - seek urgent medical help.",
+  "exact_sms_source": "Twilio Messages API fetch of provider SID (body_len matches message_events.meta.body_len=580)",
+  "plus_21d_configured_semantics": {
+    "stage_key": "outcome_followup",
+    "stage_title": "Outcome Follow-up",
+    "stage_purpose": "Scheduled day-21 closure.",
+    "primary_question": {
+      "id": "recovery_check_in",
+      "prompt": "Is anything still unresolved about your recovery or result?",
+      "options": [
+        { "value": 1, "label": "Everything feels normal" },
+        { "value": 2, "label": "Mostly what I expected" },
+        { "value": 3, "label": "I'm not quite sure" },
+        { "value": 4, "label": "Something doesn't feel right" },
+        { "value": 5, "label": "I'd like my clinic to contact me" }
+      ]
+    },
+    "expected_recovery_branches": {
+      "score_1_2": "reassure_and_finish with SETTLED_DAY21 terminal closing (no further scheduled check-ins unless clinic advises)"
+    },
+    "uncertainty_branches": {
+      "score_3": "collect residual_detail free text → offer clinic contact (unsure_want_review yes/no); no→REVIEW_DECLINED_STABLE; yes→contact_clear"
+    },
+    "review_contact_branches": {
+      "score_5": "acknowledge_contact_and_screen (clinic contact request path)"
+    },
+    "concern_branches": {
+      "score_4": "collect_concern_and_screen (safety screen then disposition)"
+    },
+    "safety_branches": "Standard v4 safety_class emergency/immediate/urgent disposition map (airway, swallow, speech/neuro, thunderclap, anaphylaxis, vision, weakness, swelling, infection, ptosis, etc.)",
+    "terminal_behaviour": "Positive score 1–2 completes journey with SETTLED_DAY21; enrolment completion follows established lifecycle after final-stage interaction — send alone must not complete enrolment",
+    "source": "clinical-library/anti-wrinkle-v4/conversation.js + materialised protocol_step_snapshot; not modified in 5J9"
+  },
+  "pre_reply_state": {
+    "checkin_status": "sent",
+    "awaiting_response": true,
+    "ce_id": "b99db16e-627b-448f-bb34-4f891218e10f",
+    "ce_status": "awaiting_reply",
+    "ce_stage_key": "outcome_followup",
+    "ce_current_question_id": "recovery_check_in",
+    "enrolment_status": "active",
+    "enrolment_not_completed_on_send": true,
+    "review_required": false,
+    "attention_required": false,
+    "open_alerts": 0,
+    "cq_v2_status_equivalent": "awaiting_response",
+    "day14_review_still_completed": true,
+    "inbound_after_send": 0
+  },
+  "day14_review_history_integrity": {
+    "ce_id": "7d12522a-8b2e-4cd1-bb3a-3e16f9dc8ddd",
+    "ce_status": "completed",
+    "answers_intact": {
+      "recovery_check_in": 3,
+      "outcome_uncertainty_context": "uneven",
+      "unsure_want_review": "yes"
+    },
+    "path_summary": "uncertainty → uneven result → requested clinic review → clinician review completed",
+    "review_id": "e6ef6110-e6f9-43e7-a371-cb1e8fc0874c",
+    "review_rows": 1,
+    "mutated_by_plus_21d_send": false
+  },
+  "duplicate_protections": {
+    "same_sid_inbound_claim": "twilio_inbound:${messageSid}:claim unique idempotency_key (api/routes/twilio.js)",
+    "two_minute_post_completion_race_suppression": "decideAlreadyCompleteReply → already_complete_race_suppressed (lib/conversation_engine/sms_handler.js)",
+    "simulated_duplicates": false,
+    "live_api_build": "3a6e93b5146f9e4683a803796312f156941656c0"
+  },
+  "ui_q1_sanity_after_send": {
+    "method": "read-only derived + production app shell; no UI mutation; authenticated live browser skipped (no founder prod creds in agent)",
+    "cq_expected": "Patient A under awaiting_response (attention_required false)",
+    "workspace": "split workspace architecture unchanged; evidence strip responsive grid from UI-Q1 remains; conversation_path available for Day14 history",
+    "overlap_regression_risk": "none introduced by send; UI not changed in 5J9",
+    "app_signalcare_io": "HTTP 200 / Inter shell"
+  },
+  "patient_b": {
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "enrolment_status": "active",
+    "accelerated": false,
+    "schedule_mutated": false,
+    "plus_24h_id": "0087f027-e74d-40f9-8864-2178adc79faa",
+    "plus_24h_status_at_close": "scheduled",
+    "plus_24h_due_at": "2026-09-04T03:53:56.908+00:00",
+    "plus_24h_due_brisbane": "2026-09-04 13:53:56 AEST",
+    "natural_send_during_5j9_window": false,
+    "note": "Due after +21d send; may still send naturally later — allowed, not suppressed, not responded"
+  },
+  "communications_during_5j9": {
+    "patient_a_outbound": 1,
+    "patient_a_inbound": 0,
+    "patient_b_outbound": 0,
+    "patient_b_inbound": 0,
+    "clinician_notifications": 0,
+    "media": 0
+  },
+  "sydney_mumbai": {
+    "sydney": "kfwfcgfirsdpqpiiemaq — sole write target (due_at only)",
+    "mumbai": "untouched"
+  },
+  "repository_deployment": {
+    "web": "UI-Q1 already on production (no 5J9 redeploy)",
+    "api": "3a6e93b live; evidence-only commit for 5J9",
+    "evidence_commit": "pending"
+  },
+  "next_action": "WAITING FOR FOUNDER PHYSICAL +21D PHONE CONFIRMATION. DO NOT process or instruct a reply inside Cursor."
+}
