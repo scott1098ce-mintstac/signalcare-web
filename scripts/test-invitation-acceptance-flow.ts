@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import {
   getSafeAuthNextPath,
   getAuthCallbackDestination,
+  getAuthCallbackErrorMessage,
   hasInboundSupabaseAuthParams,
   isAcceptInvitationDestination,
   isFirstTimeInviteFlow,
@@ -100,6 +101,11 @@ assert.equal(
   '/auth/accept-invitation?token=abc&flow=invite',
 )
 assert.equal(getAuthCallbackDestination('?type=recovery', ''), '/auth/reset-password')
+assert.equal(
+  getAuthCallbackErrorMessage('', '#error=access_denied&error_code=otp_expired'),
+  'This reset link is invalid or has already been used. Request a new one from forgot password.',
+)
+assert.equal(getAuthCallbackErrorMessage('?code=abc', ''), null)
 assert.equal(isAcceptInvitationDestination('/auth/accept-invitation?token=abc'), true)
 assert.equal(isAcceptInvitationDestination('/auth/signin'), false)
 

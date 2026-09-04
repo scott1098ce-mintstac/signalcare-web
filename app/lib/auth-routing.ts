@@ -77,6 +77,24 @@ export function hasInboundSupabaseAuthParams(
   return type === 'invite' || type === 'recovery' || type === 'magiclink' || type === 'signup';
 }
 
+/** Surface Auth error fragments (e.g. consumed /auth/v1/verify links) without leaking tokens. */
+export function getAuthCallbackErrorMessage(
+  search = typeof window !== 'undefined' ? window.location.search : '',
+  hash = typeof window !== 'undefined' ? window.location.hash : '',
+): string | null {
+  const params = new URLSearchParams(search);
+  const hashParams = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+  const error = String(params.get('error') || hashParams.get('error') || '').trim();
+  const errorCode = String(params.get('error_code') || hashParams.get('error_code') || '')
+    .trim()
+    .toLowerCase();
+  if (!error && !errorCode) return null;
+  if (errorCode === 'otp_expired' || errorCode === 'otp_disabled') {
+    return 'This reset link is invalid or has already been used. Request a new one from forgot password.';
+  }
+  return 'This sign-in link could not be completed. Request a new one, or return to sign in.';
+}
+
 export function isAcceptInvitationDestination(path: string | null | undefined): boolean {
   return Boolean(path && path.startsWith('/auth/accept-invitation'));
 }

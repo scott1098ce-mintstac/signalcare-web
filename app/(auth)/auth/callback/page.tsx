@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   completeAuthenticatedSession,
   getAuthCallbackDestination,
+  getAuthCallbackErrorMessage,
   isAcceptInvitationDestination,
   obtainSupabaseAccessToken,
 } from '../../../lib/auth-routing';
@@ -21,6 +22,12 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const run = async () => {
       try {
+        const authError = getAuthCallbackErrorMessage();
+        if (authError) {
+          setErr(authError);
+          return;
+        }
+
         const destination = getAuthCallbackDestination();
         const continuation = parseAcceptInvitationPath(destination);
         if (continuation) {
