@@ -1,0 +1,138 @@
+{
+  "phase": "5K3",
+  "title": "CQ outstanding clinician work precedence remediation",
+  "executed_at_utc": "2026-09-06T23:32:00Z",
+  "verdict": "PASS",
+  "mode": "INSPECT_FIX_TEST_DEPLOY_VERIFY",
+  "production_blocker": true,
+  "remediates": "5K2 CQ_AWAITING_MASKS_OUTSTANDING_REVIEW",
+  "web_code_change": false,
+  "note": "Fix shipped in signalcare-api commit 8492233. Web already consumes monitoring_v2 + actions.can_open_review; no UI redesign.",
+  "absolute_stops_honoured": {
+    "patient_sms_sent_by_agent": false,
+    "inbound_simulated": false,
+    "mark_reviewed_clicked": false,
+    "plus_24h_replied": false,
+    "accelerated": false,
+    "patient_b_mutated": false,
+    "v4_mutated": false,
+    "mumbai_touched": false,
+    "clinical_algorithm_changed": false,
+    "copy_001_changed": false
+  },
+  "defect_from_5k2": {
+    "code": "CQ_AWAITING_MASKS_OUTSTANDING_REVIEW",
+    "summary": "Newer unanswered +24h check-in projected awaiting_response and blocked Mark reviewed despite outstanding +30m clinician review.",
+    "patient_id": "48463849-d278-483e-bb6a-329f2ffac54d",
+    "v5_enrolment_id": "b139a43f-55d0-4e63-a8bf-f876c00c787d",
+    "free_text_exact": "One of my eyelids feels a bit heavy"
+  },
+  "root_cause": {
+    "proven": true,
+    "api_files": [
+      "lib/monitoring_projection.js — projectMonitoringEnrolment (awaiting before review)",
+      "lib/workspace_actions.js — canOpenReview gated on workspace_status",
+      "lib/workspace_status.js — followed masked v2_status"
+    ]
+  },
+  "precedence_before": [
+    "alert",
+    "awaiting_response",
+    "review_required",
+    "stable"
+  ],
+  "precedence_after": [
+    "alert_open / alert_acknowledged",
+    "review_required",
+    "awaiting_response",
+    "stable"
+  ],
+  "attention_required": {
+    "patient_a_after_fix": true
+  },
+  "mark_reviewed_eligibility": {
+    "before": "workspace_status === review_required",
+    "after": "queue_review_required on outstanding review episode",
+    "patient_a_after_fix": true
+  },
+  "generic_fix": {
+    "repo": "signalcare-api",
+    "commit": "8492233",
+    "protocol_independent": true
+  },
+  "test_matrix": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "PASS",
+    "G": "PASS",
+    "H": "PASS"
+  },
+  "deployment": {
+    "api_build": "849223371041fa2836b19339f5c0c966505a3b54",
+    "api_health": true,
+    "web": "https://app.signalcare.io HTTP 200",
+    "web_redeploy_required": false
+  },
+  "real_production_verification": {
+    "verified_at_utc": "2026-09-06T23:31:04.976Z",
+    "cq_v2_status": "review_required",
+    "attention_required": true,
+    "has_awaiting_response": true,
+    "workspace_status": "review_required",
+    "workspace_status_reason": "Reply may need review · Also awaiting patient response",
+    "can_open_review": true,
+    "mark_reviewed_available": true,
+    "open_alert": false,
+    "plus_24h_ce_awaiting_reply": true,
+    "plus_24h_not_replied": true
+  },
+  "risk_vs_disposition": {
+    "queue_risk_score_derived": "high",
+    "clinical_disposition": "routine_review / medium",
+    "scoring_changed": false,
+    "assessment": "Preserved UI-Q1 queue-risk vs clinical-disposition distinction; no emergency alert"
+  },
+  "v5_journey": {
+    "status": "active",
+    "plus_30m": "replied with outstanding review",
+    "plus_24h": "sent awaiting_reply"
+  },
+  "v4_isolation": {
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "unchanged": true
+  },
+  "patient_b": {
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "mutated": false
+  },
+  "communication_audit": {
+    "agent_sms_in_5k3": 0
+  },
+  "copy_001": {
+    "preserved": true,
+    "remediated_in_5k3": false
+  },
+  "production": {
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "mumbai_project": "wpbyxrsiayspyweaqmwy",
+    "mumbai_writes": false,
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "database": {
+    "migration_required": false
+  },
+  "evidence": {
+    "path": "docs/testing/phase-5k3-cq-review-precedence-remediation.json",
+    "api_fix_commit": "8492233",
+    "api_docs_commit": "see signalcare-api",
+    "web_docs_commit": "pending_this_file"
+  },
+  "blockers": [],
+  "next_action": "WAITING FOR FOUNDER TO PERFORM REAL MARK REVIEWED ON THE OUTSTANDING V5 REVIEW. DO NOT REPLY TO +24H. DO NOT ACCELERATE FURTHER V5 STAGES."
+}
