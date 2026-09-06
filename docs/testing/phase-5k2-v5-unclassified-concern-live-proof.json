@@ -1,26 +1,26 @@
 {
   "phase": "5K2",
-  "title": "V5 unclassified concern + safety-clear live production proof",
-  "executed_at_utc": "2026-09-06T23:05:00Z",
-  "verdict": "PASS",
+  "title": "V5 unclassified concern live proof + review state",
+  "executed_at_utc": "2026-09-06T23:16:00Z",
+  "verdict": "FAIL",
+  "verdict_code": "CQ_AWAITING_MASKS_OUTSTANDING_REVIEW",
   "mode": "READ_ONLY_VERIFY_REAL_INTERACTION",
   "code_changes": "none",
+  "remediation_in_5k2": false,
   "communications_by_agent": 0,
   "absolute_stops_honoured": {
     "patient_sms_sent_by_agent": false,
     "inbound_simulated": false,
     "mark_reviewed_clicked": false,
     "clinical_note_added": false,
+    "accelerated": false,
     "patient_b_mutated": false,
-    "v5_stages_accelerated": false,
-    "v5_logic_changed": false,
-    "media_enabled": false,
-    "clinician_notifications_enabled": false,
+    "v4_mutated": false,
     "mumbai_touched": false
   },
   "production": {
     "api_health": true,
-    "api_version": "79c8a698fe03ce80252ad2ad33ae6db32b1b76c3",
+    "api_version": "48fab247c8274e0cb5288ee49b17adbbb2522b14",
     "web": "https://app.signalcare.io HTTP 200",
     "sydney_project": "kfwfcgfirsdpqpiiemaq",
     "mumbai_project": "wpbyxrsiayspyweaqmwy",
@@ -39,25 +39,16 @@
     "status": "active",
     "protocol_version_id": "6ec89fa8-9c0d-4ef0-af23-0364a1771764"
   },
-  "checkin_30m": {
-    "id": "1a249800-fcc6-4dc2-9f56-4d906aac80a6",
-    "status": "replied",
-    "offset_minutes": 30,
-    "sent_at": "2026-09-04T04:26:10.929+00:00",
-    "replied_at": "2026-09-06T22:55:13.114+00:00"
+  "clinical_disposition_result": {
+    "status": "PASS",
+    "summary": "Real production v5 unclassified eyelid/brow concern + clear functional screen correctly produced no auto-reassurance, routine clinician review, medium clinical priority, no alert."
   },
-  "ce_30m": {
-    "id": "5113e92c-50fe-4a4a-8f0d-80f608bbc818",
-    "status": "completed",
-    "stage_key": "immediate_safety",
-    "current_branch_id": "functional_clear",
-    "completed_at": "2026-09-06T22:58:04.265+00:00",
-    "processed_branch_ids": ["score_4_collect", "score4_eyelid_brow", "functional_clear"],
-    "escalation_status": "none",
-    "orphaned_awaiting_reply_on_30m_ce": false
+  "cq_workspace_result": {
+    "status": "FAIL",
+    "summary": "After natural +24h send, outstanding review episode remains in backend (queue_review_required=true) but CQ v2_status=awaiting_response, attention_required=false, and can_open_review=false. Newer awaiting check-in obscures unresolved clinician work and blocks Mark reviewed."
   },
-  "real_interaction": {
-    "note_free_text": "Founder brief recalled 'little heavy'; Twilio + persisted answers exact text is 'bit heavy'. Exact production text retained.",
+  "real_plus_30m_interaction": {
+    "free_text_note": "Founder brief expected 'little heavy'. Twilio + CE persisted exact text is 'bit heavy'. Exact production raw text retained.",
     "inputs": [
       {
         "seq": 1,
@@ -65,11 +56,11 @@
         "timestamp_utc": "2026-09-06T22:55:13.05Z",
         "sid_redacted": "SM36…b4",
         "sid_prefix": "SM36af14",
-        "active_question": "recovery_check_in",
+        "question": "recovery_check_in",
         "interpretation": "option_match value=4",
-        "branch_transition": "score_4_collect → tell_us_more",
-        "outbound_followup_sid_redacted": "SM81…ea",
-        "outbound_body": "Thanks.\n\nPlease tell us briefly what you are noticing so Test Aesthetics Clinic can support you.\n\nReply with a short message."
+        "branch": "score_4_collect",
+        "action": "collect_concern_and_screen",
+        "processed_once": true
       },
       {
         "seq": 2,
@@ -77,13 +68,11 @@
         "timestamp_utc": "2026-09-06T22:56:06.791Z",
         "sid_redacted": "SMd1…08",
         "sid_prefix": "SMd11af0",
-        "active_question": "tell_us_more",
-        "classification": "eyelid_brow_concern",
-        "unclassified_concern": true,
-        "not_ptosis_functional": true,
-        "branch_transition": "score4_eyelid_brow → functional_safety_screen",
-        "outbound_followup_sid_redacted": "SMd1…3e",
-        "outbound_body": "Thanks.\n\nJust to be sure — are you having any trouble keeping an eye open, any change in vision (including double vision), or drooping that seems obvious or getting worse?\n\nReply:\n\n1 No — none of those\n\n2 Difficulty keeping an eye open\n\n3 Change in vision\n\n4 New double vision\n\n5 Obvious or progressive drooping"
+        "question": "tell_us_more",
+        "interpretation": "unknown free text",
+        "branch": "score4_eyelid_brow",
+        "action": "eyelid_brow_screen",
+        "processed_once": true
       },
       {
         "seq": 3,
@@ -91,176 +80,229 @@
         "timestamp_utc": "2026-09-06T22:58:04.221Z",
         "sid_redacted": "SMb9…0f",
         "sid_prefix": "SMb9d6a5",
-        "active_question": "functional_safety_screen",
+        "question": "functional_safety_screen",
         "interpretation": "option_match value=none",
-        "branch_transition": "functional_clear / clinic_review_clear",
-        "final_outbound_sid_redacted": "SM01…1d",
-        "final_outbound_status": "delivered"
+        "branch": "functional_clear",
+        "action": "clinic_review_clear",
+        "processed_once": true
       }
     ],
     "unique_inbound_sids": 3,
-    "duplicate_inbound_processing": false,
-    "bound_to_v5_enrolment": true,
-    "bound_to_v4_enrolment": false,
-    "cross_binding_to_completed_v4": false
+    "duplicate_processing": false,
+    "bound_to_v5": true,
+    "bound_to_v4": false
   },
-  "free_text_integrity": {
-    "persisted_exact": "One of my eyelids feels a bit heavy",
-    "persisted_in": ["recovery_conversation_sessions.answers.tell_us_more", "patient_signals.decision_snapshot.answers.tell_us_more", "workspace evidence.recovery_concern.patient_reported"],
-    "paraphrased": false,
+  "classification": {
     "concern_class": "eyelid_brow_concern",
-    "does_not_prove_ptosis": true
-  },
-  "functional_safety_screen": {
-    "question_id": "functional_safety_screen",
-    "targeted_eyelid_brow_screen": true,
-    "not_full_red_flag_screen": true,
-    "founder_selection": "none",
-    "means": "absence of listed functional red flags (eye open / vision / diplopia / progressive droop)",
-    "not_interpreted_as_expected_recovery": true
+    "unclassified_concern": true,
+    "safety_class": "none",
+    "functional_safety_screen": "none",
+    "not_ptosis": true,
+    "not_expected_recovery": true,
+    "not_au_xeomin_pi_claim": true
   },
   "v5_primary_invariant": {
-    "classification": "eyelid_brow_concern / unclassified_concern=true",
-    "safety_class": "none",
     "allow_reassurance": false,
     "reassurance_permitted": false,
     "patient_reassured": false,
     "expected_resolution": false,
-    "clinical_priority": "medium",
-    "recommended_action": "routine_review",
+    "disposition": "routine_review",
     "review_required": true,
+    "clinical_priority": "medium",
     "alert": false,
     "open_alert": false,
-    "cq_at_ce_complete": "review_required",
-    "attention_at_ce_complete": true,
-    "not_automatic_high_clinical": true,
-    "events": [
-      "clinician_contact_requested",
-      "clinician_review_required",
-      "triage_outcome_created",
-      "confidence_outcome_created"
-    ],
     "patient_signal_id": "4106936a-fd22-47a7-b175-386c88b4b2f9",
+    "backend_events": ["clinician_contact_requested", "clinician_review_required", "triage_outcome_created"],
     "result": "PASS"
   },
-  "final_patient_response": {
+  "final_plus_30m_patient_response": {
+    "sid_redacted": "SM01…1d",
+    "delivery": "delivered",
+    "duplicates": 0,
     "branch_id": "functional_clear",
-    "action": "clinic_review_clear",
-    "copy_source": "UNCLASSIFIED_CONCERN_REVIEW",
     "exact_body": "Thanks. You haven't reported any of the urgent symptoms we screen for.\n\nBecause we can't confidently class what you've described as expected at this stage, we've asked Test Aesthetics Clinic to review it and follow up if needed.\n\nIf symptoms become severe or sudden before you hear from them, don't wait — seek urgent medical help.",
     "is_generic_reassurance": false,
-    "backend_correspondence": "real clinician_review_required + patient_signal with review_required=true (not cosmetic copy)"
+    "backend_review_correspondence": true
   },
-  "no_artificial_emergency": {
-    "emergency_disposition": false,
-    "call_000_branch": false,
-    "urgent_alert": false,
-    "open_alert": false,
-    "clinical_priority_high": false,
-    "clinical_priority_actual": "medium",
-    "queue_risk_level_score_derived": "high",
-    "queue_risk_note": "monitoring_projection.deriveRiskLevel(score>=4)→high is score-badge only; UI-Q1 separates Queue risk from Disposition (medium / routine review). Not emergency HIGH."
+  "plus_30m_ce": {
+    "id": "5113e92c-50fe-4a4a-8f0d-80f608bbc818",
+    "status": "completed",
+    "stage_key": "immediate_safety",
+    "current_branch_id": "functional_clear",
+    "completed_at": "2026-09-06T22:58:04.265+00:00",
+    "orphaned_awaiting": false
   },
-  "journey_after_30m_ce": {
-    "enrolment_status": "active",
-    "journey_did_not_complete_on_ce_complete": true,
-    "stages_at_ce_complete_snapshot": {
+  "plus_30m_checkin": {
+    "id": "1a249800-fcc6-4dc2-9f56-4d906aac80a6",
+    "status": "replied",
+    "offset_minutes": 30,
+    "protocol_version_id": "6ec89fa8-9c0d-4ef0-af23-0364a1771764",
+    "replied_at": "2026-09-06T22:55:13.114+00:00"
+  },
+  "natural_plus_24h": {
+    "checkin_id": "f30ee189-a43b-4fcd-b8e9-e27eac2dc285",
+    "stage_key": "early_recovery",
+    "offset_minutes": 1440,
+    "status": "sent",
+    "sent_at": "2026-09-06T23:03:08.207+00:00",
+    "sid_redacted": "SM48…79",
+    "sid_prefix": "SM48fbdf",
+    "delivery": "delivered",
+    "outbound_count": 1,
+    "duplicates": 0,
+    "founder_replied": false,
+    "ce_id": "b58cc60e-55db-4302-b403-158d431d10aa",
+    "ce_status": "awaiting_reply",
+    "current_question_id": "recovery_check_in",
+    "exact_opening_matches_founder_report": true,
+    "no_duplicate_sms_incident": true
+  },
+  "open_review_journey_independence": {
+    "review_still_outstanding_when_24h_sent": true,
+    "review_episode_queue_review_required": true,
+    "review_suppressed": false,
+    "journey_continued_to_24h": true,
+    "architecture_confirmed": "clinician work and recovery journey lifecycle are independent — unresolved routine review did not suspend monitoring",
+    "cq_defect": "independence is correct for send behaviour, but CQ presentation precedence incorrectly hides outstanding review behind awaiting_response"
+  },
+  "v5_journey": {
+    "status": "active",
+    "stages": {
       "30": "replied",
-      "1440": "scheduled",
+      "1440": "sent_awaiting_reply",
       "4320": "scheduled",
       "10080": "scheduled",
       "20160": "scheduled",
       "30240": "scheduled"
     }
   },
-  "natural_plus_24h_during_5k2": {
-    "agent_accelerated": false,
-    "agent_invoked_sender": false,
-    "checkin_id": "f30ee189-a43b-4fcd-b8e9-e27eac2dc285",
-    "status": "sent",
-    "sent_at": "2026-09-06T23:03:08.207+00:00",
-    "sid_redacted": "SM48…79",
-    "ce_id": "b58cc60e-55db-4302-b403-158d431d10aa",
-    "ce_status": "awaiting_reply",
-    "stage_key": "early_recovery",
-    "note": "Natural scheduler pickup of overdue/deferred +24h while 5K2 read-only verification was in progress. Not part of founder unclassified-concern sequence."
-  },
-  "cq_workspace_snapshots": {
-    "at_ce_complete_before_natural_24h": {
-      "v2_status": "review_required",
-      "attention_required": true,
-      "review_required": true,
-      "can_open_review": true,
-      "open_alert": null,
-      "evidence_concern": "One of my eyelids feels a bit heavy",
-      "interpretation_severity": "medium"
-    },
-    "current_after_natural_24h": {
-      "v2_status": "awaiting_response",
-      "attention_required": false,
-      "review_required": true,
-      "review_trigger_outstanding": true,
-      "can_open_review": false,
-      "workspace_status": "awaiting_response",
-      "open_alert": null,
-      "evidence_still_shows_concern": true,
-      "interpretation_severity": "medium",
-      "masking_rule": "monitoring_projection: hasAwaiting → v2_status=awaiting_response precedes queueReviewRequired; canOpenReview requires workspace_status===review_required"
+  "command_queue_current": {
+    "v2_status": "awaiting_response",
+    "attention_required": false,
+    "review_required_flag": true,
+    "review_episode_outstanding": true,
+    "open_alert": null,
+    "risk_level_score_derived": "high",
+    "clinical_priority": "medium",
+    "exposes_unresolved_review_as_actionable_v2": false,
+    "pass_criterion_cq_exposes_review": false,
+    "pass_criterion_attention_required": false,
+    "defect": {
+      "code": "CQ_AWAITING_MASKS_OUTSTANDING_REVIEW",
+      "location": [
+        "lib/monitoring_projection.js — hasAwaiting → v2_status=awaiting_response before queueReviewRequired",
+        "lib/workspace_actions.js — canOpenReview requires workspace_status===review_required",
+        "lib/review_episode_state.js — assertReviewEpisodeOpenForPost returns review_not_operational when masked"
+      ],
+      "clinical_risk": "Unresolved clinician review from +30m unclassified concern is not Attention/Mark-reviewed actionable while a later check-in awaits reply; clinician may miss required review work.",
+      "expected_by_5k2": "Newer scheduled/sent check-in must NOT obscure unresolved clinician work"
     }
   },
+  "patient_workspace_current": {
+    "workspace_status": "awaiting_response",
+    "raw_concern_visible": true,
+    "raw_concern_exact": "One of my eyelids feels a bit heavy",
+    "conversation_path_partial": [
+      {
+        "key": "recovery_check_in",
+        "display": "Something doesn't feel right"
+      }
+    ],
+    "safety_visible": "No defined urgent symptoms reported",
+    "disposition_visible": "Clinician review required",
+    "interpretation_severity": "medium",
+    "can_open_review": false,
+    "mark_reviewed_available": false,
+    "pass_criterion_mark_reviewed_available": false
+  },
   "review_ux": {
-    "at_ce_complete_mark_reviewed_exposed": true,
-    "current_mark_reviewed_exposed": false,
+    "mark_reviewed_available": false,
     "add_clinical_note_distinct": true,
-    "mark_reviewed_clicked_in_5k2": false
+    "neither_clicked": true
   },
   "v4_isolation": {
     "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
     "status": "completed",
     "completed_at": "2026-09-04T03:36:03.659786+00:00",
     "protocol_version_id": "6db2d89c-d33a-4395-881b-9318da10dacb",
-    "six_checkins_replied": true,
     "day14_review_id": "e6ef6110-e6f9-43e7-a371-cb1e8fc0874c",
-    "v5_signal_attached_to_v4": false,
-    "v4_in_cq": false
+    "v5_work_attached_to_v4": false,
+    "unchanged": true
   },
   "patient_b": {
     "mutated": false,
     "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
-    "plus_24h_status": "sent",
-    "ce_id": "dbd718ff-2116-4f2c-a7a9-882eec7450cb",
-    "ce_status": "awaiting_reply",
-    "stage_key": "early_recovery"
+    "plus_24h": "sent",
+    "ce": "dbd718ff-2116-4f2c-a7a9-882eec7450cb awaiting_reply early_recovery"
   },
   "communication_audit": {
-    "expected_v5_30m_sequence": "opening (5K1) + 3 inbound + 3 conversational outbound replies",
-    "agent_new_sms_in_5k2": 0,
+    "plus_30m_opening": "SM89…0f (5K1)",
+    "founder_4": "SM36…b4",
+    "sc_freetext_prompt": "SM81…ea",
+    "founder_freetext": "SMd1…08",
+    "sc_functional_screen": "SMd1…3e",
+    "founder_1": "SMb9…0f",
+    "sc_review_ack": "SM01…1d",
+    "natural_plus_24h": "SM48…79 once",
     "email": 0,
-    "clinician_notification_delivery": false,
+    "clinician_notifications": false,
     "media": false,
-    "natural_plus_24h_outbound_during_verify": 1
+    "agent_sms_in_5k2": 0
   },
   "copy_001": {
     "id": "UI/COPY-001",
-    "title": "PATIENT SMS DASH STYLE",
-    "severity": "non-blocking product-quality",
-    "finding": "Em dashes / en dashes in patient-facing SMS feel AI-generated",
+    "title": "PATIENT MESSAGE STYLE — DASH PUNCTUATION",
+    "severity": "non-blocking pre-first-clinic copy quality",
+    "finding": "Em dash / en dash / stylistic hyphen sentence breaks make patient SMS feel AI-generated",
     "examples_observed": [
       "No — none of those",
       "Just to be sure — are you having…",
-      "don't wait — seek urgent medical help."
+      "don't wait — seek urgent medical help.",
+      "don't wait for a reply here - seek urgent medical help."
     ],
-    "approved_direction": "No em dash or en dash in patient-facing SignalCare SMS. Prefer natural punctuation e.g. 'No, none of those' and 'don't wait. Seek urgent medical help.'",
-    "remediation_in_5k2": false,
-    "later_pass_required": "Inspect all patient-facing aesthetics messages for dashes, AI-sounding constructions, awkward clinical prose; preserve clinical meaning"
+    "approved_direction": [
+      "No, none of those",
+      "don't wait. Seek urgent medical help.",
+      "don't wait for a reply here. Seek urgent medical help."
+    ],
+    "no_blind_global_replace": true,
+    "changed_in_5k2": false
+  },
+  "pass_criteria_matrix": {
+    "three_inputs_once": true,
+    "exact_free_text_retained": true,
+    "targeted_functional_screen": true,
+    "screen_clear": true,
+    "unclassified_nonurgent": true,
+    "no_auto_reassurance": true,
+    "backend_review_created": true,
+    "review_required_true": true,
+    "attention_required_true": false,
+    "routine_disposition": true,
+    "no_artificial_emergency_alert": true,
+    "no_alert": true,
+    "ce_30m_completed": true,
+    "checkin_30m_replied": true,
+    "natural_24h_once": true,
+    "24h_awaiting": true,
+    "open_review_survived_24h_send_backend": true,
+    "cq_exposes_unresolved_review": false,
+    "workspace_exposes_concern": true,
+    "mark_reviewed_available": false,
+    "journey_active": true,
+    "remaining_stages_intact": true,
+    "v4_unchanged": true,
+    "no_unexpected_comms": true,
+    "copy_001_documented": true,
+    "sydney_only": true,
+    "mumbai_untouched": true
   },
   "blockers": [
     {
-      "code": "AWAITING_RESPONSE_MASKS_OUTSTANDING_REVIEW",
-      "severity": "operational_for_next_step",
-      "does_not_invalidate_v5_clinical_proof": true,
-      "detail": "Natural +24h send created awaiting_reply CE; CQ v2_status=awaiting_response and can_open_review=false despite outstanding review episode from unclassified concern. Mark reviewed unavailable until workspace_status returns to review_required."
+      "code": "CQ_AWAITING_MASKS_OUTSTANDING_REVIEW",
+      "blocks": ["Mark reviewed", "attention_required presentation", "CQ review_required v2_status"],
+      "does_not_invalidate_v5_clinical_disposition": true
     }
   ],
-  "next_action": "Outstanding v5 unclassified-concern review episode remains (signal 4106936a-…). Mark reviewed currently masked by natural +24h awaiting CE. Do not agent-reply or accelerate. Founder/product path needed to clear awaiting mask before Mark reviewed, OR address awaiting-vs-review precedence in a separate phase. DO NOT SEND FURTHER PATIENT SMS FROM AGENT. DO NOT ACCELERATE FURTHER V5 STAGES."
+  "next_action": "FAIL STOP. Do not Mark reviewed yet (UI/API blocked). Do not reply to +24h. Do not remediate in 5K2. Separate phase required to fix awaiting-vs-outstanding-review CQ/Workspace precedence so unresolved clinician work remains actionable, then re-verify Mark reviewed availability."
 }
