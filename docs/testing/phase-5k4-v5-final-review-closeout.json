@@ -1,0 +1,81 @@
+{
+  "phase": "5K4",
+  "title": "Final v5 review completion verification / live validation closeout",
+  "executed_at_utc": "2026-09-06T23:42:49Z",
+  "verdict": "PASS",
+  "mode": "READ_ONLY_FINAL_PRODUCTION_VERIFICATION",
+  "code_changes": "none",
+  "web_code_change": false,
+  "note": "Read-only verification mirrored from signalcare-api evidence. No web deploy.",
+  "founder_action": {
+    "action": "MARK_REVIEWED",
+    "review_id": "47085c4b-d2bd-4084-b782-2f61dc486102",
+    "reviewed_at": "2026-09-06T23:39:20.380Z",
+    "trigger_patient_signal_id": "4106936a-fd22-47a7-b175-386c88b4b2f9",
+    "review_note": "within expected recovery , all ok"
+  },
+  "review_suppression": {
+    "queue_review_required": false,
+    "review_suppressed": true,
+    "can_open_review": false
+  },
+  "command_queue_after": {
+    "attention_required_count": 0,
+    "patient_a_v2_status": "awaiting_response",
+    "attention_required": false,
+    "has_awaiting_response": true
+  },
+  "workspace_after": {
+    "workspace_status": "awaiting_response",
+    "workspace_status_reason": "Awaiting patient response",
+    "matches_founder_screenshot": true
+  },
+  "plus_24h": {
+    "checkin_id": "f30ee189-a43b-4fcd-b8e9-e27eac2dc285",
+    "status": "sent",
+    "replied_at": null,
+    "ce_id": "b58cc60e-55db-4302-b403-158d431d10aa",
+    "ce_status": "awaiting_reply",
+    "stage_key": "early_recovery"
+  },
+  "v5_journey": {
+    "status": "active",
+    "stages_intact": true
+  },
+  "five_k3_regression": {
+    "before_review": "review_required actionable",
+    "after_review": "awaiting_response non-actionable",
+    "both_directions_proven": true
+  },
+  "v4_isolation": {
+    "enrolment_id": "ae00941b-8666-454f-a631-d9ae5a292176",
+    "unchanged": true
+  },
+  "patient_b": {
+    "enrolment_id": "54809314-7e9a-4ce8-8fd8-2eec211d9170",
+    "natural_state": "stable",
+    "mutated": false
+  },
+  "communication_side_effects": {
+    "sms_after_review": 0
+  },
+  "copy_001": {
+    "status": "OPEN",
+    "next_phase": "PATIENT-FACING MESSAGE COPY QUALITY AND NATURAL-TONE PASS"
+  },
+  "production": {
+    "sydney_project": "kfwfcgfirsdpqpiiemaq",
+    "mumbai_project": "wpbyxrsiayspyweaqmwy",
+    "mumbai_writes": false,
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "final_conclusion": "ANTI-WRINKLE V5 CONTROLLED LIVE PRODUCTION VALIDATION: CLOSED — PASS",
+  "evidence": {
+    "path": "docs/testing/phase-5k4-v5-final-review-closeout.json",
+    "api_primary": "docs/testing/phase-5k4-v5-final-review-closeout.json in signalcare-api"
+  },
+  "blockers": []
+}
