@@ -1,13 +1,14 @@
 # First Clinic Launch Status
 
 **Authoritative source of truth**  
-**Updated:** 2026-09-07T03:50:00Z (Phase 6E)  
+**Updated:** 2026-09-07T04:00:00Z (Phase 6F)  
 **Evidence:**  
 - `docs/testing/phase-6a-first-clinic-launch-gate-reconciliation.json`  
 - `docs/testing/phase-6b-auth-invite-redirect-remediation.json`  
 - `docs/testing/phase-6b2-real-staff-invitation-closeout.json`  
 - `docs/testing/phase-6c-privacy-data-flow-audit.json`  
 - `docs/testing/phase-6e-legal-privacy-launch-implementation.json`  
+- `docs/testing/phase-6f-ext-002-production-closure-audit.json`  
 - `docs/legal/` (founder-approved launch pack sources)
 
 This document supersedes stale checklist wording where later production evidence proves otherwise. It does **not** reopen locked workstreams or Anti-Wrinkle pathway work.
@@ -19,15 +20,18 @@ This document supersedes stale checklist wording where later production evidence
 | Question | Answer |
 |----------|--------|
 | Can Scott start **selling / demoing**? | **YES** |
-| Can Scott **create / onboard a clinic account** (Scott as sole admin)? | **YES** (Terms acceptance required at onboarding) |
-| Can Scott **invite additional clinic staff** via Staff Directory? | **YES** |
-| Can Scott **enrol the first real patient**? | **NOT YET** — EXT-002 is **IMPLEMENTED — PENDING FINAL PRODUCTION CLOSURE AUDIT** (Phase 6F) |
+| Can Scott **create / onboard a clinic account**? | **YES** |
+| Can Scott **invite additional clinic staff**? | **YES** |
+| Can Scott **enrol the first real patient**? | **YES** |
 
-**Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6** (after EXT-002 closure).
+**Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6**.
 
 **AUTH-INVITE-REDIRECT:** **CLOSED — PROVEN IN REAL PRODUCTION**.
 
-**EXT-002 Privacy / Terms / patient privacy architecture:** **IMPLEMENTED — PENDING FINAL PRODUCTION CLOSURE AUDIT**
+**EXT-002 Privacy / Terms / patient privacy architecture:**  
+**CLOSED — FOUNDER APPROVED FOR INITIAL COMMERCIAL LAUNCH**
+
+**External legal review:** DEFERRED UNTIL COMMERCIALLY JUSTIFIED
 
 ---
 
@@ -35,70 +39,73 @@ This document supersedes stale checklist wording where later production evidence
 
 - Workstreams **A–H** permanently locked (PASS)
 - Security / AuthZ production attack matrix **25/25** (Workstream H)
-- Consent / Start Monitoring gate (LAUNCH-001) + Phase 6E provenance
-- Dead Terms/Privacy `#` links removed (LAUNCH-002 software)
-- Public `/privacy`, `/patient-privacy`, `/terms` hosted (Phase 6E)
-- Enrolment consent/notice provenance + org Terms acceptance (Phase 6E)
-- First outbound SMS privacy notice link (Phase 6E)
-- Operational breach / access / retention docs adopted (Phase 6E)
-- First-clinic runbook exists and path-verified
-- Anti-Wrinkle **v6** global + Test Aesthetics adoption (Phase 5M)
-- Password recovery 5J8A–C PASS
-- **LAUNCH-003** SMTP CLOSED
-- **AUTH-INVITE-REDIRECT** CLOSED (6B2)
-- Phase 6C privacy/data-flow architecture audit PASS
-- Sydney healthy; Mumbai rollback-only; media/notifications/external AI fail-closed
+- Consent / Start Monitoring gate + Phase 6E provenance
+- Public `/privacy`, `/patient-privacy`, `/terms` (version `2026-09-07.1`)
+- Organisation Terms acceptance + enrolment fail-closed
+- First outbound SMS patient privacy notice link
+- Operational breach / access / retention / subprocessor docs
+- Phase 6C architecture audit + Phase 6E implementation + Phase 6F closure audit
+- Password recovery + SMTP + staff invitation proven
+- Sydney healthy; Mumbai rollback-only; media / clinician PHI email / external AI fail-closed
 
 ---
 
 ## True remaining gates
 
-### 1. EXT-002 — IMPLEMENTED — PENDING FINAL PRODUCTION CLOSURE AUDIT
+### EXT-002 — CLOSED
 
-Phase 6E implemented the founder-approved legal/privacy launch pack in product. Phase 6F must perform the final read-only production closure audit before EXT-002 is marked CLOSED and the first real patient may be enrolled.
+No genuine first-patient legal/privacy implementation blocker remains under the founder-approved launch standard.
 
-| Stage | Blocks? |
-|-------|---------|
-| Sales / demo | **NO** |
-| Clinic onboarding | **NO** |
-| Staff invitation | **NO** |
-| First real patient | **YES until 6F closes EXT-002** |
+### EXT-001 Formal external clinical sign-off — OPEN — PILOT TASK (not a software blocker)
 
-### 2. EXT-001 Formal external clinical sign-off — OPEN — PILOT TASK (not a software blocker)
+### EXT-003 Regulatory / insurance / corporate — OPEN — PILOT TASK / counsel
 
-### 3. EXT-003 Regulatory / insurance / corporate — OPEN — PILOT TASK / counsel
+---
+
+## Operational action before next enrolment (not EXT-002)
+
+If the target organisation has not accepted Clinic Terms `2026-09-07.1` (Test Aesthetics currently has **no** acceptance row), an organisation **owner/admin** must accept Terms in Organisation settings (or complete Terms at new-org onboarding) before starting a new enrolment. The product correctly returns `organisation_terms_required` until then.
+
+---
+
+## Documentation note (not a launch blocker)
+
+`docs/operations/FIRST_CLINIC_LAUNCH_RUNBOOK.md` still describes pre-6E consent wording and does not yet document Terms acceptance / notice provenance. Product behaviour is correct; update the runbook when convenient.
 
 ---
 
 ## Deferred (not first-clinic blockers)
 
-Stripe production activation · patient media/MMS · external clinician notifications · enabling OpenAI semantic intent · patient portal · automated deletion · external lawyer review.
+Stripe production activation · patient media/MMS · external clinician notifications · enabling OpenAI · patient portal · automated deletion · external lawyer review · perfect vendor due diligence · ISO/HIPAA theatre.
 
 ---
 
 ## What Scott can do now
 
 1. Sell and demo SignalCare.
-2. Provision real aesthetics clinics (runbook); accept Clinic Terms at onboarding or Organisation settings.
+2. Provision a paying aesthetics clinic (accept Clinic Terms at onboarding).
 3. Invite clinic staff via Staff Directory.
-4. Wait for Phase 6F EXT-002 closure before enrolling the first real patient’s health information.
-5. Optionally accept current Terms for Test Aesthetics via Organisation settings (does not fabricate historical acceptance).
+4. Enrol the first real consented patient on Anti-Wrinkle **v6** after Terms acceptance for that organisation, with monitoring consent + Patient Privacy Notice confirmation.
+5. Operate Command Queue in-app.
 
 ---
 
 ## Single next action
 
-**Run Phase 6F final read-only EXT-002 production closure audit.**
+**Onboard the first paying clinic and enrol the first real patient under the runbook + Phase 6E controls (accept Terms first if the organisation has not).**
 
 ---
 
-## Production snapshot (6E)
+## Production snapshot (6F)
 
 | Check | Result |
 |-------|--------|
 | API health | ok |
-| API build | `6fec588…` (ECS `:223`) |
-| Migration | `048_legal_privacy_launch_provenance.sql` applied Sydney |
+| API build | `722d80d…` (ECS `:225`) |
+| Web | production Ready; legal routes 200 |
+| Migration 048 | applied Sydney |
+| Historical enrolments | 3 with null notice provenance (truthful) |
+| Terms acceptances | 0 (Test Aesthetics null — operational gate) |
 | Flags | media/notifications `false`; OpenAI not injected |
 | Sydney | `kfwfcgfirsdpqpiiemaq` |
 | Mumbai | untouched |
@@ -107,4 +114,4 @@ Stripe production activation · patient media/MMS · external clinician notifica
 
 ## Test clinic / patients
 
-Test Aesthetics + controlled patients remain isolated. Do not delete historical controlled patients. Do not fabricate historical consent/notice/Terms provenance.
+Controlled patients remain isolated and historically truthful. Do not fabricate provenance. Accept current Terms before any new enrolment on Test Aesthetics if used for a real patient.

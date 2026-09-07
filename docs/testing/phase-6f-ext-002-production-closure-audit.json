@@ -1,0 +1,118 @@
+{
+  "phase": "6F",
+  "title": "EXT-002 final production closure audit",
+  "mode": "read_only",
+  "timestamp_utc": "2026-09-07T04:00:00Z",
+  "verdict": "PASS",
+  "production_mutation": "NONE",
+  "ext_002_final": "CLOSED — FOUNDER APPROVED FOR INITIAL COMMERCIAL LAUNCH",
+  "first_paying_clinic": "YES",
+  "first_real_patient": "YES",
+  "external_legal_review": "DEFERRED UNTIL COMMERCIALLY JUSTIFIED",
+  "deployment": {
+    "api_health": "ok",
+    "api_version_build": "722d80d28bacac7eaa3e417bc4529fb9f496df91",
+    "ecs_task_definition": "signalcare-api:225",
+    "api_repo_head": "722d80d",
+    "phase_6e_feat_commit_ancestor": "1737006",
+    "controls_present_in_deployed_lineage": true,
+    "web_repo_head": "a2ab68b",
+    "web_phase_6e_feat_ancestor": "4ba24b7",
+    "web_production": "Ready",
+    "supabase_host": "kfwfcgfirsdpqpiiemaq.supabase.co",
+    "sydney": true,
+    "mumbai_active": false
+  },
+  "public_legal_routes": {
+    "privacy": { "url": "https://app.signalcare.io/privacy", "status": 200, "version": "2026-09-07.1" },
+    "patient_privacy": { "url": "https://app.signalcare.io/patient-privacy", "status": 200, "version": "2026-09-07.1" },
+    "terms": { "url": "https://app.signalcare.io/terms", "status": 200, "version": "2026-09-07.1" },
+    "drafting_artefacts": "PASS",
+    "australia_all_data_claim": "NEGATION_ONLY_PASS",
+    "note": "Public text states primary AU infrastructure and explicitly does not claim all personal information remains in Australia."
+  },
+  "internal_docs_not_public": {
+    "founder_memo": 404,
+    "breach_plan_guessed_routes": 404
+  },
+  "schema": {
+    "migration_048_applied": true,
+    "legal_document_versions": [
+      { "document_key": "privacy_policy", "version": "2026-09-07.1", "status": "current" },
+      { "document_key": "patient_privacy_notice", "version": "2026-09-07.1", "status": "current" },
+      { "document_key": "clinic_terms", "version": "2026-09-07.1", "status": "current" }
+    ],
+    "enrolment_provenance_columns": "ok",
+    "organisation_terms_acceptances_table": "ok"
+  },
+  "historical_truthfulness": {
+    "enrolments_privacy_notice_version_null": 3,
+    "enrolments_privacy_notice_version_set": 0,
+    "enrolments_monitoring_consent_confirmed_null": 3,
+    "enrolments_monitoring_consent_confirmed_true": 0,
+    "fabricated_historical_provenance": false
+  },
+  "terms_acceptance": {
+    "organisation_acceptances_count": 0,
+    "test_aesthetics_accepted": false,
+    "operational_action_before_next_enrolment": "Organisation owner/admin accepts current Clinic Terms (2026-09-07.1) via Organisation settings or new onboarding before creating the next enrolment.",
+    "product_fail_closed": "organisation_terms_required",
+    "who_can_accept": ["owner", "admin"]
+  },
+  "enrolment_fail_closed": {
+    "evidence": "deployed code + scripts/test-phase-6e-legal-privacy.js PASS",
+    "errors": [
+      "monitoring_consent_confirmation_required",
+      "privacy_notice_acknowledgement_required",
+      "privacy_notice_version_mismatch",
+      "organisation_terms_required"
+    ],
+    "production_enrolment_created_for_test": false
+  },
+  "patient_notice_delivery": {
+    "first_outbound_only": true,
+    "url": "https://app.signalcare.io/patient-privacy",
+    "live_sms_sent": false,
+    "copy_001": "PASS"
+  },
+  "flags": {
+    "PATIENT_MEDIA_ENABLED": false,
+    "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": false,
+    "external_ai_injected": false
+  },
+  "privacy_contact": {
+    "public": "hello@signalcare.io",
+    "SUPPORT_EMAIL": "hello@signalcare.io",
+    "SMTP_FROM_EMAIL": "hello@signalcare.io",
+    "deliverability_independent_test": "not_performed_in_6F",
+    "credibility": "same mailbox used for production SMTP from/support configuration"
+  },
+  "runbook": {
+    "file": "docs/operations/FIRST_CLINIC_LAUNCH_RUNBOOK.md",
+    "product_flow_correct": true,
+    "runbook_reflects_6e_terms_and_notice_provenance": false,
+    "classification": "DOCUMENTATION_DEFECT_NOT_LAUNCH_BLOCKER"
+  },
+  "auth_invitation_regression": {
+    "staff_invitation_links_test": "PASS",
+    "auth_invite_redirect_status": "CLOSED — PROVEN IN REAL PRODUCTION",
+    "new_invitation_sent": false
+  },
+  "clinical_regression": {
+    "aw_v6_clinical_semantics": "unchanged_except_first_sms_privacy_appendix",
+    "phase_6e_unit_tests": "PASS",
+    "live_clinical_mutation": false
+  },
+  "patient_a_b": {
+    "touched": false,
+    "new_sms": false,
+    "new_enrolment": false,
+    "fabricated_provenance": false
+  },
+  "genuine_first_patient_blockers": [],
+  "operational_actions_before_next_enrolment": [
+    "If using an organisation without current Terms acceptance (including Test Aesthetics), owner/admin must accept Clinic Terms 2026-09-07.1 before the next enrolment.",
+    "At enrolment, staff must confirm monitoring consent and Patient Privacy Notice access.",
+    "Prefer updating FIRST_CLINIC_LAUNCH_RUNBOOK.md post-launch to describe Terms acceptance and notice provenance (documentation defect only)."
+  ]
+}
