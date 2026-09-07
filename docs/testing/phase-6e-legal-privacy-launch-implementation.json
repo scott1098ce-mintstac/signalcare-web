@@ -3,7 +3,7 @@
   "title": "Founder-approved legal/privacy launch implementation",
   "timestamp_utc": "2026-09-07T03:50:00Z",
   "verdict": "PASS",
-  "ext_002_status": "IMPLEMENTED — PENDING FINAL PRODUCTION CLOSURE AUDIT",
+  "ext_002_status": "IMPLEMENTED \u2014 PENDING FINAL PRODUCTION CLOSURE AUDIT",
   "migration": {
     "file": "supabase-migrations/048_legal_privacy_launch_provenance.sql",
     "project": "kfwfcgfirsdpqpiiemaq",
@@ -36,7 +36,10 @@
   },
   "terms_acceptance": {
     "scope": "organisation",
-    "who_can_accept": ["owner", "admin"],
+    "who_can_accept": [
+      "owner",
+      "admin"
+    ],
     "onboarding_required": true,
     "settings_accept_api": "POST /app/organisation/terms/accept",
     "enrolment_requires_current_terms": true
@@ -56,11 +59,17 @@
     "patient_a_b_touched": false
   },
   "production_deployment": {
-    "api_build": "6fec5885d12a77a8626cdecdb195915a51df1710",
+    "api_build": "2ec864ff9ed1e5f40469a732c8a6ad917779fd7a",
     "ecs_task_definition": "signalcare-api:223",
     "aws_region": "ap-southeast-2",
     "web_project": "signalcare-web-3qwn",
-    "web_status": "pending_push_verify"
+    "web_status": "Ready",
+    "web_verified_routes": {
+      "privacy": 200,
+      "patient_privacy": 200,
+      "terms": 200,
+      "founder_memo_not_public": 404
+    }
   },
   "flags": {
     "PATIENT_MEDIA_ENABLED": false,
@@ -75,12 +84,37 @@
     "privacy_contact": "hello@signalcare.io"
   },
   "corporate_details": {
-    "resolved": ["trading_name_SignalCare", "privacy_support_email_hello@signalcare.io", "governing_law_Queensland"],
-    "unresolved": ["contracting_entity_legal_name", "ABN_ACN", "registered_business_address"],
+    "resolved": [
+      "trading_name_SignalCare",
+      "privacy_support_email_hello@signalcare.io",
+      "governing_law_Queensland"
+    ],
+    "unresolved": [
+      "contracting_entity_legal_name",
+      "ABN_ACN",
+      "registered_business_address"
+    ],
     "public_presentation": "SignalCare trading/service name; no bracket placeholders on public pages"
   },
   "sydney": "kfwfcgfirsdpqpiiemaq",
   "mumbai": "wpbyxrsiayspyweaqmwy",
   "mumbai_untouched": true,
-  "single_next_action": "Run Phase 6F final read-only EXT-002 production closure audit."
+  "single_next_action": "Run Phase 6F final read-only EXT-002 production closure audit.",
+  "production_route_verification": {
+    "privacy": {
+      "url": "https://app.signalcare.io/privacy",
+      "status": 200,
+      "version": "2026-09-07.1"
+    },
+    "patient_privacy": {
+      "url": "https://app.signalcare.io/patient-privacy",
+      "status": 200,
+      "version": "2026-09-07.1"
+    },
+    "terms": {
+      "url": "https://app.signalcare.io/terms",
+      "status": 200,
+      "version": "2026-09-07.1"
+    }
+  }
 }
