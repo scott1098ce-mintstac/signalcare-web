@@ -1,0 +1,21 @@
+{
+  "phase": "5L",
+  "title": "Anti-Wrinkle patient-facing message quality pass",
+  "executed_at_utc": "2026-09-06T23:55:00Z",
+  "verdict": "PASS",
+  "web_code_change": false,
+  "note": "Copy revision shipped in signalcare-api as Anti-Wrinkle v6. Web unchanged.",
+  "versioning": {
+    "v6_required": true,
+    "pathway": "anti_wrinkle_cpd_v6",
+    "clinical_logic_unchanged_from_v5": true
+  },
+  "patient_a_untouched": true,
+  "patient_b_untouched": true,
+  "artifacts_in_api": [
+    "docs/clinical/anti-wrinkle-patient-message-register-v6.md",
+    "docs/clinical/anti-wrinkle-v6-patient-message-snapshot.json",
+    "docs/testing/phase-5l-anti-wrinkle-patient-copy-quality.json"
+  ],
+  "final_conclusion": "ANTI-WRINKLE PATIENT-FACING MESSAGE QUALITY PASS: CLOSED — PASS"
+}
