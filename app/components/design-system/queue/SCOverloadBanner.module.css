@@ -3,7 +3,8 @@
 .banner {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
   margin: 0;
   padding: 14px 24px;
@@ -18,4 +19,23 @@
   text-transform: uppercase;
   color: var(--ds-alert-danger-icon);
   box-sizing: border-box;
+}
+
+.label {
+  min-width: 0;
+}
+
+.badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ds-alert-danger-icon);
+  color: var(--ds-text-inverse);
+  font-size: 11px;
+  font-weight: var(--ds-font-weight-semibold);
+  letter-spacing: 0.04em;
+  line-height: 14px;
+  text-transform: uppercase;
 }

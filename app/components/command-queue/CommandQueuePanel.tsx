@@ -45,9 +45,21 @@ export function CommandQueuePanel({
       )
     : groups.needsAttention;
 
+  const showChrome = !isEmpty && !loading && !error;
+
   return (
     <div className={styles.panel}>
-      {!isEmpty && !loading && !error ? (
+      {showChrome && showOverloaded ? (
+        <ImmediateActionPanel
+          rows={immediateRows}
+          selectedEnrolmentId={selectedEnrolmentId}
+          currentUserId={currentUserId}
+          onSelect={onSelectEpisode}
+          onActionComplete={refresh}
+        />
+      ) : null}
+
+      {showChrome ? (
         <CommandQueueFilters
           filters={filters}
           procedures={procedures}
@@ -72,18 +84,8 @@ export function CommandQueuePanel({
           </div>
         ) : null}
 
-        {!loading && !error && !isEmpty ? (
+        {showChrome ? (
           <>
-            {showOverloaded ? (
-              <ImmediateActionPanel
-                rows={immediateRows}
-                selectedEnrolmentId={selectedEnrolmentId}
-                currentUserId={currentUserId}
-                onSelect={onSelectEpisode}
-                onActionComplete={refresh}
-              />
-            ) : null}
-
             <QueueSection
               title="Attention required"
               titleNodeId="267:2565"
