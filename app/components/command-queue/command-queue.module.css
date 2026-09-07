@@ -17,29 +17,30 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  height: var(--ds-queue-filter-bar-height);
   min-height: var(--ds-queue-filter-bar-height);
+  height: auto;
   background: var(--ds-surface-base);
   box-sizing: border-box;
+  padding-right: var(--ds-queue-filter-padding-x);
 }
 
 .filterControls {
   display: flex;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--ds-queue-filter-gap);
-  padding: var(--ds-queue-filter-padding-y) var(--ds-queue-filter-padding-x);
+  padding: var(--ds-queue-filter-padding-y) 0 var(--ds-queue-filter-padding-y)
+    var(--ds-queue-filter-padding-x);
   box-sizing: border-box;
-}
-
-.filterControls > * {
-  flex-shrink: 0;
+  min-width: 0;
 }
 
 .filterClearButton {
   flex: 0 0 auto;
-  margin-right: var(--ds-queue-filter-padding-x);
+  margin-right: 0;
 }
 
 .listScroll {
@@ -69,6 +70,20 @@
   color: var(--ds-text-secondary);
 }
 
+.immediateSection {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--ds-alert-danger-border);
+}
+
+.immediateList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--ds-alert-danger-bg);
+}
+
 .errorWrap {
   padding: var(--ds-space-6);
 }
@@ -89,15 +104,33 @@
 }
 
 .allClear {
-  margin: 0;
-  padding: var(--ds-space-4) var(--ds-space-4);
-  border-bottom: 1px solid var(--ds-alert-success-border);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 8px 24px 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--ds-alert-success-border);
+  border-radius: 10px;
   background: var(--ds-alert-success-bg);
-  font-family: var(--ds-font-family);
+  box-sizing: border-box;
+}
+
+.allClearIcon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  color: var(--ds-alert-success-text);
+  margin-top: 1px;
+}
+
+.allClearCopy {
+  min-width: 0;
+  flex: 1;
 }
 
 .allClearTitle {
   margin: 0 0 4px;
+  font-family: var(--ds-font-family);
   font-size: var(--ds-font-size-heading-2);
   font-weight: var(--ds-font-weight-semibold);
   line-height: var(--ds-line-height-row);
@@ -106,6 +139,7 @@
 
 .allClearBody {
   margin: 0;
+  font-family: var(--ds-font-family);
   font-size: var(--ds-font-size-body);
   line-height: var(--ds-line-height-body);
   color: var(--ds-alert-success-text);

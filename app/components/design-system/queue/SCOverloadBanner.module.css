@@ -1,8 +1,14 @@
 @import '../tokens/tokens.css';
 
 .banner {
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-bottom: 1px solid var(--ds-alert-danger-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 0;
   background: var(--ds-alert-danger-bg);
   font-family: var(--ds-font-family);
   font-size: var(--ds-font-size-body-sm);
@@ -10,5 +16,6 @@
   line-height: 16px;
   letter-spacing: var(--ds-tracking-label);
   text-transform: uppercase;
-  color: var(--ds-text-primary);
+  color: var(--ds-alert-danger-icon);
+  box-sizing: border-box;
 }
