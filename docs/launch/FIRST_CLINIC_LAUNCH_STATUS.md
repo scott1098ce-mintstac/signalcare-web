@@ -99,7 +99,7 @@ Stripe production activation · patient media/MMS · external clinician notifica
 
 ## Single next action
 
-**Commercial product expansion:** Protocol Library aesthetics pack — **Dermal Fillers v3 CLOSED** (HA-primary CPD; Sydney migration 049; API `ee6d32f` on ECS `signalcare-api:227`; runtime verified). Anti-Wrinkle remains v6. Next aesthetics starters (Laser/IPL, RF, Minor Cosmetic) still pending elevation. Do not reopen Command Queue visuals.
+**Commercial product expansion:** Protocol Library aesthetics pack — **Dermal Fillers v3 CLOSED**; **Lip Filler v1 CLOSED** (HA lip CPD; Sydney migration 050; API `1147f5e` on ECS `signalcare-api:229`; runtime verified). Anti-Wrinkle remains v6. Next aesthetics starters (Laser/IPL, RF, Minor Cosmetic) still pending elevation. Do not reopen Command Queue visuals.
 
 **Operational parallel:** Onboard the first paying clinic and enrol the first real patient under the runbook + Phase 6E controls (accept Terms first if the organisation has not).
 
