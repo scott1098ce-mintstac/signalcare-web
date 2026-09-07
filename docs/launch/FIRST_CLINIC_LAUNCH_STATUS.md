@@ -14,7 +14,7 @@ This document supersedes stale “OPEN” checklist wording where later producti
 |----------|--------|
 | Can Scott start **selling / demoing**? | **YES** |
 | Can Scott **create / onboard a clinic account** (Scott as sole admin)? | **YES** (invite-only Supabase founder invite → create-password → `/auth/onboarding`) |
-| Can Scott **invite additional clinic staff** via Staff Directory? | **YES, SUBJECT TO** fixing Auth invitation `redirectTo` (`callback?next=` rejected by Sydney Auth allowlist — see AUTH-INVITE-REDIRECT) |
+| Can Scott **invite additional clinic staff** via Staff Directory? | **YES, SUBJECT TO** completing the Phase 6B controlled live invitation proof (code fixed/deployed; acceptance not yet proven) |
 | Can Scott **enrol the first real patient**? | **YES, SUBJECT TO** clinic/business gates below (consent process, CQ-in-app training, EXT-002/EXT-001 decisions if Scott requires them) — **not** blocked by software P0/P1 |
 
 **Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6**. Do not reopen.
@@ -50,13 +50,17 @@ This document supersedes stale “OPEN” checklist wording where later producti
 
 ## True remaining gates
 
-### 1. AUTH-INVITE-REDIRECT — OPEN — BLOCKER (before inviting additional staff)
+### 1. AUTH-INVITE-REDIRECT — OPEN — BLOCKER (before inviting additional staff) — code fixed, live proof pending
 
-**What:** `api/routes/staff.js` `buildAuthInviteLink` still sets  
-`redirectTo = APP_URL/auth/callback?next=/auth/accept-invitation?...`  
-Phase **5J8A** proved Sydney Auth **rejects** `redirectTo` values with query strings and falls back to Site URL `http://localhost:3000`. Password recovery was fixed to use allowlisted `/auth/callback` **without** `?next=`. Staff invitations were **not** fixed.
+**Phase 6B (2026-09-07):** Root cause proven and remediated in production.
 
-**Missing assertion:** No production evidence that a Staff Directory invitation email was accepted end-to-end **after** this Auth allowlist finding.
+- Auth `redirectTo` is now exactly `https://app.signalcare.io/auth/callback` (no query).
+- Email uses app callback browser link with `token_hash` + constrained `next=/auth/accept-invitation?...` (not Supabase `/verify` action_link).
+- Continue gate covers invite/magiclink/recovery token_hash links.
+- API `f3e917f` / ECS `:219` and web `b91ad4a` deployed.
+- **Still OPEN until** one controlled real Staff Directory invitation is accepted end-to-end.
+
+**Live proof waiting on Scott** — see `docs/testing/phase-6b-auth-invite-redirect-remediation.json`.
 
 **Does not block:** Scott-as-sole-admin clinic provisioning or Scott monitoring the first patient himself.
 
@@ -103,9 +107,9 @@ Stripe production activation · patient media/MMS · external clinician notifica
 
 ## Single next action
 
-**Fix staff invitation Auth `redirectTo` so invitation links use an allowlisted `https://app.signalcare.io/auth/callback` form without query-string rejection (mirror the password-recovery pattern), preserving invitation-token handoff to `/auth/accept-invitation`.**
+**Scott: from Test Aesthetics → Settings → Staff, send ONE invitation to a founder-controlled mailbox that is not already a clinic member. Open the newest email in a clean browser → Continue to accept invitation → complete password/account → confirm clinic role → then revoke/deactivate the test membership.**
 
-Then STOP further checklist churn until that fix is verified.
+(Do not invite a real clinic employee. Do not use `scott1098ce@gmail.com` as the invitee — it is already the admin.)
 
 ---
 
@@ -114,11 +118,13 @@ Then STOP further checklist churn until that fix is verified.
 | Check | Result |
 |-------|--------|
 | `GET https://api.signalcare.io/health` | `{"ok":true}` |
-| `GET https://api.signalcare.io/version` | build `079c3d8…` |
+| `GET https://api.signalcare.io/version` | build `079c3d8…` (6A); **6B live `f3e917f…`** |
 | `https://app.signalcare.io/` | HTTP 200 |
 | Sydney | `kfwfcgfirsdpqpiiemaq` |
 | Mumbai | rollback-only / not written |
 | Media / clinician notification flags | `false` / `false` |
+
+**6B update:** AUTH-INVITE-REDIRECT code fixed and deployed; live invitation acceptance proof still required before closing the gate.
 
 ---
 

@@ -1,0 +1,166 @@
+{
+  "phase": "6B",
+  "title": "Auth invitation redirect remediation",
+  "executed_at_utc": "2026-09-07T00:48:00Z",
+  "verdict": "READY_FOR_LIVE_PROOF",
+  "mode": "INSPECT_FIX_TEST_DEPLOY_STOP_BEFORE_SEND",
+  "absolute_stops_honoured": {
+    "invitation_sent": false,
+    "patient_created": false,
+    "enrolment_created": false,
+    "sms_sent": false,
+    "patient_a_touched": false,
+    "patient_b_touched": false,
+    "mumbai_touched": false,
+    "media_enabled": false,
+    "clinician_notifications_enabled": false
+  },
+  "root_cause": {
+    "summary": "Staff invitation generateLink used redirectTo with query string callback?next=/auth/accept-invitation..., which Sydney Auth redirect allowlist rejects. Auth then falls back to Site URL http://localhost:3000, so invitation emails that relied on Supabase action_link redirected users to localhost.",
+    "live_sydney_proof": {
+      "clean_redirectTo": "https://app.signalcare.io/auth/callback",
+      "clean_action_redirect_to": "https://app.signalcare.io/auth/callback",
+      "dirty_redirectTo": "https://app.signalcare.io/auth/callback?next=%2Fauth%2Faccept-invitation%3Ftoken%3Dabc%26flow%3Dinvite",
+      "dirty_action_redirect_to": "http://localhost:3000",
+      "proven_at": "2026-09-07T00:41:00Z"
+    },
+    "prior_evidence": "docs/testing/phase-5j8a-production-password-recovery.json invite_redirect_query_string debt"
+  },
+  "old_flow": {
+    "redirectTo": "https://app.signalcare.io/auth/callback?next=/auth/accept-invitation?token=...&flow=...",
+    "email_link": "Supabase action_link (/auth/v1/verify with redirect_to often localhost)",
+    "result": "broken production invitation acceptance"
+  },
+  "new_flow": {
+    "auth_generateLink_redirectTo": "https://app.signalcare.io/auth/callback",
+    "email_browser_link": "https://app.signalcare.io/auth/callback?token_hash=...&type=invite|magiclink&next=/auth/accept-invitation?token=...&flow=...",
+    "callback": "Continue gate → verifyOtp → save invitation continuation → /auth/accept-invitation",
+    "accept": "resolve invitation → accept membership/role → password if first-time → app"
+  },
+  "redirect": {
+    "exact_redirectTo": "https://app.signalcare.io/auth/callback",
+    "query_string_on_auth_redirectTo": false
+  },
+  "callback_handoff": {
+    "mechanism": "App-controlled next query on the emailed browser URL (not Auth redirectTo). getSafeAuthNextPath allows only /auth/* paths. Invitation token + flow carried in next=/auth/accept-invitation?token=...&flow=... and persisted to sessionStorage continuation.",
+    "continue_gate": "token_hash + type invite|magiclink|recovery require explicit Continue before verifyOtp (scanner-safe)"
+  },
+  "open_redirect_protection": {
+    "auth_redirectTo": "fixed allowlisted callback only",
+    "next_param": "getSafeAuthNextPath rejects protocol-relative, absolute URLs, non-/auth paths, javascript:",
+    "assertStaffInvitationBrowserLink": "rejects evil hosts, localhost, supabase verify URLs, next without accept-invitation token"
+  },
+  "token_security": {
+    "raw_tokens_logged": false,
+    "email_uses_hashed_token_param": true,
+    "no_service_role_in_client": true,
+    "invitation_db_stores_hash_only": true
+  },
+  "accept_invitation_flow": {
+    "existing_page": "app/(auth)/auth/accept-invitation/page.tsx",
+    "account_mismatch_guard": "blocks wrong signed-in email",
+    "membership_binding": "POST accept uses invitation clinic/role only"
+  },
+  "membership_role_safety": {
+    "org_membership_does_not_grant_clinical_access": true,
+    "clinic_scoped_invitation": true,
+    "unchanged_architecture": true
+  },
+  "failure_states": {
+    "covered_by_existing_accept_page": [
+      "missing token",
+      "expired",
+      "revoked",
+      "already accepted",
+      "invalid",
+      "wrong signed-in account"
+    ],
+    "otp_expired_copy_updated": true
+  },
+  "tests": {
+    "scripts/test-staff-invitation-links.js": "PASS",
+    "scripts/test-staff-invitations.js": "PASS",
+    "scripts/test-password-recovery.js": "PASS",
+    "npm run test:invitation-acceptance": "PASS",
+    "scripts/test-protocols-settings-billing-authz.js": "PASS"
+  },
+  "security_regression": {
+    "authz_wiring": "PASS",
+    "open_redirect_assertions": "PASS",
+    "attack_matrix_rerun": false,
+    "note": "No AuthZ permission matrix reopen; invitation invite permission unchanged"
+  },
+  "password_recovery_regression": {
+    "builders_unchanged": true,
+    "test-password-recovery": "PASS",
+    "recovery_redirectTo": "https://app.signalcare.io/auth/callback"
+  },
+  "deployment": {
+    "api": {
+      "commit": "f3e917fffe6ab40fc8a8c0a241632279b59d3fbd",
+      "ecs": "signalcare-api:219",
+      "image": "signalcare-api:f3e917fffe6ab40fc8a8c0a241632279b59d3fbd",
+      "version_live": "f3e917fffe6ab40fc8a8c0a241632279b59d3fbd",
+      "health": true
+    },
+    "web": {
+      "commit": "b91ad4abdc7182ba6c7f79fe319a57dfe7e69b98",
+      "deployment_id": "dpl_Heu2PRHrLzGetLco1HhNsYRfzJtT",
+      "url": "https://signalcare-web-3qwn-4skf4ozjo-scotts-projects-c36e8413.vercel.app",
+      "alias": "https://app.signalcare.io",
+      "note": "Git-connected production Ready; CLI vercel --prod failed prebuild git ls-files (non-blocking)"
+    },
+    "routes": {
+      "auth_callback_http": 200,
+      "accept_invitation_http": 200,
+      "web_home_http": 200
+    }
+  },
+  "production_auth_config": {
+    "allowlisted_callback": "https://app.signalcare.io/auth/callback",
+    "wildcards_added": false,
+    "app_url_secret": "https://app.signalcare.io",
+    "query_string_redirectTo_still_rejected": true,
+    "site_url_localhost_fallback_still_present": true,
+    "custom_smtp": "OFF (invites use ECS Zoho)"
+  },
+  "live_invitation_proof": {
+    "status": "waiting_founder_action",
+    "completed": false,
+    "reason_stopped": "Do not invent recipient; founder approval required to send controlled invitation to a safe mailbox that is not already a clinic member",
+    "founder_production_account": {
+      "user_id": "0982141e-0531-4d41-a08d-0ac098014fb4",
+      "email_redacted": "scott1098ce@gmail.com",
+      "note": "Already Test Aesthetics admin — do not use as invitee for multi-staff proof"
+    },
+    "required_recipient": "Founder-controlled mailbox that is NOT already a Sydney Auth member of the target clinic (e.g. Gmail plus-address). Confirm with Scott before send.",
+    "exact_founder_next_action": "From Test Aesthetics → Settings → Staff, invite ONE founder-controlled non-member mailbox as role staff (or nurse). Open newest email on a clean browser → Continue to accept invitation → set password if prompted → confirm clinic access. Then revoke/deactivate the test membership.",
+    "recommended_cleanup_after_proof": "Revoke pending invite if unused; or deactivate the controlled membership and leave audit rows intact"
+  },
+  "patient_impact": {
+    "none": true
+  },
+  "production": {
+    "sydney": "kfwfcgfirsdpqpiiemaq",
+    "mumbai": "wpbyxrsiayspyweaqmwy",
+    "mumbai_written": false,
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "files_changed": {
+    "api": [
+      "lib/staff_invitation_links.js",
+      "api/routes/staff.js",
+      "scripts/test-staff-invitation-links.js"
+    ],
+    "web": [
+      "app/lib/auth-routing.ts",
+      "app/(auth)/auth/callback/page.tsx",
+      "scripts/test-invitation-acceptance-flow.ts"
+    ]
+  },
+  "launch_status_update": "AUTH-INVITE-REDIRECT remains OPEN until real invitation acceptance proof; SMTP LAUNCH-003 stays CLOSED",
+  "single_next_action": "Scott sends ONE Staff Directory invitation from Test Aesthetics to a founder-controlled mailbox that is not already a clinic member, then completes Continue → accept → password/login → confirms role, then revokes/deactivates the test user."
+}
