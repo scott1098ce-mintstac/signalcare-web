@@ -1,0 +1,114 @@
+{
+  "phase": "6C",
+  "title": "Privacy, data flow & legal architecture audit",
+  "mode": "inspect_document_stop",
+  "timestamp_utc": "2026-09-07T02:57:49Z",
+  "verdict": "PASS",
+  "production": {
+    "supabase_sydney": "kfwfcgfirsdpqpiiemaq",
+    "supabase_mumbai": "wpbyxrsiayspyweaqmwy",
+    "mumbai_untouched": true,
+    "api_health": "ok",
+    "api_build_sha_ecs_env": "f1de2d9500095a3265bb85e227a6657f6b6b9449",
+    "ecs_task_definition": "signalcare-api:221",
+    "aws_region": "ap-southeast-2",
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": false,
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": false,
+      "SMS_DRY_RUN": false
+    },
+    "production_mutations": false,
+    "patient_communications_sent": false
+  },
+  "external_ai_processing": {
+    "verdict": "CONDITIONAL",
+    "effective_production_calls": "NO",
+    "rationale": "Secrets Manager contains OPENAI_API_KEY and SEMANTIC_INTENT_LLM=openai, but ECS task definition does not inject OPENAI_* or SEMANTIC_INTENT_* into the running container; llmEnabled() requires SEMANTIC_INTENT_LLM=openai.",
+    "if_enabled_would_send": "Inbound free-text patient replies (truncated) plus limited question/prior-turn context; designed without patient IDs/names; clinical free text remains health information.",
+    "other_llm_providers": "none_in_deps"
+  },
+  "clinical_automation": {
+    "model": "hybrid_architecture",
+    "primary": "deterministic_rules_based",
+    "optional": "openai_semantic_intent_when_env_mounted",
+    "outputs": [
+      "scores",
+      "alerts",
+      "review_required_states",
+      "conversation_replies",
+      "cq_attention_inputs"
+    ]
+  },
+  "patient_identity_fields": {
+    "present": ["first_name", "last_name", "name", "mobile", "clinic_patient_identifier", "consent_status", "sms_opt_out"],
+    "absent": ["email", "dob", "address"]
+  },
+  "consent": {
+    "field": "patients.consent_status",
+    "values": ["unknown", "consented", "declined", "revoked"],
+    "version_column": false,
+    "source_column": false,
+    "dedicated_consented_at_column": false,
+    "audit_event": "patient_consent_updated"
+  },
+  "retention_class": "INDEFINITE_UNTIL_MANUAL_ACTION",
+  "deletion": {
+    "soft_archive": true,
+    "hard_delete_api": false
+  },
+  "patient_portal": false,
+  "patient_level_export": false,
+  "privacy_terms_surfaces": {
+    "hosted_documents": false,
+    "in_app_routes": false,
+    "footer_links_require_https_env": true,
+    "env_names": ["NEXT_PUBLIC_PRIVACY_POLICY_URL", "NEXT_PUBLIC_TERMS_OF_SERVICE_URL"]
+  },
+  "secondary_use": {
+    "advertising": "none",
+    "marketing": "none",
+    "model_training_by_signalcare": "none_evidenced",
+    "third_party_product_analytics_sdk": "none",
+    "research": "none",
+    "sale": "none",
+    "brokerage": "none",
+    "cross_customer_analytics": "none"
+  },
+  "breach_readiness": "AD_HOC_UNDOCUMENTED",
+  "subprocessors_documented": true,
+  "ext_002": {
+    "status": "OPEN — BLOCKER BEFORE FIRST REAL PATIENT",
+    "reason": "Privacy/legal framework being completed from verified production data-flow architecture."
+  },
+  "can_scott": {
+    "sell_demo": true,
+    "onboard_clinic": true,
+    "invite_staff": true,
+    "enrol_first_real_patient": false
+  },
+  "artifacts": [
+    "docs/privacy/PRIVACY_DATA_FLOW_ARCHITECTURE.md",
+    "docs/privacy/SUBPROCESSOR_FACT_REGISTER.md",
+    "docs/privacy/PRIVACY_LEGAL_FACT_MATRIX.md",
+    "docs/privacy/PRIVACY_EXTERNAL_CONFIRMATIONS_REQUIRED.md",
+    "docs/testing/phase-6c-privacy-data-flow-audit.json",
+    "docs/launch/FIRST_CLINIC_LAUNCH_STATUS.md"
+  ],
+  "pass_criteria": {
+    "complete_data_inventory": true,
+    "patient_staff_sms_auth_flows_mapped": true,
+    "supabase_aws_vercel_zoho_mapped": true,
+    "third_parties_inventoried": true,
+    "ai_explicitly_resolved": true,
+    "residency_and_cross_border_unknowns": true,
+    "access_retention_deletion_mapped": true,
+    "privacy_consent_audit_security_breach": true,
+    "subprocessor_register": true,
+    "role_facts_secondary_use": true,
+    "external_confirmations_listed": true,
+    "no_legal_conclusions_invented": true,
+    "no_production_mutation": true,
+    "sydney_only_mumbai_untouched": true
+  },
+  "single_next_action": "Use the verified Phase 6C architecture and current Australian legal requirements to prepare SignalCare's privacy/legal launch pack."
+}

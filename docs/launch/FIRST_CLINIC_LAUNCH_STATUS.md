@@ -1,11 +1,13 @@
 # First Clinic Launch Status
 
 **Authoritative source of truth**  
-**Updated:** 2026-09-07T02:45:00Z (Phase 6B2)  
+**Updated:** 2026-09-07T02:57:49Z (Phase 6C)  
 **Evidence:**  
 - `docs/testing/phase-6a-first-clinic-launch-gate-reconciliation.json`  
 - `docs/testing/phase-6b-auth-invite-redirect-remediation.json`  
-- `docs/testing/phase-6b2-real-staff-invitation-closeout.json`
+- `docs/testing/phase-6b2-real-staff-invitation-closeout.json`  
+- `docs/testing/phase-6c-privacy-data-flow-audit.json`  
+- `docs/privacy/PRIVACY_DATA_FLOW_ARCHITECTURE.md`
 
 This document supersedes stale checklist wording where later production evidence proves otherwise. It does **not** reopen locked workstreams or Anti-Wrinkle pathway work.
 
@@ -18,11 +20,14 @@ This document supersedes stale checklist wording where later production evidence
 | Can Scott start **selling / demoing**? | **YES** |
 | Can Scott **create / onboard a clinic account** (Scott as sole admin)? | **YES** |
 | Can Scott **invite additional clinic staff** via Staff Directory? | **YES** |
-| Can Scott **enrol the first real patient**? | **YES, SUBJECT TO** EXT-002 if Scott/legal require hosted Privacy/Terms before patient data; clinic consent process + CQ-in-app training |
+| Can Scott **enrol the first real patient**? | **NO** — blocked by **EXT-002** until privacy/legal launch pack is completed |
 
-**Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6**.
+**Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6** (after EXT-002).
 
 **AUTH-INVITE-REDIRECT:** **CLOSED — PROVEN IN REAL PRODUCTION** (Phase 6B fix + Phase 6B2 acceptance).
+
+**EXT-002 Privacy / Terms / patient privacy architecture:** **OPEN — BLOCKER BEFORE FIRST REAL PATIENT**  
+Reason: Privacy/legal framework being completed from verified production data-flow architecture (Phase 6C).
 
 ---
 
@@ -38,6 +43,7 @@ This document supersedes stale checklist wording where later production evidence
 - Password recovery 5J8A–C PASS
 - **LAUNCH-003** SMTP CLOSED (5J8A–C; reconfirmed by real invitation email delivery)
 - **AUTH-INVITE-REDIRECT** CLOSED — code remediations in 6B + real Staff Directory invitation accepted in production (6B2)
+- **Phase 6C** privacy/data-flow architecture audit PASS (factual map only; no legal drafting)
 - Sydney healthy; Mumbai rollback-only; media/notifications flags fail-closed
 
 ---
@@ -50,23 +56,24 @@ This document supersedes stale checklist wording where later production evidence
 | Phase 5M / 6A “next = LAUNCH-003” | Superseded |
 | Phase 6B “live invitation proof pending” | Completed in 6B2 |
 | Optional residual invite smoke after redirect fix | Satisfied by 6B2 real acceptance |
+| Prior EXT-002 wording as soft “if legal require” only | Superseded by Phase 6C: treated as **blocker before first real patient** |
 
 ---
 
 ## True remaining gates
 
-### 1. EXT-002 Privacy / Terms — OPEN — BEFORE FIRST REAL PATIENT (external/legal)
+### 1. EXT-002 Privacy / Terms / patient privacy architecture — OPEN — BLOCKER BEFORE FIRST REAL PATIENT
 
-**Current state:** documents do not exist. Software omits links unless https env URLs are set (LAUNCH-002 CLOSED).
+**Current state:** Phase 6C factual architecture complete. Hosted Privacy/Terms documents and legal pack **not yet drafted**. Software omits legal links unless https env URLs are set (LAUNCH-002 CLOSED).
 
 | Stage | Blocks? |
 |-------|---------|
 | Sales / demo | **NO** |
-| Clinic onboarding | **NO** (software) |
+| Clinic onboarding | **NO** |
 | Staff invitation | **NO** |
-| First real patient | **YES if** Scott/legal require hosted Privacy/Terms before processing patient data — **NO** as engineering P0 |
+| First real patient health information in SignalCare | **YES** |
 
-**Missing:** hosted Privacy Policy URL; hosted Terms of Use URL; recorded acceptance only if legal design requires it (current product does not enforce acceptance UI).
+**Missing for close:** counsel/founder privacy/legal launch pack (and any required hosted documents / operational processes) based on Phase 6C evidence — not further product engineering by default.
 
 ### 2. EXT-001 Formal external clinical sign-off (BL-012) — OPEN — PILOT TASK (not a software blocker)
 
@@ -82,7 +89,7 @@ Outside engineering. Not evidenced as a product software blocker. Resolve with c
 
 ## Deferred (not first-clinic blockers)
 
-Stripe production activation · patient media/MMS · external clinician notifications · Slack/Teams · native apps · advanced analytics · org-wide CQ/reports · dental/surgical expansion.
+Stripe production activation · patient media/MMS · external clinician notifications · Slack/Teams · native apps · advanced analytics · org-wide CQ/reports · dental/surgical expansion · enabling OpenAI semantic intent in ECS (requires legal review per Phase 6C).
 
 ---
 
@@ -91,27 +98,29 @@ Stripe production activation · patient media/MMS · external clinician notifica
 1. Sell and demo SignalCare.
 2. Provision real aesthetics clinics (runbook).
 3. Invite clinic staff via Staff Directory (production invitation flow proven).
-4. Enrol consented patients on Anti-Wrinkle **v6** and operate Command Queue in-app — subject to EXT-002 legal decision if required before patient data.
+4. **Do not** enrol the first real patient’s health information until EXT-002 privacy/legal pack is completed.
 5. Optionally deactivate the Phase 6B2 controlled test staff membership after evidence closeout (do not delete audit history).
 
 ---
 
 ## Single next action
 
-**Decide with counsel whether hosted Privacy Policy and Terms of Use are required before the first real patient data is processed (EXT-002). If yes, produce/host https documents and wire `NEXT_PUBLIC_PRIVACY_POLICY_URL` / `NEXT_PUBLIC_TERMS_OF_SERVICE_URL`. If no, proceed to first-clinic patient enrolment under the runbook.**
+**Use the verified Phase 6C architecture and current Australian legal requirements to prepare SignalCare’s privacy/legal launch pack.**
 
 ---
 
-## Production snapshot (6B2)
+## Production snapshot (6C)
 
 | Check | Result |
 |-------|--------|
 | API health | ok |
-| API version | `2852de2…` (docs tip; invite fix `f3e917f` on ECS `:219`) |
-| Web | HTTP 200 |
+| API build (ECS env) | `f1de2d9…` |
+| ECS task | `signalcare-api:221` |
+| Web | HTTP 200 (unchanged; docs-only phase) |
 | Sydney | `kfwfcgfirsdpqpiiemaq` |
 | Mumbai | untouched |
 | Flags | media/notifications `false` |
+| OpenAI in ECS task | **not injected** (secrets exist unmounted) |
 
 ---
 
