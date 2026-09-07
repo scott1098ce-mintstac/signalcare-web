@@ -1,0 +1,42 @@
+---
+description: Command Queue visual design is approved and locked — do not change CQ visuals without explicit approval
+globs: app/components/command-queue/**/*,app/components/design-system/queue/**/*,app/components/design-system/tokens/tokens.css,app/components/design-system/layout/SectionHeader.module.css,app/components/design-system/layout/Sidebar.*,app/components/design-system/layout/Header.module.css,app/components/design-system/controls/SCDropdown.module.css,app/components/design-system/controls/SCButton.*
+alwaysApply: false
+---
+
+# Command Queue — DESIGN LOCKED
+
+**Status:** APPROVED AND DESIGN LOCKED at web commit `c59fe0b`  
+**Evidence:** `docs/testing/command-queue-figma-precision-correction.json`  
+**Figma SOT:** file `Qf7mvTW8NZaRkmmd6qJdEG`, frames `241:20653` / `241:21324` / `259:3460` / `230:17052`
+
+## Forbidden without explicit founder approval
+
+Do **not** change Command Queue (or shared tokens/components that define its approved geometry) for:
+
+- visual design, spacing, typography, sizing, layout
+- responsive behaviour or component chrome
+- Figma precision measurements listed in the closeout evidence
+
+## Allowed without reopening the lock
+
+Only when required for:
+
+- functional behaviour / bug fixes
+- accessibility
+- production data integration
+
+Even then: **do not alter the approved visual design** unless the user explicitly approves a visual change.
+
+## Intentional production differences (preserve)
+
+- Procedure (not Ward)
+- SignalCare mark in sidebar; no hamburger
+- Protocols navigation / current routes
+- Clinically accurate all-clear copy
+- No duplicate immediate-action rows in Attention Required
+- Workspace split retained (Figma CQ is full-bleed)
+
+## Shared shell note
+
+Sidebar width `80px` and header `72px` are part of the locked CQ shell geometry. Do not regress them casually; Patient Workspace remains separately design-locked.

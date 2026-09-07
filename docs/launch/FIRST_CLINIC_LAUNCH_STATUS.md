@@ -90,9 +90,18 @@ Stripe production activation · patient media/MMS · external clinician notifica
 
 ---
 
+## Design locks (commercial UI)
+
+| Surface | Status | Evidence |
+|---------|--------|----------|
+| **Command Queue** | **APPROVED AND DESIGN LOCKED** at web `c59fe0b` | `docs/testing/command-queue-figma-precision-correction.json` — no further visual/spacing/typography/layout changes without explicit approval |
+| Patient Workspace | DESIGN LOCKED (prior) | Do not redesign |
+
 ## Single next action
 
-**Onboard the first paying clinic and enrol the first real patient under the runbook + Phase 6E controls (accept Terms first if the organisation has not).**
+**Commercial product expansion:** Protocol Library aesthetics pack — **Dermal Filler** next (API clinical pathway + global template + clinic adoption; Protocol Library UI already clone-ready). Do not reopen Command Queue visuals.
+
+**Operational parallel:** Onboard the first paying clinic and enrol the first real patient under the runbook + Phase 6E controls (accept Terms first if the organisation has not).
 
 ---
 
