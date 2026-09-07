@@ -1,0 +1,86 @@
+{
+  "phase": "6E",
+  "title": "Founder-approved legal/privacy launch implementation",
+  "timestamp_utc": "2026-09-07T03:50:00Z",
+  "verdict": "PASS",
+  "ext_002_status": "IMPLEMENTED — PENDING FINAL PRODUCTION CLOSURE AUDIT",
+  "migration": {
+    "file": "supabase-migrations/048_legal_privacy_launch_provenance.sql",
+    "project": "kfwfcgfirsdpqpiiemaq",
+    "applied": true,
+    "destructive": false,
+    "mumbai_touched": false
+  },
+  "document_versions": {
+    "privacy_policy": "2026-09-07.1",
+    "patient_privacy_notice": "2026-09-07.1",
+    "clinic_terms": "2026-09-07.1"
+  },
+  "public_routes": {
+    "privacy": "https://app.signalcare.io/privacy",
+    "patient_privacy": "https://app.signalcare.io/patient-privacy",
+    "terms": "https://app.signalcare.io/terms"
+  },
+  "consent_provenance": {
+    "enrolment_columns": [
+      "monitoring_consent_confirmed",
+      "consent_recorded_at",
+      "consent_recorded_by",
+      "privacy_notice_version",
+      "privacy_notice_provided_at",
+      "privacy_notice_source"
+    ],
+    "fail_closed": true,
+    "historical_backfill": false,
+    "audit_event": "enrolment_monitoring_consent_recorded"
+  },
+  "terms_acceptance": {
+    "scope": "organisation",
+    "who_can_accept": ["owner", "admin"],
+    "onboarding_required": true,
+    "settings_accept_api": "POST /app/organisation/terms/accept",
+    "enrolment_requires_current_terms": true
+  },
+  "patient_notice_delivery": {
+    "method": "first_outbound_sms_appendix",
+    "url": "https://app.signalcare.io/patient-privacy",
+    "subsequent_messages_polluted": false,
+    "live_sms_sent_during_phase": false
+  },
+  "tests": {
+    "api_unit": "scripts/test-phase-6e-legal-privacy.js PASS",
+    "web_static": "scripts/test-phase-6e-legal-pages.mjs PASS",
+    "workstream_d_patient_admin": "PASS",
+    "staff_invitation_links": "PASS",
+    "live_sms": false,
+    "patient_a_b_touched": false
+  },
+  "production_deployment": {
+    "api_build": "6fec5885d12a77a8626cdecdb195915a51df1710",
+    "ecs_task_definition": "signalcare-api:223",
+    "aws_region": "ap-southeast-2",
+    "web_project": "signalcare-web-3qwn",
+    "web_status": "pending_push_verify"
+  },
+  "flags": {
+    "PATIENT_MEDIA_ENABLED": false,
+    "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": false,
+    "external_ai_injected_in_ecs": false
+  },
+  "privacy_operations": {
+    "breach_plan": "docs/legal/DATA_BREACH_RESPONSE_PLAN.md",
+    "access_correction": "docs/legal/PRIVACY_ACCESS_CORRECTION_PROCEDURE.md",
+    "retention": "docs/legal/DATA_RETENTION_DELETION_STANDARD.md",
+    "subprocessor_register": "docs/legal/SUBPROCESSOR_VENDOR_REGISTER.md",
+    "privacy_contact": "hello@signalcare.io"
+  },
+  "corporate_details": {
+    "resolved": ["trading_name_SignalCare", "privacy_support_email_hello@signalcare.io", "governing_law_Queensland"],
+    "unresolved": ["contracting_entity_legal_name", "ABN_ACN", "registered_business_address"],
+    "public_presentation": "SignalCare trading/service name; no bracket placeholders on public pages"
+  },
+  "sydney": "kfwfcgfirsdpqpiiemaq",
+  "mumbai": "wpbyxrsiayspyweaqmwy",
+  "mumbai_untouched": true,
+  "single_next_action": "Run Phase 6F final read-only EXT-002 production closure audit."
+}

@@ -34,7 +34,18 @@ export function AuthSecurityFooter() {
   return (
     <div className={splitStyles.footer} data-name="Footer Disclaimer">
       <p className={splitStyles.footerLine}>
-        <span className={splitStyles.footerSecurity}>Protected by enterprise-grade security.</span>
+        <span className={splitStyles.footerSecurity}>Protected by enterprise-grade security.</span>{' '}
+        <a className={splitStyles.footerSecurity} href="/privacy">
+          Privacy
+        </a>
+        {' · '}
+        <a className={splitStyles.footerSecurity} href="/patient-privacy">
+          Patient Privacy
+        </a>
+        {' · '}
+        <a className={splitStyles.footerSecurity} href="/terms">
+          Terms
+        </a>
       </p>
     </div>
   );

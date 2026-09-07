@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { appApiFetch } from '../../lib/api';
 import { normalizeAuMobileInput } from '../../lib/command-queue';
+import { CURRENT_PATIENT_PRIVACY_NOTICE_VERSION } from '../../lib/legal-document-registry';
 import { Alert, Button, Checkbox, FieldLabel, Input, Modal, Select } from '../ui';
 
 type ProtocolOption = {
@@ -107,7 +108,9 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
     }
 
     if (!smsConsentRecorded) {
-      setError('Record SMS monitoring consent before starting monitoring. Check-ins are not sent unless consent is consented.');
+      setError(
+        'Confirm patient monitoring consent and privacy notice access before starting monitoring.',
+      );
       return;
     }
 
@@ -166,6 +169,10 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
           patient_id: patientId,
           protocol_id: protocolId,
           started_at: startedAt,
+          patient_monitoring_consent_and_notice: true,
+          monitoring_consent_confirmed: true,
+          privacy_notice_acknowledged: true,
+          privacy_notice_version: CURRENT_PATIENT_PRIVACY_NOTICE_VERSION,
         },
       });
       const enrJson = await enrRes.json();
@@ -184,6 +191,20 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
           setError(
             'SMS monitoring consent is not recorded. Check-ins are not sent unless consent is consented.',
           );
+          return;
+        }
+        if (enrRes.status === 403 && enrJson.error === 'organisation_terms_required') {
+          setError(
+            'Your organisation must accept the current SignalCare Terms before starting patient monitoring. An organisation owner or admin can accept Terms in Organisation settings.',
+          );
+          return;
+        }
+        if (enrRes.status === 422 && enrJson.error === 'monitoring_consent_confirmation_required') {
+          setError('Confirm patient monitoring consent before starting monitoring.');
+          return;
+        }
+        if (enrRes.status === 422 && enrJson.error === 'privacy_notice_acknowledgement_required') {
+          setError('Confirm the patient was given access to the Patient Privacy Notice.');
           return;
         }
         if (enrRes.status === 400 && enrJson.error === 'patient_archived') {
@@ -338,17 +359,25 @@ export function EnrollPatientModal({ open, onClose, onSuccess }: EnrollPatientMo
 
         <div>
           <h3 className="mb-3 text-[length:var(--sc-text-sm)] font-semibold uppercase tracking-wide text-[var(--sc-text-secondary)]">
-            SMS monitoring consent
+            Patient monitoring consent
           </h3>
           <Checkbox
             id="enroll-sms-consent"
             checked={smsConsentRecorded}
             onChange={(e) => setSmsConsentRecorded(e.target.checked)}
-            label="I confirm SMS monitoring consent is recorded for this patient."
+            label="The patient has agreed to participate in SignalCare monitoring and has been provided with the SignalCare Patient Privacy & Monitoring Notice."
           />
           <p className="mt-2 text-[length:var(--sc-text-xs)] text-[var(--sc-text-secondary)]">
-            Check-ins are not sent unless consent is consented and the patient is not opted out.
-            Monitoring cannot start until this is confirmed.
+            This confirms monitoring participation and notice access. It is not clinical treatment consent.{' '}
+            <a
+              href="/patient-privacy"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[var(--sc-brand)] underline"
+            >
+              View notice
+            </a>
+            . Check-ins are not sent unless consent is recorded and the patient is not opted out.
           </p>
         </div>
 

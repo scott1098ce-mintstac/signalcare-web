@@ -22,12 +22,14 @@ export type ClinicDetailsScreenProps = {
   timezone?: string;
   contactName?: string;
   contactPhone?: string;
+  termsAccepted?: boolean;
   error?: string | null;
   loading?: boolean;
   onClinicNameChange?: (value: string) => void;
   onTimezoneChange?: (value: string) => void;
   onContactNameChange?: (value: string) => void;
   onContactPhoneChange?: (value: string) => void;
+  onTermsAcceptedChange?: (value: boolean) => void;
   onSubmit?: () => void | Promise<void>;
 };
 
@@ -38,12 +40,14 @@ export function ClinicDetailsScreen({
   timezone = '',
   contactName = '',
   contactPhone = '',
+  termsAccepted = false,
   error = null,
   loading = false,
   onClinicNameChange,
   onTimezoneChange,
   onContactNameChange,
   onContactPhoneChange,
+  onTermsAcceptedChange,
   onSubmit,
 }: ClinicDetailsScreenProps) {
   const [localTimezone, setLocalTimezone] = useState(timezone);
@@ -174,6 +178,30 @@ export function ClinicDetailsScreen({
                 />
               </div>
             </div>
+
+            {!readOnly ? (
+              <div className={onboardingStyles.field} style={{ marginTop: 8 }}>
+                <label className={onboardingStyles.fieldLabel} htmlFor="terms-accepted" style={{ textTransform: 'none' }}>
+                  <input
+                    id="terms-accepted"
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => onTermsAcceptedChange?.(e.target.checked)}
+                    required
+                    style={{ marginRight: 8 }}
+                  />
+                  I agree to the{' '}
+                  <a href="/terms" target="_blank" rel="noreferrer">
+                    SignalCare Clinic Terms
+                  </a>{' '}
+                  and{' '}
+                  <a href="/privacy" target="_blank" rel="noreferrer">
+                    Privacy Policy
+                  </a>{' '}
+                  on behalf of this organisation.
+                </label>
+              </div>
+            ) : null}
 
             {error ? (
               <p className={onboardingStyles.error} role="alert">

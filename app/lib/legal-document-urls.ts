@@ -1,3 +1,8 @@
+/**
+ * First-party public legal document URLs.
+ * Prefer stable app.signalcare.io routes over optional external env overrides.
+ */
+
 function isHttpsUrl(value: string | undefined | null): value is string {
   const raw = String(value || '').trim();
   if (!raw) return false;
@@ -9,17 +14,24 @@ function isHttpsUrl(value: string | undefined | null): value is string {
   }
 }
 
+const DEFAULT_PRIVACY = '/privacy';
+const DEFAULT_PATIENT_PRIVACY = '/patient-privacy';
+const DEFAULT_TERMS = '/terms';
+
 /**
- * Optional production legal document URLs.
- * Absent or non-https values must not render dead # links.
+ * Public legal links for auth footers and product chrome.
+ * Env overrides allowed only when https (hosted external docs).
  */
 export function getLegalDocumentUrls() {
   return {
     privacyPolicyUrl: isHttpsUrl(process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL)
       ? process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL.trim()
-      : null,
+      : DEFAULT_PRIVACY,
+    patientPrivacyUrl: isHttpsUrl(process.env.NEXT_PUBLIC_PATIENT_PRIVACY_URL)
+      ? process.env.NEXT_PUBLIC_PATIENT_PRIVACY_URL.trim()
+      : DEFAULT_PATIENT_PRIVACY,
     termsOfServiceUrl: isHttpsUrl(process.env.NEXT_PUBLIC_TERMS_OF_SERVICE_URL)
       ? process.env.NEXT_PUBLIC_TERMS_OF_SERVICE_URL.trim()
-      : null,
+      : DEFAULT_TERMS,
   };
 }

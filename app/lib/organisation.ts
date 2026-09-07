@@ -157,3 +157,29 @@ export async function fetchAccessibleClinics(accessToken?: string): Promise<
   if (!res.ok) return { ok: false, error: String(json.error || 'my_clinics_failed') };
   return { ok: true, clinics: Array.isArray(json.clinics) ? json.clinics : [] };
 }
+
+export async function fetchOrganisationTerms() {
+  const res = await appApiFetch('/app/organisation/terms');
+  const json = await readJson(res);
+  if (!res.ok) return { ok: false as const, error: String(json.error || 'terms_failed'), status: res.status };
+  return {
+    ok: true as const,
+    accepted: json.accepted === true,
+    acceptance: json.acceptance || null,
+    current_terms: json.current_terms || null,
+  };
+}
+
+export async function acceptOrganisationTerms(termsVersion: string) {
+  const res = await appApiFetch('/app/organisation/terms/accept', {
+    method: 'POST',
+    body: {
+      terms_accepted: true,
+      terms_version: termsVersion,
+      acceptance_source: 'settings',
+    },
+  });
+  const json = await readJson(res);
+  if (!res.ok) return { ok: false as const, error: String(json.error || 'terms_accept_failed'), status: res.status };
+  return { ok: true as const, acceptance: json.acceptance };
+}
