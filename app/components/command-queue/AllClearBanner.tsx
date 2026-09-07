@@ -1,16 +1,16 @@
 import styles from './command-queue.module.css';
 
-/** Contained Figma-style all-clear — attention empty, monitoring continues. */
+/** Figma 267:2545 geometry; production clinical copy (not Figma “Have a great shift!”). */
 export function AllClearBanner() {
   return (
     <div className={styles.allClear} role="status">
       <div className={styles.allClearIcon} aria-hidden>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <circle cx="10" cy="10" r="10" fill="currentColor" opacity="0.18" />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="currentColor" opacity="0.18" />
           <path
-            d="M5.5 10.2L8.4 13.1L14.5 7"
+            d="M6.5 12.2L9.8 15.5L17.5 7.8"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />

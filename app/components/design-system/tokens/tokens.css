@@ -44,6 +44,7 @@
   --ds-alert-warning-text: #a05e00;
 
   /* ——— Colour / alert success ——— */
+  --ds-alert-success-icon: #00bc7d;
   --ds-alert-success-border: #00bc7d;
   --ds-alert-success-bg: #e6faf4;
   --ds-alert-success-text: #00774d;
@@ -128,35 +129,39 @@
   --ds-card-padding: 24px;
   --ds-timeline-step-size: 24px;
 
-  /* ——— Layout / queue ——— */
+  /* ——— Layout / queue ——— Figma 267:3047 / 267:2610 / 267:2579 / 284:6683 / 284:6805 */
   --ds-queue-filter-bar-height: 76px;
   --ds-queue-filter-control-height: 52px;
   --ds-queue-search-width: 452px;
-  --ds-queue-dropdown-width: 160px;
+  --ds-queue-dropdown-width: 183px;
   --ds-queue-filter-gap: 12px;
   --ds-queue-filter-padding-x: 24px;
   --ds-queue-filter-padding-y: 12px;
   --ds-queue-clear-all-right: 30px;
   --ds-queue-clear-all-height: 38px;
-  --ds-queue-section-header-height: 44px;
-  --ds-queue-section-header-padding-x: 24px;
-  --ds-queue-section-header-padding-y: 14px;
+  --ds-queue-section-header-height: 40px;
+  --ds-queue-section-header-padding-x: 16px;
+  --ds-queue-section-header-padding-y: 12px;
   --ds-queue-severity-bar-width: 8px;
-  --ds-queue-row-padding-y: 12px;
-  --ds-queue-row-padding-y-simple: 18px;
+  --ds-queue-row-padding-y: 8px;
+  --ds-queue-row-padding-y-simple: 15px;
   --ds-queue-row-padding-left: 24px;
   --ds-queue-row-padding-right: 32px;
-  --ds-queue-row-height: 56px;
-  --ds-queue-row-height-expanded: 64px;
+  --ds-queue-row-height: 48px;
+  --ds-queue-row-height-expanded: 51px;
+  --ds-queue-row-height-immediate: 54px;
   --ds-queue-row-details-gap: 24px;
   --ds-queue-row-leading-gap: 12px;
   --ds-queue-row-meta-gap: 8px;
 
-  /* ——— Layout / split pane ——— */
-  /* Figma 241:20678 content 1432px; filter block 816px → 816/1432 = 57.04% */
-  --ds-split-queue-min-width: 816px;
+  /* ——— Layout / split pane ———
+   * Figma CQ is full-bleed 1432px (no workspace). Production keeps the workspace
+   * split, so the queue pane must be wide enough for 4×183 filters + Clear All
+   * (~903px) without shrinking Figma control geometry.
+   */
+  --ds-split-queue-min-width: 920px;
   --ds-split-queue-max-width: 9999px;
-  --ds-split-queue-width-percent: 57.04%;
+  --ds-split-queue-width-percent: 64%;
 
   /* ——— Layout / table ——— */
   /* Figma 323:7447 Table Toolbar, 323:7823 Table/Staff */

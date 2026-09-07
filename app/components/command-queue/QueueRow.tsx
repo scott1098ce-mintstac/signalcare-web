@@ -165,6 +165,7 @@ export function QueueRow({
       scoreLabel={showScore ? 'Score:' : undefined}
       scoreValue={showScore ? formatRiskScore(row.latest_score) : undefined}
       scoreDanger={scoreIsDanger(row, variant)}
+      immediate={urgentPrimaryAction}
       assigneeInfo={
         assignee && (variant === 'assigned' || variant === 'review')
           ? { name: assignee, time: assigneeTime }

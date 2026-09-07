@@ -35,6 +35,8 @@ export type SCQueueRowProps = {
   actions?: ReactNode;
   onClick?: () => void;
   className?: string;
+  /** Figma overloaded immediate strip rows are 54px (374:8581). */
+  immediate?: boolean;
   'data-name'?: string;
 };
 
@@ -63,6 +65,7 @@ export function SCQueueRow({
   actions,
   onClick,
   className,
+  immediate = false,
   'data-name': dataName = 'Alert',
 }: SCQueueRowProps) {
   const interactive = Boolean(onClick);
@@ -160,6 +163,7 @@ export function SCQueueRow({
           styles.row,
           styles.rowInteractive,
           (variant === 'assigned' || variant === 'review') && styles.rowExpanded,
+          immediate && styles.rowImmediate,
           className,
         )}
         data-name={dataName}
@@ -181,6 +185,7 @@ export function SCQueueRow({
       className={cn(
         styles.row,
         (variant === 'assigned' || variant === 'review') && styles.rowExpanded,
+        immediate && styles.rowImmediate,
         className,
       )}
       data-name={dataName}

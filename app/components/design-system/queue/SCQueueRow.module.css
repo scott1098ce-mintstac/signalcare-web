@@ -18,6 +18,16 @@
   max-height: var(--ds-queue-row-height-expanded);
 }
 
+.rowImmediate {
+  height: var(--ds-queue-row-height-immediate);
+  max-height: var(--ds-queue-row-height-immediate);
+}
+
+.rowImmediate .content,
+.rowImmediate .contentDangerColored {
+  min-height: var(--ds-queue-row-height-immediate);
+}
+
 .rowInteractive {
   cursor: pointer;
 }

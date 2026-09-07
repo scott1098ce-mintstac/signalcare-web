@@ -1,6 +1,5 @@
 /**
- * Command Queue pane layout — filter bar shell and panel chrome only.
- * Measurements: Figma 267:3047 (76px header), 267:2610 (filter group), 267:3049 (Clear All).
+ * Command Queue pane — Figma 267:3047 / 267:2610 / 267:2545.
  */
 @import '../design-system/tokens/tokens.css';
 
@@ -17,10 +16,10 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--ds-queue-filter-gap);
   width: 100%;
+  height: var(--ds-queue-filter-bar-height);
   min-height: var(--ds-queue-filter-bar-height);
-  height: auto;
   background: var(--ds-surface-base);
   box-sizing: border-box;
   padding-right: var(--ds-queue-filter-padding-x);
@@ -28,9 +27,9 @@
 
 .filterControls {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--ds-queue-filter-gap);
   padding: var(--ds-queue-filter-padding-y) 0 var(--ds-queue-filter-padding-y)
     var(--ds-queue-filter-padding-x);
@@ -38,8 +37,14 @@
   min-width: 0;
 }
 
+.filterControls > * {
+  flex-shrink: 0;
+}
+
 .filterClearButton {
   flex: 0 0 auto;
+  width: 87px;
+  height: var(--ds-queue-clear-all-height);
   margin-right: 0;
 }
 
@@ -73,7 +78,8 @@
 .immediateSection {
   display: flex;
   flex-direction: column;
-  margin-bottom: 4px;
+  flex-shrink: 0;
+  background: var(--ds-alert-danger-bg);
   border-bottom: 1px solid var(--ds-alert-danger-border);
 }
 
@@ -81,6 +87,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding: 8px 22px 12px;
+  box-sizing: border-box;
   background: var(--ds-alert-danger-bg);
 }
 
@@ -103,44 +111,50 @@
   color: var(--ds-text-secondary);
 }
 
+/* Figma 267:2545 Alert Content inside All-clear 241:21324 — geometry only; production copy retained */
 .allClear {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin: 8px 24px 12px;
-  padding: 16px 18px;
-  border: 1px solid var(--ds-alert-success-border);
-  border-radius: 10px;
+  align-items: center;
+  gap: 12px;
+  margin: 36px 24px;
+  padding: 12px 20px;
+  border: none;
+  border-left: 4px solid var(--ds-alert-success-icon);
+  border-radius: 12px;
   background: var(--ds-alert-success-bg);
   box-sizing: border-box;
+  min-height: 68px;
 }
 
 .allClearIcon {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  color: var(--ds-alert-success-text);
-  margin-top: 1px;
+  width: 24px;
+  height: 24px;
+  color: var(--ds-alert-success-icon);
 }
 
 .allClearCopy {
   min-width: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .allClearTitle {
-  margin: 0 0 4px;
+  margin: 0;
   font-family: var(--ds-font-family);
   font-size: var(--ds-font-size-heading-2);
   font-weight: var(--ds-font-weight-semibold);
-  line-height: var(--ds-line-height-row);
+  line-height: 1.5;
   color: var(--ds-alert-success-text);
 }
 
 .allClearBody {
   margin: 0;
   font-family: var(--ds-font-family);
-  font-size: var(--ds-font-size-body);
-  line-height: var(--ds-line-height-body);
-  color: var(--ds-alert-success-text);
+  font-size: var(--ds-font-size-heading-3);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 1.4;
+  color: var(--ds-alert-success-icon);
 }

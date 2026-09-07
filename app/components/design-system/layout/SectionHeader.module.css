@@ -1,12 +1,14 @@
 @import '../tokens/tokens.css';
 
+/* Figma 267:2555 List Header — 40×1432, px 16 py 12, surface/subtle */
 .header {
   display: flex;
   align-items: center;
+  height: var(--ds-queue-section-header-height);
   min-height: var(--ds-queue-section-header-height);
   padding: var(--ds-queue-section-header-padding-y) var(--ds-queue-section-header-padding-x);
   border-bottom: 1px solid var(--ds-border-subtle);
-  background: var(--ds-surface-base);
+  background: var(--ds-surface-subtle);
   box-sizing: border-box;
 }
 
@@ -16,7 +18,7 @@
   font-size: var(--ds-font-size-body-sm);
   font-weight: var(--ds-font-weight-semibold);
   line-height: 16px;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--ds-tracking-label);
   text-transform: uppercase;
-  color: var(--ds-text-secondary);
+  color: var(--ds-text-primary);
 }
