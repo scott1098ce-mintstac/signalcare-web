@@ -1,0 +1,120 @@
+{
+  "phase": "CQ-COMMERCIAL-UI-CLOSEOUT",
+  "title": "Command Queue commercial UI closeout — Figma restoration + shell branding",
+  "executed_at_utc": "2026-09-07T05:00:00Z",
+  "verdict": "PASS",
+  "mode": "INSPECT → IMPLEMENT → TEST → FIX → RETEST → DEPLOY → VERIFY → VISUAL QA → DOCUMENT → CLOSE OUT",
+  "absolute_stops_honoured": {
+    "backend_architecture_rebuilt": false,
+    "unrelated_pages_redesigned": false,
+    "clinical_semantics_changed": false,
+    "monitoring_precedence_changed": false,
+    "review_suppression_changed": false,
+    "journey_lifecycle_changed": false,
+    "attention_required_semantics_changed": false,
+    "risk_classification_changed": false,
+    "ward_terminology_restored": false,
+    "fake_figma_patients_seeded": false,
+    "sms_sent": false,
+    "schedules_accelerated": false,
+    "mumbai_writes": false,
+    "patient_workspace_redesigned": false,
+    "invented_logo": false,
+    "sidebar_collapse_feature_built": false
+  },
+  "files_changed": [
+    "app/components/design-system/layout/Sidebar.tsx",
+    "app/components/design-system/layout/Sidebar.module.css",
+    "app/components/design-system/layout/SectionHeader.module.css",
+    "app/components/design-system/tokens/tokens.css",
+    "app/components/design-system/queue/SCQueueRow.module.css",
+    "app/components/design-system/queue/SCOverloadBanner.module.css",
+    "app/components/command-queue/AllClearBanner.tsx",
+    "app/components/command-queue/CommandQueuePanel.tsx",
+    "app/components/command-queue/ImmediateActionPanel.tsx",
+    "app/components/command-queue/QueueRow.tsx",
+    "app/components/command-queue/command-queue.module.css",
+    "public/images/ao/signalcare-mark-white.png",
+    "public/images/ao/signalcare-mark-color.png",
+    "visual-lock/baselines/** (28 locked screenshots updated with founder approval token)",
+    "scripts/test-command-queue-commercial-ui.mjs",
+    "scripts/capture-cq-commercial-ui-evidence.mjs"
+  ],
+  "shell": {
+    "branding": "Approved SignalCare mark extracted from official white wordmark → public/images/ao/signalcare-mark-white.png; persistent top-of-sidebar home link",
+    "hamburger_removed": true,
+    "sidebar_width_changed": false,
+    "affected_surfaces_regression_checked": [
+      "Command Queue",
+      "Patients",
+      "Protocols",
+      "Reports",
+      "Settings",
+      "Patient Workspace (shell only)"
+    ]
+  },
+  "command_queue_ui": {
+    "figma_sot": "Restored denser-but-breathable Figma hierarchy: section headers, row heights 56/64, padding, review vs danger distinction",
+    "terminology": "Procedure retained (not Ward)",
+    "filters": ["Procedure", "Risk Level", "Status", "Assigned to", "Clear All"],
+    "filter_fix": "Clear All was clipped by 183px×4 dropdowns in split pane; dropdown width 160px + flex wrap keeps Clear All visible",
+    "attention_hierarchy": {
+      "alert_open": "danger tint + severity bar + danger icon + Acknowledge",
+      "alert_acknowledged": "assigned treatment + Resolve",
+      "review_required": "white/neutral + IconAlertNeutral + Review (no severity bar; not conflated with risk)",
+      "awaiting_response": "muted simple rows",
+      "stable": "muted simple rows"
+    },
+    "all_clear": {
+      "trigger": "Attention Required count = 0 with enrolled recoveries still present",
+      "treatment": "Contained card (not full-bleed strip)",
+      "copy": "All Clear! / No episodes currently require clinical attention. Monitoring continues for enrolled recoveries."
+    },
+    "immediate_action": {
+      "supported": true,
+      "semantics_unchanged": "isOverloadedView: ≥3 rows with v2_status === alert_open",
+      "dedupe": "Immediate rows excluded from Attention Required list to avoid duplicate clinician work",
+      "faked_severity_model": false
+    }
+  },
+  "clinical_logic_regression": {
+    "journey_vs_clinician_work_independent": "unchanged — UI only",
+    "review_required_precedence": "unchanged — UI only",
+    "overload_threshold": "unchanged (≥3 alert_open)",
+    "actions": "Acknowledge / Review / Resolve semantics unchanged"
+  },
+  "tests": {
+    "assert_public_images": "PASS",
+    "focused_script": "node --experimental-strip-types scripts/test-command-queue-commercial-ui.mjs → PASS (overload, dedupe, all-clear grouping)",
+    "visual_lock": "PASS (28 locked screenshots) after UPDATE_VISUAL_LOCK_BASELINES=1 with SIGNALCARE_FOUNDER_BASELINE_APPROVAL",
+    "dom_smoke": {
+      "clear_all_visible": true,
+      "signalcare_mark_visible": true,
+      "hamburger_count": 0,
+      "procedure_filter_visible": true
+    }
+  },
+  "visual_qa": {
+    "evidence_dir": ".presentation-qa/cq-commercial-ui/",
+    "captures": [
+      "populated-1440.png",
+      "empty-1440.png",
+      "all-clear-1440.png",
+      "overload-1440.png",
+      "patients-1440.png",
+      "settings-1440.png"
+    ],
+    "vs_figma": "Substantially matches approved CQ visual system (hierarchy, danger/review/simple distinction, shell branding, contained all-clear, immediate-action strip). Production Procedure terminology retained. Not a blind pixel copy where production IA differs (Protocols nav, Procedure vs Ward).",
+    "vs_prior_compressed_production": "No longer matches compressed table-like production; density/spacing restored toward Figma"
+  },
+  "deployment": {
+    "web_project": "signalcare-web-3qwn",
+    "production_host": "https://app.signalcare.io",
+    "note": "Filled after push/deploy verification"
+  },
+  "remaining_limitations": [
+    "Visual-lock populated fixture intentionally avoids overload (≥3 open alerts) so normal Attention hierarchy stays locked separately from ?mode=overload",
+    "All-clear visual-lock mode is evidence-captured but not a separate locked baseline surface",
+    "Official mark is a cropped badge from the approved wordmark; full wordmark does not fit the compact 80px rail"
+  ]
+}

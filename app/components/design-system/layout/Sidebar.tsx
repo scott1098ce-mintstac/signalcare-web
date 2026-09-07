@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { IconMenu } from '../icons';
 import { cn } from '../../../lib/cn';
 import styles from './Sidebar.module.css';
 
@@ -33,15 +32,21 @@ function NavItem({ item }: { item: SidebarNavItem }) {
   );
 }
 
-/** Figma 241:20677 — Navbar / Sidebar. */
+/** Application rail — SignalCare mark + primary/secondary nav (no non-functional hamburger). */
 export function Sidebar({ primaryNav, secondaryNav = [], className }: SidebarProps) {
   return (
     <aside className={cn(styles.sidebar, className)} aria-label="Main navigation">
       <div className={styles.top}>
-        <div className={styles.menuWrap}>
-          <button type="button" className={styles.menuButton} aria-label="Menu">
-            <IconMenu className={styles.menuIcon} />
-          </button>
+        <div className={styles.brandWrap}>
+          <Link href="/" className={styles.brandLink} aria-label="SignalCare home">
+            <img
+              className={styles.brandMark}
+              src="/images/ao/signalcare-mark-white.png"
+              alt=""
+              width={36}
+              height={36}
+            />
+          </Link>
         </div>
         <hr className={styles.divider} />
         <nav className={styles.navList} aria-label="Primary">

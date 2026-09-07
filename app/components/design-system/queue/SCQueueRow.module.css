@@ -83,8 +83,8 @@
 }
 
 .contentReview {
-  background: var(--ds-alert-warning-bg);
-  border-bottom-color: var(--ds-alert-warning-icon);
+  background: var(--ds-surface-base);
+  border-bottom-color: var(--ds-border-subtle);
   padding: var(--ds-queue-row-padding-y) var(--ds-queue-row-padding-right)
     var(--ds-queue-row-padding-y) var(--ds-queue-row-padding-left);
   min-height: var(--ds-queue-row-height-expanded);
@@ -130,8 +130,8 @@
 }
 
 .iconWrapNeutral {
-  background: var(--ds-alert-warning-bg);
-  color: var(--ds-alert-warning-icon);
+  background: var(--ds-surface-muted);
+  color: var(--ds-text-secondary);
 }
 
 .icon {

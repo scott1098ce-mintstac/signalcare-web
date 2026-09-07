@@ -39,6 +39,12 @@ export function CommandQueuePanel({
   onEnroll,
   canEnrol = true,
 }: CommandQueuePanelProps) {
+  const attentionRows = showOverloaded
+    ? groups.needsAttention.filter(
+        (row) => !immediateRows.some((item) => item.enrolment_id === row.enrolment_id),
+      )
+    : groups.needsAttention;
+
   return (
     <div className={styles.panel}>
       {!isEmpty && !loading && !error ? (
@@ -81,8 +87,8 @@ export function CommandQueuePanel({
             <QueueSection
               title="Attention required"
               titleNodeId="267:2565"
-              count={groups.needsAttention.length}
-              rows={groups.needsAttention}
+              count={attentionRows.length}
+              rows={attentionRows}
               selectedEnrolmentId={selectedEnrolmentId}
               currentUserId={currentUserId}
               onSelect={onSelectEpisode}

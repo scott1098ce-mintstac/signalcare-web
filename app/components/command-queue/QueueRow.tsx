@@ -14,6 +14,7 @@ import {
 } from '../design-system';
 import {
   IconAlertDanger,
+  IconAlertNeutral,
   IconAlertWarning,
 } from '../design-system/icons';
 
@@ -68,7 +69,7 @@ function scoreIsDanger(row: MonitoringRow, variant: SCQueueRowVariant): boolean 
 function iconForRow(row: MonitoringRow, variant: SCQueueRowVariant) {
   if (variant === 'simple') return null;
   if (variant === 'review') {
-    return { icon: <IconAlertWarning />, tone: 'warning' as const };
+    return { icon: <IconAlertNeutral />, tone: 'neutral' as const };
   }
   if (variant === 'assigned' && row.risk_level === 'medium') {
     return { icon: <IconAlertWarning />, tone: 'warning' as const };
@@ -77,7 +78,7 @@ function iconForRow(row: MonitoringRow, variant: SCQueueRowVariant) {
 }
 
 function severityToneForRow(row: MonitoringRow, variant: SCQueueRowVariant): 'danger' | 'warning' | 'success' | 'neutral' {
-  if (variant === 'review') return 'warning';
+  if (variant === 'review') return 'neutral';
   if (variant === 'assigned' && row.risk_level === 'medium') return 'warning';
   if (variant === 'dangerColored' || variant === 'assigned') return 'danger';
   return 'neutral';
@@ -104,7 +105,7 @@ export function QueueRow({
   const showScore =
     variant === 'dangerColored' || variant === 'assigned' || variant === 'review';
   const showBar =
-    variant === 'dangerColored' || variant === 'assigned' || variant === 'review';
+    variant === 'dangerColored' || variant === 'assigned';
   const assignee = row.acknowledged_by?.trim();
   const assigneeTime = formatAssigneeTime(row.acknowledged_at);
   const iconSpec = iconForRow(row, variant);
