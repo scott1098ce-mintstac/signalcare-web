@@ -1,0 +1,30 @@
+{
+  "phase": "5M",
+  "title": "Anti-Wrinkle v6 clinic adoption + pathway closeout",
+  "executed_at_utc": "2026-09-07T00:22:00Z",
+  "verdict": "PASS",
+  "web_code_change": false,
+  "note": "Adoption executed against Sydney production via existing protocol archive+clone APIs in signalcare-api. Web unchanged.",
+  "clinic_v6": {
+    "protocol_id": "7850273a-0fe8-4f04-b9ab-94b848c24a44",
+    "version_id": "2b903a34-a810-411d-9c94-8449db183681",
+    "source_global_version_id": "a1060606-0001-4000-8000-000000000001",
+    "pathway": "anti_wrinkle_cpd_v6"
+  },
+  "historical_clinic_v5": {
+    "protocol_id": "3bff4985-bc49-409e-b4e1-b885c34f6481",
+    "version_id": "6ec89fa8-9c0d-4ef0-af23-0364a1771764",
+    "archived": true,
+    "source_pin_unchanged": true
+  },
+  "patient_a_v5_untouched": true,
+  "patient_a_v4_untouched": true,
+  "patient_b_untouched": true,
+  "no_enrolment_created": true,
+  "no_sms_sent": true,
+  "artifacts_in_api": [
+    "docs/testing/phase-5m-anti-wrinkle-v6-clinic-adoption-closeout.json"
+  ],
+  "final_conclusion": "ANTI-WRINKLE PATHWAY: PRODUCTION READY FOR FUTURE ENROLMENTS ON V6",
+  "next_product_step": "LAUNCH-003 — prove staff invitation SMTP with one founder-controlled mailbox"
+}
