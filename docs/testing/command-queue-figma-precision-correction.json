@@ -1,6 +1,6 @@
 {
   "phase": "CQ-FIGMA-PRECISION-CORRECTION",
-  "title": "Command Queue Figma precision correction — exact MCP geometry",
+  "title": "Command Queue Figma precision correction \u2014 exact MCP geometry",
   "executed_at_utc": "2026-09-07T05:45:00Z",
   "verdict": "PASS",
   "figma": {
@@ -8,20 +8,32 @@
     "fileKey": "Qf7mvTW8NZaRkmmd6qJdEG",
     "section": "230:17051",
     "frames": {
-      "Command Queue View": { "id": "241:20653", "size": "1512×900" },
-      "Command Queue View/All-clear": { "id": "241:21324", "size": "1512×900" },
-      "Command Queue View/Overloaded": { "id": "259:3460", "size": "1512×900" },
-      "Command Queue Default View": { "id": "230:17052", "size": "1512×900" }
+      "Command Queue View": {
+        "id": "241:20653",
+        "size": "1512\u00d7900"
+      },
+      "Command Queue View/All-clear": {
+        "id": "241:21324",
+        "size": "1512\u00d7900"
+      },
+      "Command Queue View/Overloaded": {
+        "id": "259:3460",
+        "size": "1512\u00d7900"
+      },
+      "Command Queue Default View": {
+        "id": "230:17052",
+        "size": "1512\u00d7900"
+      }
     },
-    "source": "Authenticated Figma MCP get_metadata + get_design_context — not screenshots"
+    "source": "Authenticated Figma MCP get_metadata + get_design_context \u2014 not screenshots"
   },
   "reference_metrics": {
     "sidebar_width": 80,
     "header_height": 72,
     "title": "24px / 700 / lh 40 / #1a1a1a",
-    "filter_control": "183×52",
-    "filter_group": "816×76 gap 12 padding 24×12",
-    "filter_row": "1432×76",
+    "filter_control": "183\u00d752",
+    "filter_group": "816\u00d776 gap 12 padding 24\u00d712",
+    "filter_row": "1432\u00d776",
     "section_header": "40px / 12px 600 uppercase tracking 0.3 / #f9f9fb / border #dedde6",
     "standard_row": 48,
     "assigned_review_row": 51,
@@ -33,7 +45,7 @@
   },
   "production_constraints_documented": [
     "Figma CQ frames are full-bleed 1432px without workspace; production retains Patient Workspace split.",
-    "Queue pane min-width raised to 920px / 64% so 4×183 filters + Clear All fit without shrinking Figma control geometry.",
+    "Queue pane min-width raised to 920px / 64% so 4\u00d7183 filters + Clear All fit without shrinking Figma control geometry.",
     "Procedure retained (Figma label is Ward).",
     "All-clear geometry from 267:2545; production clinical copy retained (not 'Have a great shift!').",
     "SignalCare mark + no hamburger + Protocols nav retained."
@@ -75,6 +87,7 @@
   "deployment": {
     "web_project": "signalcare-web-3qwn",
     "production_host": "https://app.signalcare.io",
-    "note": "Filled after merge"
+    "git_sha": "c59fe0bf068747336b35afbe5c428a0c72a2ba50",
+    "pr": "https://github.com/scott1098ce-mintstac/signalcare-web/pull/3"
   }
 }
