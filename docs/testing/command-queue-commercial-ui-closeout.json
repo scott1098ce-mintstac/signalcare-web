@@ -110,11 +110,29 @@
   "deployment": {
     "web_project": "signalcare-web-3qwn",
     "production_host": "https://app.signalcare.io",
-    "note": "Filled after push/deploy verification"
+    "git_sha": "0d1e41c12d8c80c5aad51943b4773770a09bbdb8",
+    "pr": "https://github.com/scott1098ce-mintstac/signalcare-web/pull/1",
+    "vercel_status_signalcare-web-3qwn": "success",
+    "vercel_deployment_url": "https://vercel.com/scotts-projects-c36e8413/signalcare-web-3qwn/FmcF2UgdLVuwbe6oAeDSGrKfLqTh",
+    "public_asset_check": {
+      "url": "https://app.signalcare.io/images/ao/signalcare-mark-white.png",
+      "http_status": 200,
+      "content_type": "image/png"
+    }
+  },
+  "production_verification": {
+    "authenticated_browser_qa": "SKIPPED — local .patient-directory-e2e.json is signalcare.test (invalid on production auth); same limitation as UI-Q1 closeout",
+    "unauthenticated_checks": {
+      "app_host_200": true,
+      "signalcare_mark_asset_200": true,
+      "deploy_commit_on_main": "0d1e41c"
+    },
+    "founder_followup": "Sign in on app.signalcare.io and confirm: mark in sidebar, no hamburger, Procedure filters, Attention/Awaiting/Stable hierarchy, all-clear card when applicable, shell pages"
   },
   "remaining_limitations": [
     "Visual-lock populated fixture intentionally avoids overload (≥3 open alerts) so normal Attention hierarchy stays locked separately from ?mode=overload",
     "All-clear visual-lock mode is evidence-captured but not a separate locked baseline surface",
-    "Official mark is a cropped badge from the approved wordmark; full wordmark does not fit the compact 80px rail"
+    "Official mark is a cropped badge from the approved wordmark; full wordmark does not fit the compact 80px rail",
+    "Authenticated production screenshot pass requires founder/production clinic credentials not present in this agent environment"
   ]
 }
