@@ -1,0 +1,182 @@
+{
+  "phase": "6B2",
+  "title": "Real staff invitation proof + AUTH-INVITE-REDIRECT closeout",
+  "executed_at_utc": "2026-09-07T02:45:00Z",
+  "verdict": "PASS",
+  "mode": "READ_ONLY_VERIFY_DOCUMENT_CLOSE",
+  "absolute_stops_honoured": {
+    "invitation_sent": false,
+    "email_sent": false,
+    "membership_changed": false,
+    "role_changed": false,
+    "account_revoked": false,
+    "password_changed": false,
+    "patient_created": false,
+    "enrolment_created": false,
+    "sms_sent": false,
+    "deployed": false,
+    "migration_applied": false,
+    "mumbai_touched": false
+  },
+  "real_invitation": {
+    "id": "9e0d1bc9-b9a1-44c3-935d-6c0e15a2b196",
+    "clinic_id": "f8d5b902-3c4e-5e6b-c7d8-9e0f1a2b3c4d",
+    "clinic_name": "Test Aesthetics Clinic",
+    "organisation_id": "e7c4a891-2f3b-4d5a-b6c7-8d9e0f1a2b3c",
+    "email_redacted": "sc***@mcacorp.com.au",
+    "email_hash16": "451cd407ab677b53",
+    "role": "staff",
+    "status": "accepted",
+    "invited_by": "0982141e-0531-4d41-a08d-0ac098014fb4",
+    "invited_at": "2026-09-07T02:37:47.646Z",
+    "last_sent_at": "2026-09-07T02:37:48.065Z",
+    "accepted_at": "2026-09-07T02:38:25.170Z",
+    "accepted_by": "bd5d24b5-8915-4220-a91c-b59d7e56b05b",
+    "auth_link_type": "invite",
+    "send_count": 1,
+    "unique_recent_accepted_for_clinic": true
+  },
+  "auth_identity": {
+    "uuid": "bd5d24b5-8915-4220-a91c-b59d7e56b05b",
+    "email_redacted": "sc***@mcacorp.com.au",
+    "email_hash16": "451cd407ab677b53",
+    "providers": ["email"],
+    "created_at": "2026-09-07T02:37:47.719055Z",
+    "invited_at": "2026-09-07T02:37:47.71407Z",
+    "email_confirmed_at": "2026-09-07T02:38:20.149839Z",
+    "last_sign_in_at": "2026-09-07T02:38:20.153572Z",
+    "is_founder_admin": false,
+    "differs_from_founder": true
+  },
+  "clinic_membership": {
+    "composite_key": "clinic_users(user_id, clinic_id)",
+    "user_id": "bd5d24b5-8915-4220-a91c-b59d7e56b05b",
+    "clinic_id": "f8d5b902-3c4e-5e6b-c7d8-9e0f1a2b3c4d",
+    "role": "staff",
+    "is_active": true,
+    "created_at": "2026-09-07T02:38:25.163Z",
+    "matches_invitation_role": true
+  },
+  "access_boundary": {
+    "intended": "clinic-scoped staff on Test Aesthetics only",
+    "clinic_membership_count": 1,
+    "other_clinic_memberships": 0,
+    "organisation_memberships": 0,
+    "owner_role": false,
+    "billing_role": false,
+    "admin_role": false,
+    "privilege_escalation": false,
+    "architecture_note": "No organisation_users row — clinical access is clinic-scoped only"
+  },
+  "acceptance_proof": {
+    "invitation_status": "accepted",
+    "accepted_at_present": true,
+    "not_pending": true,
+    "audit_created": {
+      "event_type": "staff_invitation_created",
+      "actor_user_id": "0982141e-0531-4d41-a08d-0ac098014fb4",
+      "at": "2026-09-07T02:37:48.142Z"
+    },
+    "audit_accepted": {
+      "event_type": "staff_invitation_accepted",
+      "actor_user_id": "bd5d24b5-8915-4220-a91c-b59d7e56b05b",
+      "new_role": "staff",
+      "at": "2026-09-07T02:38:25.242Z"
+    },
+    "not_mere_email_delivery": true
+  },
+  "redirect_proof": {
+    "phase_6b_code": "f3e917f — Auth redirectTo exactly https://app.signalcare.io/auth/callback; browser link token_hash + constrained next",
+    "auth_link_type_on_invitation": "invite",
+    "founder_browser_sequence": "email received → Continue → accept → password/account → Test Aesthetics access",
+    "backend_corroboration": "invitee Auth user created at invite time; email confirmed + signed in; membership created at accepted_at; audit staff_invitation_accepted",
+    "conclusion": "real production invitation chain corroborates Phase 6B remediation"
+  },
+  "security": {
+    "open_redirect": "none introduced — constrained next + allowlisted callback (6B tests)",
+    "localhost_redirect": "not used for successful Auth redirectTo (6B clean redirect proven; invitation auth_link_type=invite under post-fix code)",
+    "raw_tokens_in_evidence": false,
+    "wrong_user_binding": false,
+    "duplicate_membership": false,
+    "cross_clinic_access": false,
+    "privilege_escalation": false,
+    "attack_matrix_rerun": false
+  },
+  "founder_account": {
+    "uuid": "0982141e-0531-4d41-a08d-0ac098014fb4",
+    "clinic_role": "admin",
+    "organisation_role": "owner",
+    "unchanged": true,
+    "invited_this_proof": true
+  },
+  "smtp": {
+    "launch_003": "CLOSED — PROVEN",
+    "real_invitation_email_received": true,
+    "reopen_launch_003": false
+  },
+  "patient_clinical_impact": {
+    "patients_created_since_6b_deploy": 0,
+    "enrolments_created": 0,
+    "message_events": 0,
+    "patient_a_v5_active": true,
+    "patient_a_v4_completed": true,
+    "patient_b_active": true,
+    "aw_v6_protocol_intact": true
+  },
+  "production": {
+    "api_health": true,
+    "api_version_build": "2852de2addbf2e07955dd81a8097776e0229f417",
+    "invite_fix_build": "f3e917fffe6ab40fc8a8c0a241632279b59d3fbd",
+    "ecs": "signalcare-api:219",
+    "web_http": 200,
+    "sydney": "kfwfcgfirsdpqpiiemaq",
+    "mumbai": "wpbyxrsiayspyweaqmwy",
+    "mumbai_written": false,
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "launch_status_transition": {
+    "LAUNCH-003": "CLOSED — PROVEN",
+    "AUTH-INVITE-REDIRECT": {
+      "from": "OPEN — live proof pending",
+      "to": "CLOSED — PROVEN IN REAL PRODUCTION",
+      "evidence": [
+        "docs/testing/phase-6b-auth-invite-redirect-remediation.json",
+        "docs/testing/phase-6b2-real-staff-invitation-closeout.json"
+      ]
+    }
+  },
+  "test_account_cleanup": {
+    "executed": false,
+    "recommended": "deactivate (soft) the staff membership for bd5d24b5-… via Staff Directory when convenient; leave Auth user and audit rows intact; do not hard-delete",
+    "retain_if": "useful as ongoing founder test staff login"
+  },
+  "remaining_gates": [
+    {
+      "id": "EXT-002",
+      "title": "Hosted Privacy Policy / Terms",
+      "status": "OPEN — BEFORE FIRST REAL PATIENT (conditional on legal)",
+      "blocks_first_real_patient_if_legal_requires": true
+    },
+    {
+      "id": "EXT-001",
+      "title": "External clinical sign-off",
+      "status": "OPEN — PILOT TASK / not automatic veto under current governance"
+    },
+    {
+      "id": "EXT-003",
+      "title": "Regulatory / insurance / corporate",
+      "status": "OPEN — PILOT TASK / counsel"
+    }
+  ],
+  "can_scott_now": {
+    "sell_demo": true,
+    "onboard_clinic": true,
+    "invite_staff": true,
+    "enrol_first_real_patient": "YES_SUBJECT_TO_EXT002_IF_LEGAL_REQUIRES_HOSTED_DOCS"
+  },
+  "single_next_action": "Decide with counsel whether hosted Privacy Policy and Terms of Use are required before first real patient data (EXT-002). If yes, produce/host https docs and wire NEXT_PUBLIC_* URLs; if no, proceed to first-clinic patient enrolment under the runbook.",
+  "final_conclusion": "AUTH-INVITE-REDIRECT: CLOSED — PROVEN IN REAL PRODUCTION"
+}

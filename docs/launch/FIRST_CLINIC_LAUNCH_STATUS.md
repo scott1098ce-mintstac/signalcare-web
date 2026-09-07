@@ -1,10 +1,13 @@
 # First Clinic Launch Status
 
-**Authoritative source of truth as of Phase 6A**  
-**Reconciled:** 2026-09-07T00:34:27Z  
-**Evidence:** `docs/testing/phase-6a-first-clinic-launch-gate-reconciliation.json`
+**Authoritative source of truth**  
+**Updated:** 2026-09-07T02:45:00Z (Phase 6B2)  
+**Evidence:**  
+- `docs/testing/phase-6a-first-clinic-launch-gate-reconciliation.json`  
+- `docs/testing/phase-6b-auth-invite-redirect-remediation.json`  
+- `docs/testing/phase-6b2-real-staff-invitation-closeout.json`
 
-This document supersedes stale “OPEN” checklist wording where later production evidence proves otherwise. It does **not** reopen locked workstreams or Anti-Wrinkle pathway work.
+This document supersedes stale checklist wording where later production evidence proves otherwise. It does **not** reopen locked workstreams or Anti-Wrinkle pathway work.
 
 ---
 
@@ -13,11 +16,13 @@ This document supersedes stale “OPEN” checklist wording where later producti
 | Question | Answer |
 |----------|--------|
 | Can Scott start **selling / demoing**? | **YES** |
-| Can Scott **create / onboard a clinic account** (Scott as sole admin)? | **YES** (invite-only Supabase founder invite → create-password → `/auth/onboarding`) |
-| Can Scott **invite additional clinic staff** via Staff Directory? | **YES, SUBJECT TO** completing the Phase 6B controlled live invitation proof (code fixed/deployed; acceptance not yet proven) |
-| Can Scott **enrol the first real patient**? | **YES, SUBJECT TO** clinic/business gates below (consent process, CQ-in-app training, EXT-002/EXT-001 decisions if Scott requires them) — **not** blocked by software P0/P1 |
+| Can Scott **create / onboard a clinic account** (Scott as sole admin)? | **YES** |
+| Can Scott **invite additional clinic staff** via Staff Directory? | **YES** |
+| Can Scott **enrol the first real patient**? | **YES, SUBJECT TO** EXT-002 if Scott/legal require hosted Privacy/Terms before patient data; clinic consent process + CQ-in-app training |
 
-**Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6**. Do not reopen.
+**Anti-Wrinkle pathway:** CLOSED — production ready for future enrolments on **v6**.
+
+**AUTH-INVITE-REDIRECT:** **CLOSED — PROVEN IN REAL PRODUCTION** (Phase 6B fix + Phase 6B2 acceptance).
 
 ---
 
@@ -28,14 +33,12 @@ This document supersedes stale “OPEN” checklist wording where later producti
 - Consent / Start Monitoring gate (LAUNCH-001)
 - Dead Terms/Privacy `#` links removed (LAUNCH-002 software)
 - First-clinic runbook exists and path-verified
-- Clinic configuration (name, phone, timezone, clinic type, staff roles, protocol adopt)
-- Patient create → consent → enrol → SMS → CE → CQ → Workspace → Mark reviewed (controlled production proof, incl. AW v5 live)
-- Anti-Wrinkle **v6** global published + Test Aesthetics adopted for future enrolments (Phase 5M)
-- Password recovery: 5J8A → 5J8B → 5J8C PASS (Continue gate, OTP, session, set password, logout/login; Zoho SMTP)
-- Production founder Auth account confirmed: `0982141e-0531-4d41-a08d-0ac098014fb4` (Test Aesthetics admin / org owner)
-- ECS Zoho SMTP delivery to a real mailbox (password recovery path; same `SMTP_*` secrets as invitations)
-- Sydney production healthy; Mumbai rollback-only
-- Flags fail-closed: `PATIENT_MEDIA_ENABLED=false`, `CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED=false`
+- Clinic configuration, protocol adopt, patient journey (controlled production)
+- Anti-Wrinkle **v6** global + Test Aesthetics adoption (Phase 5M)
+- Password recovery 5J8A–C PASS
+- **LAUNCH-003** SMTP CLOSED (5J8A–C; reconfirmed by real invitation email delivery)
+- **AUTH-INVITE-REDIRECT** CLOSED — code remediations in 6B + real Staff Directory invitation accepted in production (6B2)
+- Sydney healthy; Mumbai rollback-only; media/notifications flags fail-closed
 
 ---
 
@@ -43,49 +46,37 @@ This document supersedes stale “OPEN” checklist wording where later producti
 
 | Gate | Why stale |
 |------|-----------|
-| **LAUNCH-003** (prove staff invitation SMTP with founder mailbox) | Original criterion was live **SMTP delivery**. That is now proven by Phase **5J8A–C** (ECS Zoho → founder/disposable mailboxes). Commercial-audit “no live invitation email” is outdated for SMTP. **Do not send another invitation merely to re-prove SMTP.** |
-| Phase 5M “next = LAUNCH-003 SMTP” | Superseded by this reconciliation |
+| **LAUNCH-003** SMTP mailbox proof | Proven via Zoho recovery + real invitation email |
+| Phase 5M / 6A “next = LAUNCH-003” | Superseded |
+| Phase 6B “live invitation proof pending” | Completed in 6B2 |
+| Optional residual invite smoke after redirect fix | Satisfied by 6B2 real acceptance |
 
 ---
 
 ## True remaining gates
 
-### 1. AUTH-INVITE-REDIRECT — OPEN — BLOCKER (before inviting additional staff) — code fixed, live proof pending
+### 1. EXT-002 Privacy / Terms — OPEN — BEFORE FIRST REAL PATIENT (external/legal)
 
-**Phase 6B (2026-09-07):** Root cause proven and remediated in production.
-
-- Auth `redirectTo` is now exactly `https://app.signalcare.io/auth/callback` (no query).
-- Email uses app callback browser link with `token_hash` + constrained `next=/auth/accept-invitation?...` (not Supabase `/verify` action_link).
-- Continue gate covers invite/magiclink/recovery token_hash links.
-- API `f3e917f` / ECS `:219` and web `b91ad4a` deployed.
-- **Still OPEN until** one controlled real Staff Directory invitation is accepted end-to-end.
-
-**Live proof waiting on Scott** — see `docs/testing/phase-6b-auth-invite-redirect-remediation.json`.
-
-**Does not block:** Scott-as-sole-admin clinic provisioning or Scott monitoring the first patient himself.
-
-### 2. EXT-002 Privacy / Terms — OPEN — BEFORE FIRST REAL PATIENT (external/legal)
-
-**Current state:** **D — documents do not exist** (no hosted Privacy Policy / Terms). Software correctly **omits** links unless `NEXT_PUBLIC_PRIVACY_POLICY_URL` / `NEXT_PUBLIC_TERMS_OF_SERVICE_URL` are https (LAUNCH-002 CLOSED).
+**Current state:** documents do not exist. Software omits links unless https env URLs are set (LAUNCH-002 CLOSED).
 
 | Stage | Blocks? |
 |-------|---------|
-| Sales / demo | **NO** (software) |
-| Clinic account onboarding (Scott) | **NO** as software defect |
-| Staff invitation | **NO** as software; legal may still want docs visible at sign-in |
-| First real patient / clinic users in production | **YES if** Scott/legal require hosted docs before patient data processing — **NO** as an engineering P0 |
+| Sales / demo | **NO** |
+| Clinic onboarding | **NO** (software) |
+| Staff invitation | **NO** |
+| First real patient | **YES if** Scott/legal require hosted Privacy/Terms before processing patient data — **NO** as engineering P0 |
 
-### 3. EXT-001 Formal clinical sign-off (BL-012) — OPEN — PILOT TASK / business decision
+**Missing:** hosted Privacy Policy URL; hosted Terms of Use URL; recorded acceptance only if legal design requires it (current product does not enforce acceptance UI).
 
-Controlled live AW v5 validation + v6 copy governance reduce product risk. Formal external clinical sign-off of starter library remains a **business** decision, not a software defect.
+### 2. EXT-001 Formal external clinical sign-off (BL-012) — OPEN — PILOT TASK (not a software blocker)
 
-### 4. EXT-003 Regulatory / insurance / corporate — OPEN — PILOT TASK / outside engineering
+SignalCare pathway governance is: authoritative evidence + conservative safety policy + internal clinical rationale + founder approval + immutable versioning + controlled production validation + structured real-world clinician feedback.
 
-Documented as external. Not evidenced as a hard product blocker. Complete per Scott’s counsel during pilot as required.
+External clinician feedback is useful; it is **not** an automatic prerequisite or veto for each pathway. Anti-Wrinkle already has controlled live validation + founder-approved v6. Treat EXT-001 as optional pilot feedback, not a hard launch gate unless Scott elects otherwise.
 
-### 5. LAUNCH-003 residual (optional smoke after redirect fix) — OPEN — PILOT TASK
+### 3. EXT-003 Regulatory / insurance / corporate — OPEN — PILOT TASK / counsel
 
-After AUTH-INVITE-REDIRECT is fixed: one controlled invite to a founder-controlled mailbox remains a sensible smoke — **not** required to re-prove SMTP.
+Outside engineering. Not evidenced as a product software blocker. Resolve with counsel as needed for the commercial pilot (corporate entity, insurance/cyber cover, privacy governance, customer terms) — do not invent requirements here.
 
 ---
 
@@ -95,39 +86,35 @@ Stripe production activation · patient media/MMS · external clinician notifica
 
 ---
 
-## What Scott can do today
+## What Scott can do now
 
-1. Approach and demo SignalCare to aesthetics clinics.
-2. Provision a real clinic via the first-clinic runbook (Scott as admin).
-3. Configure clinic profile, adopt Anti-Wrinkle **v6**, create consented patients, enrol, operate Command Queue in-app.
-4. **Do not** invite additional staff via Staff Directory until AUTH-INVITE-REDIRECT is fixed (or explicitly risk-accepted after a controlled proof).
-5. Decide with counsel whether hosted Privacy/Terms are required before the first real patient.
+1. Sell and demo SignalCare.
+2. Provision real aesthetics clinics (runbook).
+3. Invite clinic staff via Staff Directory (production invitation flow proven).
+4. Enrol consented patients on Anti-Wrinkle **v6** and operate Command Queue in-app — subject to EXT-002 legal decision if required before patient data.
+5. Optionally deactivate the Phase 6B2 controlled test staff membership after evidence closeout (do not delete audit history).
 
 ---
 
 ## Single next action
 
-**Scott: from Test Aesthetics → Settings → Staff, send ONE invitation to a founder-controlled mailbox that is not already a clinic member. Open the newest email in a clean browser → Continue to accept invitation → complete password/account → confirm clinic role → then revoke/deactivate the test membership.**
-
-(Do not invite a real clinic employee. Do not use `scott1098ce@gmail.com` as the invitee — it is already the admin.)
+**Decide with counsel whether hosted Privacy Policy and Terms of Use are required before the first real patient data is processed (EXT-002). If yes, produce/host https documents and wire `NEXT_PUBLIC_PRIVACY_POLICY_URL` / `NEXT_PUBLIC_TERMS_OF_SERVICE_URL`. If no, proceed to first-clinic patient enrolment under the runbook.**
 
 ---
 
-## Production snapshot (read-only, 6A)
+## Production snapshot (6B2)
 
 | Check | Result |
 |-------|--------|
-| `GET https://api.signalcare.io/health` | `{"ok":true}` |
-| `GET https://api.signalcare.io/version` | build `079c3d8…` (6A); **6B live `f3e917f…`** |
-| `https://app.signalcare.io/` | HTTP 200 |
+| API health | ok |
+| API version | `2852de2…` (docs tip; invite fix `f3e917f` on ECS `:219`) |
+| Web | HTTP 200 |
 | Sydney | `kfwfcgfirsdpqpiiemaq` |
-| Mumbai | rollback-only / not written |
-| Media / clinician notification flags | `false` / `false` |
-
-**6B update:** AUTH-INVITE-REDIRECT code fixed and deployed; live invitation acceptance proof still required before closing the gate.
+| Mumbai | untouched |
+| Flags | media/notifications `false` |
 
 ---
 
 ## Test clinic / patients
 
-Test Aesthetics + controlled patients are isolated founder/test tenants. They do **not** block onboarding a new real clinic via `/auth/onboarding`. Do not delete historical controlled patients.
+Test Aesthetics + controlled patients remain isolated. Do not delete historical controlled patients. Phase 6B2 invited staff account may be deactivated via Staff Directory when convenient.
