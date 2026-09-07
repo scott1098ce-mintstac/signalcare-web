@@ -1,0 +1,527 @@
+{
+  "phase": "6A",
+  "title": "Authoritative first-clinic launch-gate reconciliation",
+  "executed_at_utc": "2026-09-07T00:34:27Z",
+  "verdict": "PASS",
+  "mode": "INSPECT_RECONCILE_DOCUMENT_NO_MUTATION",
+  "absolute_stops_honoured": {
+    "invitation_sent": false,
+    "sms_sent": false,
+    "patient_created": false,
+    "clinic_created": false,
+    "protocol_changed": false,
+    "auth_changed": false,
+    "legal_copy_changed": false,
+    "deployed": false,
+    "migration_applied": false,
+    "production_data_mutated": false,
+    "attack_matrix_rerun": false,
+    "anti_wrinkle_reopened": false
+  },
+  "executive_answer": {
+    "selling_demoing": "YES",
+    "onboard_clinic_account_scott_as_sole_admin": "YES",
+    "invite_additional_clinic_staff": "YES_SUBJECT_TO_AUTH_INVITE_REDIRECT_FIX",
+    "enrol_first_real_patient": "YES_SUBJECT_TO_BUSINESS_LEGAL_CLINICAL_DECISIONS_IF_REQUIRED"
+  },
+  "key_question": {
+    "can_scott_begin_approaching_and_onboarding_first_real_aesthetics_clinic_now": "YES_SUBJECT_TO_AUTH_INVITE_REDIRECT_BEFORE_ADDITIONAL_STAFF_AND_EXT002_EXT001_IF_SCOTT_REQUIRES_BEFORE_FIRST_REAL_PATIENT",
+    "note": "Approaching/selling and Scott-as-admin provisioning are unblocked. Staff Directory invites and optional legal/clinical sign-offs are the residual gates."
+  },
+  "launch_003": {
+    "id": "LAUNCH-003",
+    "title": "Staff invitation SMTP live mailbox proof",
+    "previous_status": "OPEN (FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT; Phase 5M next_product_step)",
+    "current_status": "STALE — CLOSE",
+    "decision": "CLOSED — ALREADY PROVEN (SMTP delivery criterion)",
+    "evidence_superseding_checklist": [
+      "docs/testing/phase-5j8a-production-password-recovery.json — ECS Zoho SMTP (hello@signalcare.io) delivered recovery mail to founder mailbox; staff_invitations path documented as generateLink → ECS Zoho (validated architecture)",
+      "docs/testing/phase-5j8b-password-recovery-e2e-callback.json — mail_delivery PASS; Zoho email contains app callback",
+      "docs/testing/phase-5j8c-real-production-recovery-session.json — WebKit/Chromium production E2E PASS; same Zoho SMTP infrastructure",
+      "ECS task definition maps SMTP_* secrets used by lib/staff_invitation_email.js and password recovery"
+    ],
+    "exact_missing_assertion_if_kept_open": null,
+    "action": "Do not send another invitation merely to re-prove SMTP. Residual staff-invite risk is AUTH-INVITE-REDIRECT, not SMTP.",
+    "founder_account_confirmed": {
+      "user_id": "0982141e-0531-4d41-a08d-0ac098014fb4",
+      "email_redacted": "scott1098ce@gmail.com",
+      "source": "phase-5j8a-production-password-recovery.json"
+    }
+  },
+  "auth_invite_redirect": {
+    "id": "AUTH-INVITE-REDIRECT",
+    "title": "Staff invitation Auth redirectTo still uses callback?next=",
+    "current_status": "OPEN — BLOCKER",
+    "blocks": "inviting_additional_clinic_staff_via_staff_directory",
+    "does_not_block": [
+      "selling_demoing",
+      "scott_sole_admin_clinic_provisioning",
+      "scott_enrol_and_monitor_first_patient"
+    ],
+    "evidence": [
+      "api/routes/staff.js buildAuthInviteLink inviteRedirectTo/magicRedirectTo use /auth/callback?next=...",
+      "docs/testing/phase-5j8a-production-password-recovery.json carried_forward_config_debt invite_redirect_query_string — Auth rejects query-string redirectTo → localhost Site URL fallback",
+      "Password recovery remediated to allowlisted /auth/callback without query string; invitations not updated"
+    ],
+    "action_required": "Fix invitation redirectTo / token handoff to survive Auth allowlist (mirror recovery pattern), then optional one mailbox smoke"
+  },
+  "auth_password_recovery": {
+    "phases": ["5J8A", "5J8B", "5J8C"],
+    "current_status": "CLOSED — PROVEN",
+    "proven": [
+      "real callback",
+      "Continue gate",
+      "OTP verification",
+      "session establishment",
+      "Set new password",
+      "password update",
+      "logout",
+      "login",
+      "WebKit + Chromium disposable user",
+      "founder recovery email delivery via Zoho"
+    ],
+    "evidence": [
+      "docs/testing/phase-5j8a-production-password-recovery.json",
+      "docs/testing/phase-5j8b-password-recovery-e2e-callback.json",
+      "docs/testing/phase-5j8c-real-production-recovery-session.json"
+    ],
+    "action": "none — do not repeat"
+  },
+  "security_authz": {
+    "workstream": "H",
+    "current_status": "CLOSED — PROVEN",
+    "production_attack_matrix": "25/25 PASS",
+    "p0_p1_launch_unsafe": false,
+    "evidence": "docs/engineering/WS_H_SECURITY_AUTHZ_RATE_LIMITS_CLOSEOUT.md",
+    "action": "none — do not rerun matrix for 6A; no later evidence invalidates assertions for launch"
+  },
+  "clinical_pathway": {
+    "anti_wrinkle": "CLOSED — PRODUCTION READY FOR FUTURE ENROLMENTS ON V6",
+    "global_v6": "a1060606-0001-4000-8000-000000000001",
+    "test_clinic_protocol": "7850273a-0fe8-4f04-b9ab-94b848c24a44",
+    "test_clinic_version": "2b903a34-a810-411d-9c94-8449db183681",
+    "further_synthetic_aw_testing_required": false,
+    "evidence": "docs/testing/phase-5m-anti-wrinkle-v6-clinic-adoption-closeout.json"
+  },
+  "workstreams_a_h": {
+    "A": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_A_CLINICAL_JOURNEY_LIFECYCLE_CLOSEOUT.md" },
+    "B": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_B_CLINICIAN_OPERATIONS_CLOSEOUT.md" },
+    "C": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_C_PROTOCOLS_AND_CLINICAL_CONFIGURATION_CLOSEOUT.md" },
+    "D": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_D_PATIENT_ADMINISTRATION_CLOSEOUT.md" },
+    "E": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_E_ORGANISATION_MULTI_SITE_ENTERPRISE_CLOSEOUT.md" },
+    "F": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_F_REPORTS_CLINICAL_VALUE_CLOSEOUT.md" },
+    "G": {
+      "status": "CLOSED — PROVEN",
+      "note": "Billing architecture locked; Stripe live activation DEFERRED — not first-clinic blocker",
+      "evidence": "docs/engineering/WS_G_BILLING_SUBSCRIPTION_CLOSEOUT.md"
+    },
+    "H": { "status": "CLOSED — PROVEN", "evidence": "docs/engineering/WS_H_SECURITY_AUTHZ_RATE_LIMITS_CLOSEOUT.md" }
+  },
+  "ext_002": {
+    "id": "EXT-002",
+    "title": "Hosted Privacy Policy / Terms",
+    "current_state_code": "D",
+    "current_state": "documents do not exist",
+    "software_state": "links omitted unless NEXT_PUBLIC_PRIVACY_POLICY_URL / NEXT_PUBLIC_TERMS_OF_SERVICE_URL are https (LAUNCH-002 CLOSED)",
+    "drafts_hosted": false,
+    "placeholders_on_signin": false,
+    "missing": "hosted Privacy Policy URL; hosted Terms of Use URL; recorded acceptance if legal requires",
+    "blocks": {
+      "sales_demo": false,
+      "clinic_onboarding_scott": false,
+      "staff_invitation": false,
+      "first_real_patient": "YES_IF_SCOTT_OR_LEGAL_REQUIRE_HOSTED_DOCS_BEFORE_PATIENT_DATA — else NO as software defect"
+    },
+    "evidence": [
+      "docs/engineering/FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT.md EXT-002",
+      "app/lib/legal-document-urls.ts",
+      "app/components/auth/AuthSecurityFooter.tsx"
+    ]
+  },
+  "business_regulatory_insurance": {
+    "sources": [
+      "docs/engineering/FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT.md",
+      "docs/engineering/STRIPE_PRODUCTION_ACTIVATION.md",
+      "docs/ENGINEERING_BACKLOG.md BL-012"
+    ],
+    "items": [
+      {
+        "id": "EXT-001",
+        "title": "Formal clinical sign-off of starter copy (BL-012)",
+        "classification": "OPEN — PILOT TASK",
+        "note": "AW controlled live PASS reduces product risk; formal sign-off remains business decision"
+      },
+      {
+        "id": "EXT-003",
+        "title": "Regulatory / insurance / corporate registration",
+        "classification": "OPEN — PILOT TASK",
+        "note": "Outside engineering; not evidenced as hard software blocker"
+      },
+      {
+        "id": "ACT-001",
+        "title": "Stripe / Pty Ltd for live payments",
+        "classification": "DEFERRED",
+        "note": "Invite-only / activation_pending OK for first clinic"
+      }
+    ]
+  },
+  "first_clinic_runbook": {
+    "path": "docs/operations/FIRST_CLINIC_LAUNCH_RUNBOOK.md",
+    "current_status": "CLOSED — PROVEN (usable)",
+    "covers": [
+      "create organisation/clinic",
+      "configure clinic profile",
+      "adopt protocol",
+      "invite admin/staff",
+      "set staff roles",
+      "create patient",
+      "enrol patient",
+      "confirm consent",
+      "monitor CQ",
+      "open Workspace",
+      "mark reviewed",
+      "handle alert",
+      "complete monitoring",
+      "support/diagnostics",
+      "exhausted outbound"
+    ],
+    "staleness_notes": [
+      "Still states LAUNCH-003 SMTP mailbox proof pending — superseded by 5J8A–C for SMTP",
+      "Should reference AUTH-INVITE-REDIRECT before Staff Directory invites",
+      "Protocol section should prefer Anti-Wrinkle v6 for future enrolments after Phase 5M"
+    ],
+    "sufficient_to_onboard_first_clinic": true
+  },
+  "clinic_configuration": {
+    "current_status": "CLOSED — PROVEN",
+    "minimum_ops_data_available": [
+      "clinic name",
+      "phone",
+      "timezone",
+      "clinic type",
+      "staff",
+      "roles",
+      "protocol adoption"
+    ],
+    "genuine_missing_mandatory_config": []
+  },
+  "patient_onboarding": {
+    "current_status": "CLOSED — PROVEN",
+    "evidence_basis": "Phases 5J–5M controlled production journeys; consent gate LAUNCH-001; AW v5 live + v6 adopted",
+    "action": "do not create another patient for 6A"
+  },
+  "operational_readiness": {
+    "current_status": "CLOSED — PROVEN",
+    "covered_in_runbook_or_audit": [
+      "Twilio failure / retry exhaust",
+      "SMS delivery failure",
+      "scheduler failure (RUNBOOK_SCHEDULER)",
+      "API health/version",
+      "patient STOP / opt-out",
+      "consent blocks",
+      "unlinked inbound",
+      "CQ in-app only while clinician notifications disabled"
+    ],
+    "material_gaps_preventing_safe_first_clinic": [
+      "AUTH-INVITE-REDIRECT before multi-staff operation"
+    ]
+  },
+  "observability": {
+    "current_status": "CLOSED — PROVEN",
+    "adequate_for_supervised_first_clinic": true,
+    "surfaces": [
+      "/health",
+      "/version",
+      "/ops/health",
+      "ECS CloudWatch logs",
+      "scheduler evidence",
+      "Twilio/message_events",
+      "audit trail / clinical timeline"
+    ]
+  },
+  "test_patient_cleanup": {
+    "action": "leave in place",
+    "interference_with_real_clinic_onboarding": false,
+    "note": "New real clinic uses /auth/onboarding new org/clinic; Test Aesthetics is separate tenant"
+  },
+  "production_readonly": {
+    "api_health": { "ok": true },
+    "api_version_build": "079c3d8af8f5e286bfed87a187e650096eb62c34",
+    "web_home_http": 200,
+    "web_signin_http": 200,
+    "sydney": "kfwfcgfirsdpqpiiemaq",
+    "mumbai": "wpbyxrsiayspyweaqmwy",
+    "mumbai_written": false,
+    "flags": {
+      "PATIENT_MEDIA_ENABLED": "false",
+      "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED": "false"
+    }
+  },
+  "deferred_items": [
+    "Stripe production activation",
+    "patient media / MMS",
+    "external clinician notification delivery",
+    "Slack / Teams",
+    "native apps",
+    "advanced analytics",
+    "organisation-wide CQ",
+    "organisation-wide reports",
+    "dental expansion",
+    "surgical expansion"
+  ],
+  "authoritative_launch_matrix": [
+    {
+      "gate": "WS-A Clinical Journey",
+      "description": "Journey lifecycle independent of clinician work",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_A_CLINICAL_JOURNEY_LIFECYCLE_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-B Clinician Operations",
+      "description": "CQ / Workspace / notes / ownership",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_B_CLINICIAN_OPERATIONS_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-C Protocols",
+      "description": "Clinic-type protocols / clone / publish",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_C_PROTOCOLS_AND_CLINICAL_CONFIGURATION_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-D Patient Administration",
+      "description": "Directory / consent / enrol",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_D_PATIENT_ADMINISTRATION_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-E Organisation / Multi-site",
+      "description": "Org + sites + switcher",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_E_ORGANISATION_MULTI_SITE_ENTERPRISE_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-F Reports",
+      "description": "Clinic-scoped clinical value reports",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_F_REPORTS_CLINICAL_VALUE_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-G Billing architecture",
+      "description": "Organisation billing; Stripe activation deferred",
+      "previous_status": "PASS LOCKED / Stripe pending",
+      "evidence": "WS_G_BILLING_SUBSCRIPTION_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none for first clinic",
+      "owner": "engineering"
+    },
+    {
+      "gate": "WS-H Security / AuthZ",
+      "description": "AuthZ + rate limits; attack matrix 25/25",
+      "previous_status": "PASS LOCKED",
+      "evidence": "WS_H_SECURITY_AUTHZ_RATE_LIMITS_CLOSEOUT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "LAUNCH-001 Consent enrol",
+      "description": "Start Monitoring requires consented",
+      "previous_status": "CLOSED",
+      "evidence": "FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "LAUNCH-002 Dead legal links",
+      "description": "Omit Privacy/Terms unless https env URLs",
+      "previous_status": "CLOSED (software)",
+      "evidence": "FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT.md; legal-document-urls.ts",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "software",
+      "action_required": "none",
+      "owner": "engineering"
+    },
+    {
+      "gate": "LAUNCH-003 Staff invitation SMTP",
+      "description": "Live mailbox proof of Zoho invitation SMTP",
+      "previous_status": "OPEN",
+      "evidence": "phase-5j8a/b/c Zoho recovery delivery supersedes SMTP criterion",
+      "current_status": "STALE — CLOSE",
+      "classification": "ops proof",
+      "action_required": "none for SMTP; see AUTH-INVITE-REDIRECT",
+      "owner": "engineering"
+    },
+    {
+      "gate": "AUTH-INVITE-REDIRECT",
+      "description": "Staff invite redirectTo uses callback?next= rejected by Auth",
+      "previous_status": "P2 debt in 5J8A",
+      "evidence": "staff.js buildAuthInviteLink; phase-5j8a invite_redirect_query_string",
+      "current_status": "OPEN — BLOCKER",
+      "classification": "software defect before multi-staff",
+      "action_required": "fix redirect / token handoff",
+      "owner": "engineering"
+    },
+    {
+      "gate": "LAUNCH-004 First-clinic runbook",
+      "description": "Provisioning + ops runbook",
+      "previous_status": "CLOSED",
+      "evidence": "docs/operations/FIRST_CLINIC_LAUNCH_RUNBOOK.md",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "ops",
+      "action_required": "refresh stale LAUNCH-003 SMTP wording when convenient",
+      "owner": "engineering"
+    },
+    {
+      "gate": "Anti-Wrinkle pathway",
+      "description": "v5 clinical + v6 copy + clinic adoption",
+      "previous_status": "CLOSED Phase 5M",
+      "evidence": "phase-5m-anti-wrinkle-v6-clinic-adoption-closeout.json",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "clinical product",
+      "action_required": "none — do not reopen",
+      "owner": "product"
+    },
+    {
+      "gate": "EXT-002 Privacy / Terms documents",
+      "description": "Hosted legal documents",
+      "previous_status": "EXTERNAL SIGN-OFF",
+      "evidence": "FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT.md; no hosted docs",
+      "current_status": "OPEN — BEFORE FIRST REAL PATIENT",
+      "classification": "external/legal",
+      "action_required": "host docs if Scott/legal require before patient data",
+      "owner": "Scott / legal"
+    },
+    {
+      "gate": "EXT-001 Clinical sign-off BL-012",
+      "description": "Formal starter-copy clinical sign-off",
+      "previous_status": "EXTERNAL",
+      "evidence": "ENGINEERING_BACKLOG.md; AW live PASS",
+      "current_status": "OPEN — PILOT TASK",
+      "classification": "business/clinical",
+      "action_required": "Scott decision",
+      "owner": "Scott / clinical"
+    },
+    {
+      "gate": "EXT-003 Regulatory / insurance / corporate",
+      "description": "Non-software corporate gates",
+      "previous_status": "EXTERNAL",
+      "evidence": "FINAL_COMMERCIAL_LAUNCH_READINESS_AUDIT.md",
+      "current_status": "OPEN — PILOT TASK",
+      "classification": "external",
+      "action_required": "counsel as needed",
+      "owner": "Scott"
+    },
+    {
+      "gate": "ACT-001 Stripe live",
+      "description": "Live payments",
+      "previous_status": "DEFERRED",
+      "evidence": "STRIPE_PRODUCTION_ACTIVATION.md",
+      "current_status": "DEFERRED",
+      "classification": "activation",
+      "action_required": "none for first clinic",
+      "owner": "Scott"
+    },
+    {
+      "gate": "ACT-002 Patient media",
+      "description": "PATIENT_MEDIA_ENABLED",
+      "previous_status": "false",
+      "evidence": "ECS taskdef; Phase 5M",
+      "current_status": "DEFERRED",
+      "classification": "activation",
+      "action_required": "keep false",
+      "owner": "engineering"
+    },
+    {
+      "gate": "ACT-003 Clinician external notifications",
+      "description": "CLINICIAN_NOTIFICATIONS_DELIVERY_ENABLED",
+      "previous_status": "false",
+      "evidence": "ECS taskdef; runbook CQ-in-app",
+      "current_status": "DEFERRED",
+      "classification": "activation",
+      "action_required": "keep false; train CQ-in-app",
+      "owner": "Scott / clinic"
+    },
+    {
+      "gate": "Password recovery",
+      "description": "Production recovery UX",
+      "previous_status": "PASS 5J8C",
+      "evidence": "phase-5j8a/b/c",
+      "current_status": "CLOSED — PROVEN",
+      "classification": "auth",
+      "action_required": "none",
+      "owner": "engineering"
+    }
+  ],
+  "true_remaining_blockers_ordered": [
+    {
+      "rank": 1,
+      "id": "AUTH-INVITE-REDIRECT",
+      "prevents": "inviting additional clinic staff safely",
+      "priority_class": "prevents_first_clinic_multi_staff_onboarding"
+    },
+    {
+      "rank": 2,
+      "id": "EXT-002",
+      "prevents": "first real patient only if legal requires hosted Privacy/Terms",
+      "priority_class": "prevents_first_real_patient_conditional"
+    },
+    {
+      "rank": 3,
+      "id": "EXT-001",
+      "prevents": "nothing software-hard; business/clinical comfort",
+      "priority_class": "safety_regulatory_importance_business"
+    },
+    {
+      "rank": 4,
+      "id": "EXT-003",
+      "prevents": "nothing evidenced as product blocker",
+      "priority_class": "operational_importance_external"
+    }
+  ],
+  "what_scott_can_do_today": [
+    "Sell and demo SignalCare",
+    "Provision a real aesthetics clinic with Scott as sole admin via runbook",
+    "Configure clinic, adopt Anti-Wrinkle v6, enrol consented patients, operate CQ in-app",
+    "Decide Privacy/Terms and clinical sign-off requirements with counsel",
+    "Do not invite additional staff until AUTH-INVITE-REDIRECT fixed"
+  ],
+  "single_next_action": {
+    "id": "AUTH-INVITE-REDIRECT",
+    "action": "Fix staff invitation Auth redirectTo so invitation links use an allowlisted https://app.signalcare.io/auth/callback form without query-string rejection (mirror password-recovery pattern), preserving invitation-token handoff to /auth/accept-invitation."
+  },
+  "human_readable_source_of_truth": "docs/launch/FIRST_CLINIC_LAUNCH_STATUS.md",
+  "code_changes": {
+    "implementation": "none",
+    "documentation_only": true
+  },
+  "blockers_to_6a_pass": []
+}
