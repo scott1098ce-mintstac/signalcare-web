@@ -5,6 +5,7 @@ import {
   getAuthCallbackErrorMessage,
   hasInboundSupabaseAuthParams,
   isAcceptInvitationDestination,
+  isAuthTokenHashContinueGate,
   isFirstTimeInviteFlow,
   isRecoveryTokenHashCallback,
   inferRequiresPasswordSetup,
@@ -108,16 +109,30 @@ assert.equal(
 )
 assert.equal(getAuthCallbackDestination('?type=recovery', ''), '/auth/reset-password')
 assert.equal(
+  getAuthCallbackDestination(
+    '?token_hash=hashed&type=invite&next=%2Fauth%2Faccept-invitation%3Ftoken%3Dabc%26flow%3Dinvite',
+    '',
+  ),
+  '/auth/accept-invitation?token=abc&flow=invite',
+)
+assert.equal(
   getAuthCallbackErrorMessage('', '#error=access_denied&error_code=otp_expired'),
-  'This reset link is invalid or has already been used. Request a new one from forgot password.',
+  'This link is invalid or has already been used. Request a new invitation or password reset.',
 )
 assert.equal(getAuthCallbackErrorMessage('?code=abc', ''), null)
 assert.equal(isRecoveryTokenHashCallback('?token_hash=abc&type=recovery', ''), true)
-assert.equal(isRecoveryTokenHashCallback('?token_hash=abc&type=invite', ''), false)
+assert.equal(isAuthTokenHashContinueGate('?token_hash=abc&type=recovery', ''), true)
+assert.equal(isAuthTokenHashContinueGate('?token_hash=abc&type=invite', ''), true)
+assert.equal(isAuthTokenHashContinueGate('?token_hash=abc&type=magiclink', ''), true)
+assert.equal(isAuthTokenHashContinueGate('?token_hash=abc&type=signup', ''), false)
 assert.equal(
   messageForAuthFailureReason('otp_expired'),
-  'This reset link is invalid or has already been used. Request a new one from forgot password.',
+  'This link is invalid or has already been used. Request a new invitation or password reset.',
 )
+assert.equal(getSafeAuthNextPath('https://evil.example'), null)
+assert.equal(getSafeAuthNextPath('//evil.example'), null)
+assert.equal(getSafeAuthNextPath('/patients'), null)
+assert.equal(getSafeAuthNextPath('javascript:alert(1)'), null)
 assert.equal(isAcceptInvitationDestination('/auth/accept-invitation?token=abc'), true)
 assert.equal(isAcceptInvitationDestination('/auth/signin'), false)
 

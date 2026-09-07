@@ -92,8 +92,8 @@ export function getAuthCallbackErrorMessage(
   return messageForAuthFailureReason(normalizeAuthErrorCode(errorCode) || 'otp_failed');
 }
 
-/** Recovery email links use token_hash; require an explicit human Continue before verifyOtp. */
-export function isRecoveryTokenHashCallback(
+/** Email token_hash links require an explicit human Continue before verifyOtp. */
+export function isAuthTokenHashContinueGate(
   search = typeof window !== 'undefined' ? window.location.search : '',
   hash = typeof window !== 'undefined' ? window.location.hash : '',
 ): boolean {
@@ -101,7 +101,15 @@ export function isRecoveryTokenHashCallback(
   const hashParams = new URLSearchParams(String(hash || '').replace(/^#/, ''));
   const tokenHash = params.get('token_hash') || hashParams.get('token_hash');
   const type = String(params.get('type') || hashParams.get('type') || '').toLowerCase();
-  return Boolean(tokenHash) && type === 'recovery';
+  return Boolean(tokenHash) && (type === 'recovery' || type === 'invite' || type === 'magiclink');
+}
+
+/** @deprecated Prefer isAuthTokenHashContinueGate — kept for recovery-named call sites. */
+export function isRecoveryTokenHashCallback(
+  search = typeof window !== 'undefined' ? window.location.search : '',
+  hash = typeof window !== 'undefined' ? window.location.hash : '',
+): boolean {
+  return isAuthTokenHashContinueGate(search, hash);
 }
 
 export function normalizeAuthErrorCode(error: { message?: string; code?: string } | string | null | undefined): string | null {
@@ -124,7 +132,7 @@ export function normalizeAuthErrorCode(error: { message?: string; code?: string 
 
 export function messageForAuthFailureReason(reason: string | null | undefined): string {
   if (reason === 'otp_expired' || reason === 'otp_disabled') {
-    return 'This reset link is invalid or has already been used. Request a new one from forgot password.';
+    return 'This link is invalid or has already been used. Request a new invitation or password reset.';
   }
   if (reason === 'missing_params') {
     return 'No session found. Open the link from your email again, or return to sign in.';

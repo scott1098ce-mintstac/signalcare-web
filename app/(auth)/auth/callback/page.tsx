@@ -7,7 +7,7 @@ import {
   getAuthCallbackDestination,
   getAuthCallbackErrorMessage,
   isAcceptInvitationDestination,
-  isRecoveryTokenHashCallback,
+  isAuthTokenHashContinueGate,
   messageForAuthFailureReason,
   resolveInboundSupabaseSession,
   waitForPersistedSession,
@@ -22,7 +22,7 @@ import { supabase } from '../../../lib/supabase';
 
 /**
  * Supabase Auth redirect target for invite, recovery, and email confirmation.
- * Recovery token_hash links require an explicit Continue click before verifyOtp
+ * token_hash email links require an explicit Continue click before verifyOtp
  * so Mail/link previews that execute JS cannot burn the one-time OTP.
  */
 export default function AuthCallbackPage() {
@@ -30,6 +30,7 @@ export default function AuthCallbackPage() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [needsContinue, setNeedsContinue] = useState(false);
+  const [continueKind, setContinueKind] = useState<'recovery' | 'invite'>('recovery');
   const requestId = useMemo(() => createAuthRequestId(), []);
   const autoStarted = useRef(false);
 
@@ -170,14 +171,20 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    if (isRecoveryTokenHashCallback()) {
+    if (isAuthTokenHashContinueGate()) {
+      const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+      const hashParams = new URLSearchParams(
+        typeof window !== 'undefined' ? String(window.location.hash || '').replace(/^#/, '') : '',
+      );
+      const otpType = String(params.get('type') || hashParams.get('type') || '').toLowerCase();
+      setContinueKind(otpType === 'recovery' ? 'recovery' : 'invite');
       setNeedsContinue(true);
       logAuthDiag({
         requestId,
         route: '/auth/callback',
         phase: 'awaiting_continue',
         hasTokenHash: true,
-        otpType: 'recovery',
+        otpType: otpType || null,
         browserFamily: detectBrowserFamily(),
         storageMode: 'localStorage',
       });
@@ -214,12 +221,17 @@ export default function AuthCallbackPage() {
   }
 
   if (needsContinue) {
+    const isRecovery = continueKind === 'recovery';
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--sc-surface-page)] px-5 py-10 font-sans">
         <div className="w-full max-w-[400px] rounded-[var(--sc-radius-card)] border border-[var(--sc-border-subtle)] bg-white px-6 py-6 shadow-sm">
-          <h1 className="text-lg font-semibold text-[var(--sc-text-primary)]">Reset your password</h1>
+          <h1 className="text-lg font-semibold text-[var(--sc-text-primary)]">
+            {isRecovery ? 'Reset your password' : 'Accept your invitation'}
+          </h1>
           <p className="mt-2 text-sm text-[var(--sc-text-secondary)]">
-            Continue in this browser to securely verify your reset link and choose a new password.
+            {isRecovery
+              ? 'Continue in this browser to securely verify your reset link and choose a new password.'
+              : 'Continue in this browser to securely verify your invitation and join your clinic.'}
           </p>
           <button
             type="button"
@@ -230,7 +242,7 @@ export default function AuthCallbackPage() {
             }}
             className="mt-5 inline-flex w-full items-center justify-center rounded-[var(--sc-radius-control)] bg-[var(--sc-brand)] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {busy ? 'Verifying…' : 'Continue to reset password'}
+            {busy ? 'Verifying…' : isRecovery ? 'Continue to reset password' : 'Continue to accept invitation'}
           </button>
           <a
             href="/auth/signin"
@@ -246,7 +258,7 @@ export default function AuthCallbackPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--sc-surface-page)] px-5 font-sans">
       <p className="text-sm text-[var(--sc-text-secondary)]">
-        {busy ? 'Verifying your reset link…' : 'Signing you in…'}
+        {busy ? 'Verifying your email link…' : 'Signing you in…'}
       </p>
     </div>
   );
