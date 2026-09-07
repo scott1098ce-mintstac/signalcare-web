@@ -1,0 +1,80 @@
+{
+  "phase": "CQ-FIGMA-PRECISION-CORRECTION",
+  "title": "Command Queue Figma precision correction — exact MCP geometry",
+  "executed_at_utc": "2026-09-07T05:45:00Z",
+  "verdict": "PASS",
+  "figma": {
+    "file": "Signal Care",
+    "fileKey": "Qf7mvTW8NZaRkmmd6qJdEG",
+    "section": "230:17051",
+    "frames": {
+      "Command Queue View": { "id": "241:20653", "size": "1512×900" },
+      "Command Queue View/All-clear": { "id": "241:21324", "size": "1512×900" },
+      "Command Queue View/Overloaded": { "id": "259:3460", "size": "1512×900" },
+      "Command Queue Default View": { "id": "230:17052", "size": "1512×900" }
+    },
+    "source": "Authenticated Figma MCP get_metadata + get_design_context — not screenshots"
+  },
+  "reference_metrics": {
+    "sidebar_width": 80,
+    "header_height": 72,
+    "title": "24px / 700 / lh 40 / #1a1a1a",
+    "filter_control": "183×52",
+    "filter_group": "816×76 gap 12 padding 24×12",
+    "filter_row": "1432×76",
+    "section_header": "40px / 12px 600 uppercase tracking 0.3 / #f9f9fb / border #dedde6",
+    "standard_row": 48,
+    "assigned_review_row": 51,
+    "immediate_row": 54,
+    "row_padding": "L24 R32 Y8 (simple Y15)",
+    "patient_name": "16/700",
+    "clinical_reason": "14/500",
+    "metadata": "12/400 #706f82"
+  },
+  "production_constraints_documented": [
+    "Figma CQ frames are full-bleed 1432px without workspace; production retains Patient Workspace split.",
+    "Queue pane min-width raised to 920px / 64% so 4×183 filters + Clear All fit without shrinking Figma control geometry.",
+    "Procedure retained (Figma label is Ward).",
+    "All-clear geometry from 267:2545; production clinical copy retained (not 'Have a great shift!').",
+    "SignalCare mark + no hamburger + Protocols nav retained."
+  ],
+  "files_changed": [
+    "app/components/design-system/tokens/tokens.css",
+    "app/components/design-system/layout/SectionHeader.module.css",
+    "app/components/design-system/controls/SCDropdown.module.css",
+    "app/components/design-system/queue/SCQueueRow.tsx",
+    "app/components/design-system/queue/SCQueueRow.module.css",
+    "app/components/design-system/queue/SCOverloadBanner.module.css",
+    "app/components/command-queue/command-queue.module.css",
+    "app/components/command-queue/AllClearBanner.tsx",
+    "app/components/command-queue/QueueRow.tsx",
+    "visual-lock/baselines/**",
+    "scripts/measure-cq-figma-precision.mjs"
+  ],
+  "rendered_1512x900_measurements": {
+    "sidebar": 80,
+    "header": 72,
+    "titleFontSize": 24,
+    "titleFontWeight": "700",
+    "filterHeight": 52,
+    "filterWidth": 183,
+    "filterBar": 76,
+    "sectionHeader": 40,
+    "standardRow": 48,
+    "assignedOrReviewRow": 51,
+    "patientName": 16,
+    "clinicalReason": 14,
+    "metadata": 12,
+    "ok": true,
+    "evidence": ".presentation-qa/cq-figma-precision/measurements.json"
+  },
+  "tests": {
+    "focused_cq_helpers": "PASS",
+    "visual_lock_28": "PASS (baselines updated with founder approval token)"
+  },
+  "deployment": {
+    "web_project": "signalcare-web-3qwn",
+    "production_host": "https://app.signalcare.io",
+    "note": "Filled after merge"
+  }
+}

@@ -1,41 +1,47 @@
 @import '../tokens/tokens.css';
 
+/* Figma 274:7033 immediate title row + 297:4243 badge */
 .banner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-start;
+  gap: 8px;
   width: 100%;
   margin: 0;
-  padding: 14px 24px;
+  padding: 10px 24px 0;
   border: none;
   border-radius: 0;
   background: var(--ds-alert-danger-bg);
-  font-family: var(--ds-font-family);
-  font-size: var(--ds-font-size-body-sm);
-  font-weight: var(--ds-font-weight-semibold);
-  line-height: 16px;
-  letter-spacing: var(--ds-tracking-label);
-  text-transform: uppercase;
-  color: var(--ds-alert-danger-icon);
   box-sizing: border-box;
 }
 
 .label {
   min-width: 0;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-heading-3);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 20px;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  color: var(--ds-text-primary);
 }
 
 .badge {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
+  justify-content: center;
+  min-width: 86px;
+  height: 19px;
+  padding: 4px 8px;
+  border-radius: 4px;
   background: var(--ds-alert-danger-icon);
   color: var(--ds-text-inverse);
-  font-size: 11px;
-  font-weight: var(--ds-font-weight-semibold);
-  letter-spacing: 0.04em;
-  line-height: 14px;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-size-overline);
+  font-weight: var(--ds-font-weight-bold);
+  letter-spacing: 0.3px;
+  line-height: 1.1;
   text-transform: uppercase;
+  box-sizing: border-box;
 }
