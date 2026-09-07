@@ -25,6 +25,8 @@ type QueueRowProps = {
   onSelect: () => void;
   onActionComplete: () => void;
   metaOverride?: string;
+  /** Immediate-action strip: stronger primary Acknowledge treatment (Figma overload). */
+  urgentPrimaryAction?: boolean;
 };
 
 function rowVariant(row: MonitoringRow): SCQueueRowVariant {
@@ -91,6 +93,7 @@ export function QueueRow({
   onSelect,
   onActionComplete,
   metaOverride,
+  urgentPrimaryAction = false,
 }: QueueRowProps) {
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -105,7 +108,7 @@ export function QueueRow({
   const showScore =
     variant === 'dangerColored' || variant === 'assigned' || variant === 'review';
   const showBar =
-    variant === 'dangerColored' || variant === 'assigned';
+    variant === 'dangerColored' || variant === 'assigned' || variant === 'review';
   const assignee = row.acknowledged_by?.trim();
   const assigneeTime = formatAssigneeTime(row.acknowledged_at);
   const iconSpec = iconForRow(row, variant);
@@ -176,7 +179,11 @@ export function QueueRow({
             </span>
           ) : null}
           {showAcknowledge ? (
-            <SCButton variant="primarySm" disabled={busy} onClick={handleAcknowledge}>
+            <SCButton
+              variant={urgentPrimaryAction ? 'dangerSm' : 'primarySm'}
+              disabled={busy}
+              onClick={handleAcknowledge}
+            >
               Acknowledge
             </SCButton>
           ) : null}

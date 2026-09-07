@@ -44,6 +44,22 @@
   color: var(--ds-text-inverse);
 }
 
+/* Figma overloaded immediate-action Acknowledge */
+.dangerSm {
+  height: 32px;
+  padding: 0 var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-alert-danger-icon);
+  font-size: var(--ds-font-size-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: var(--ds-line-height-normal);
+  color: var(--ds-text-inverse);
+}
+
+.dangerSm:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
 /* Figma 284:4337 — outline primary (py 8 → ~35px) */
 .outline {
   padding: var(--ds-space-2) var(--ds-space-4);

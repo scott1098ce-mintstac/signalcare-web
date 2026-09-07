@@ -5,6 +5,7 @@ import styles from './SCButton.module.css';
 export type SCButtonVariant =
   | 'primary'
   | 'primarySm'
+  | 'dangerSm'
   | 'outline'
   | 'secondary'
   | 'ghost'
@@ -20,6 +21,7 @@ export type SCButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const variantClass: Record<SCButtonVariant, string> = {
   primary: styles.primary,
   primarySm: styles.primarySm,
+  dangerSm: styles.dangerSm,
   outline: styles.outline,
   secondary: styles.secondary,
   ghost: styles.ghost,
