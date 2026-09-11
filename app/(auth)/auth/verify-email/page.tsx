@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
+import { getAuthEmailRedirectTo } from '../../../lib/auth-email-redirect';
 import { AuthBrandingPanel } from '../../../components/auth/AuthBrandingPanel';
 import { AuthSecurityFooter } from '../../../components/auth/AuthSecurityFooter';
 import { Button } from '../../../components/ui/button';
@@ -25,10 +26,7 @@ function VerifyEmailContent() {
     }
     setLoading(true);
     try {
-      const emailRedirectTo =
-        typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth/onboarding')}`
-          : undefined;
+      const emailRedirectTo = getAuthEmailRedirectTo();
       const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
         email,

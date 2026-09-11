@@ -14,7 +14,8 @@
     "live-production-qa": "node scripts/visual-lock/live-production-qa.mjs",
     "release-verify": "node scripts/release-verify.mjs",
     "test:invitation-acceptance": "node scripts/test-invitation-acceptance-flow.mjs",
-    "test:invitation-acceptance-browser": "node scripts/test-invitation-acceptance-browser.mjs"
+    "test:invitation-acceptance-browser": "node scripts/test-invitation-acceptance-browser.mjs",
+    "test:auth-email-redirect": "node scripts/test-auth-email-redirect.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",

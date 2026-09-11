@@ -4,6 +4,7 @@ import { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
+import { getAuthEmailRedirectTo } from '../../../lib/auth-email-redirect';
 import { allPasswordRulesMet, passwordRules } from '../../../lib/password-validation';
 import {
   DEFAULT_SELF_SERVE_PLAN_KEY,
@@ -105,10 +106,10 @@ function SignUpContent() {
         sessionStorage.setItem(PLAN_STORAGE_KEY, planKey);
       }
 
-      const emailRedirectTo =
-        typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth/onboarding')}`
-          : undefined;
+      // Exact allowlisted callback only — query-string redirectTo falls back to
+      // Site URL http://localhost:3000 (Phase 5J8A / 15C.1). Routing to onboarding
+      // is handled by /auth/callback → completeAuthenticatedSession.
+      const emailRedirectTo = getAuthEmailRedirectTo();
 
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
