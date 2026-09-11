@@ -168,6 +168,12 @@ function SignInContent() {
           </Card>
 
           <AuthSecurityFooter />
+          <p className="mt-4 text-center text-[length:var(--sc-text-sm)] text-[var(--sc-text-secondary)]">
+            New clinic owner?{' '}
+            <a href="/auth/signup" className="font-medium text-[var(--sc-brand)] hover:underline">
+              Create an account
+            </a>
+          </p>
         </div>
       </main>
     </div>

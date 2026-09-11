@@ -22,7 +22,16 @@ export type OnboardingState = {
   contactName: string;
   contactPhone: string;
   clinicId?: string;
+  organisationId?: string;
   clinicDetailsCompleted?: boolean;
+  protocolsCompleted?: boolean;
+  planKey?: string;
+  protocolsAdopted?: Array<{
+    protocol_id?: string;
+    name: string;
+    source_protocol_id?: string;
+    already_existed?: boolean;
+  }>;
   idempotencyKey?: string;
   wards: WardRow[];
   staff: StaffRow[];

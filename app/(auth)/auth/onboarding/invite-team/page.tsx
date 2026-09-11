@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { InviteTeamScreen } from '../../../../components/auth-onboarding-visual/InviteTeamScreen';
-import { completeAuthenticatedSession } from '../../../../lib/auth-routing';
 import {
-  clearOnboardingState,
   createId,
   getOnboardingState,
   setOnboardingState,
@@ -47,7 +45,13 @@ export default function OnboardingInviteTeamPage() {
   function handleBack() {
     const state = getOnboardingState();
     if (state) setOnboardingState({ ...state, staff });
-    router.push('/auth/onboarding/wards-beds');
+    router.push('/auth/onboarding/protocols');
+  }
+
+  function goReady() {
+    const state = getOnboardingState();
+    if (state) setOnboardingState({ ...state, staff });
+    router.push('/auth/onboarding/ready');
   }
 
   async function handleSubmit() {
@@ -88,14 +92,7 @@ export default function OnboardingInviteTeamPage() {
         }
       }
 
-      const result = await completeAuthenticatedSession(accessToken);
-      if (!result.ok) {
-        setErrorMessage(result.error);
-        return;
-      }
-
-      clearOnboardingState();
-      router.replace(result.path);
+      goReady();
     } finally {
       setLoading(false);
     }
@@ -106,11 +103,13 @@ export default function OnboardingInviteTeamPage() {
       staff={staff}
       loading={loading}
       errorMessage={errorMessage}
-      completeLabel="Complete"
+      completeLabel="Continue"
+      skipLabel="Skip for now"
       onStaffChange={updateStaff}
       onAddStaff={addStaff}
       onRemoveStaff={removeStaff}
       onBack={handleBack}
+      onSkip={goReady}
       onSubmit={handleSubmit}
     />
   );

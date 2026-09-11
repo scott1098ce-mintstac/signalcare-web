@@ -15,11 +15,13 @@ export type InviteTeamScreenProps = {
   loading?: boolean;
   errorMessage?: string | null;
   completeLabel?: string;
+  skipLabel?: string;
   onStaffChange?: (id: string, patch: Partial<StaffRow>) => void;
   onAddStaff?: () => void;
   onRemoveStaff?: (id: string) => void;
   onBack?: () => void;
   onSubmit?: () => void | Promise<void>;
+  onSkip?: () => void | Promise<void>;
 };
 
 const VISUAL_STAFF: StaffRow[] = [
@@ -119,11 +121,13 @@ export function InviteTeamScreen({
   loading = false,
   errorMessage = null,
   completeLabel = 'Compleate',
+  skipLabel = 'Skip for now',
   onStaffChange,
   onAddStaff,
   onRemoveStaff,
   onBack,
   onSubmit,
+  onSkip,
 }: InviteTeamScreenProps) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -222,6 +226,16 @@ export function InviteTeamScreen({
                 <img className={onboardingStyles.buttonIcon} src="/images/ao/icon-arrow-left-onboarding-figma.svg" alt="" aria-hidden />
                 Back
               </button>
+              {onSkip ? (
+                <button
+                  type="button"
+                  className={onboardingStyles.ghostButton}
+                  onClick={readOnly ? undefined : () => void onSkip()}
+                  disabled={!readOnly && loading}
+                >
+                  {skipLabel}
+                </button>
+              ) : null}
               <button type="submit" className={onboardingStyles.primaryButton} disabled={!readOnly && loading}>
                 {loading ? 'Completing…' : completeLabel}
               </button>

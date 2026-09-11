@@ -1,6 +1,6 @@
 import onboardingStyles from './onboarding.module.css';
 
-export type OnboardingStep = 1 | 2 | 3;
+export type OnboardingStep = 1 | 2 | 3 | 4;
 
 type OnboardingStepperProps = {
   currentStep: OnboardingStep;
@@ -8,8 +8,9 @@ type OnboardingStepperProps = {
 
 const steps = [
   { num: 1 as const, label: 'Clinic Details' },
-  { num: 2 as const, label: 'Wards & Beds' },
+  { num: 2 as const, label: 'Protocols' },
   { num: 3 as const, label: 'Invite Team' },
+  { num: 4 as const, label: 'Ready' },
 ];
 
 export function OnboardingStepper({ currentStep }: OnboardingStepperProps) {
@@ -24,7 +25,7 @@ export function OnboardingStepper({ currentStep }: OnboardingStepperProps) {
             <div
               key={step.num}
               className={onboardingStyles.stepGroup}
-              style={{ flex: index === 2 ? '1 1 0' : undefined }}
+              style={{ flex: index === steps.length - 1 ? '1 1 0' : undefined }}
             >
               <div className={onboardingStyles.stepItem}>
                 <div
