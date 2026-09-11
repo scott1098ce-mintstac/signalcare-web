@@ -37,7 +37,7 @@ export function ProtocolSetupScreen({
   onContinue,
   onBack,
 }: ProtocolSetupScreenProps) {
-  const rows =
+  const rows: AdoptedProtocolSummary[] =
     protocols.length > 0
       ? protocols
       : FALLBACK_NAMES.map((name) => ({ name }));
