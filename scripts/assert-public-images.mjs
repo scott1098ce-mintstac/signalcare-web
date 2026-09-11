@@ -22,6 +22,21 @@ function walk(dir, files = []) {
   return files
 }
 
+function listPublicImagesFromFilesystem() {
+  const imagesRoot = path.join(root, 'public', 'images')
+  if (!fs.existsSync(imagesRoot)) return new Set()
+  const files = []
+  function walkImages(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) walkImages(full)
+      else files.push(path.relative(root, full).split(path.sep).join('/'))
+    }
+  }
+  walkImages(imagesRoot)
+  return new Set(files)
+}
+
 function gitTrackedPublicImages() {
   try {
     const out = execFileSync('git', ['ls-files', '--', 'public/images'], {
@@ -30,6 +45,13 @@ function gitTrackedPublicImages() {
     })
     return new Set(out.split('\n').map((line) => line.trim()).filter(Boolean))
   } catch {
+    // Vercel CLI file-upload builds have no .git checkout. Presence + MIME checks still apply.
+    if (process.env.VERCEL) {
+      console.warn(
+        'assert-public-images: git unavailable on Vercel file deploy; verifying public/images on disk',
+      )
+      return listPublicImagesFromFilesystem()
+    }
     throw new Error('assert-public-images: git ls-files failed; cannot prove assets are tracked')
   }
 }
