@@ -6,6 +6,7 @@ import {
   completeAuthenticatedSession,
   getAuthCallbackDestination,
   getAuthCallbackErrorMessage,
+  getAuthCallbackFailureKind,
   isAcceptInvitationDestination,
   isAuthTokenHashContinueGate,
   messageForAuthFailureReason,
@@ -31,6 +32,7 @@ export default function AuthCallbackPage() {
   const [busy, setBusy] = useState(false);
   const [needsContinue, setNeedsContinue] = useState(false);
   const [continueKind, setContinueKind] = useState<'recovery' | 'invite'>('recovery');
+  const [failureKind, setFailureKind] = useState<'recovery' | 'signup' | 'invite' | 'generic'>('generic');
   const requestId = useMemo(() => createAuthRequestId(), []);
   const autoStarted = useRef(false);
 
@@ -40,6 +42,7 @@ export default function AuthCallbackPage() {
     try {
       const authError = getAuthCallbackErrorMessage();
       if (authError) {
+        setFailureKind(getAuthCallbackFailureKind());
         logAuthDiag({
           requestId,
           route: '/auth/callback',
@@ -100,6 +103,7 @@ export default function AuthCallbackPage() {
           router.replace(destination);
           return;
         }
+        setFailureKind(getAuthCallbackFailureKind(search, hash));
         setErr(messageForAuthFailureReason(obtained.failureReason));
         return;
       }
@@ -118,11 +122,12 @@ export default function AuthCallbackPage() {
       });
 
       if (!persisted?.access_token) {
+        setFailureKind(getAuthCallbackFailureKind(search, hash));
         setErr(messageForAuthFailureReason('no_session'));
         return;
       }
 
-      // Drop one-time token_hash from the address bar before navigation.
+      // Drop one-time token_hash / code / hash credentials from the address bar before navigation.
       if (typeof window !== 'undefined' && (window.location.search || window.location.hash)) {
         window.history.replaceState({}, document.title, '/auth/callback');
       }
@@ -143,12 +148,14 @@ export default function AuthCallbackPage() {
 
       const result = await completeAuthenticatedSession(persisted.access_token);
       if (!result.ok) {
+        setFailureKind('generic');
         setErr(result.error);
         return;
       }
 
       router.replace(result.path);
     } catch (e) {
+      setFailureKind(getAuthCallbackFailureKind());
       logAuthDiag({
         requestId,
         route: '/auth/callback',
@@ -167,6 +174,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const authError = getAuthCallbackErrorMessage();
     if (authError) {
+      setFailureKind(getAuthCallbackFailureKind());
       setErr(authError);
       return;
     }
@@ -197,18 +205,30 @@ export default function AuthCallbackPage() {
   }, [requestId, runCallback]);
 
   if (err) {
+    const showResetCta = failureKind === 'recovery';
+    const showVerifyCta = failureKind === 'signup' || failureKind === 'generic';
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--sc-surface-page)] px-5 py-10 font-sans">
         <div className="w-full max-w-[400px] rounded-[var(--sc-radius-card)] border border-red-200 bg-white px-6 py-6 shadow-sm">
           <p className="text-sm text-red-800" role="alert">
             {err}
           </p>
-          <a
-            href="/auth/forgot-password"
-            className="mt-4 mr-4 inline-block text-sm font-medium text-[var(--sc-brand)] hover:underline"
-          >
-            Request a new reset link
-          </a>
+          {showResetCta ? (
+            <a
+              href="/auth/forgot-password"
+              className="mt-4 mr-4 inline-block text-sm font-medium text-[var(--sc-brand)] hover:underline"
+            >
+              Request a new reset link
+            </a>
+          ) : null}
+          {showVerifyCta ? (
+            <a
+              href="/auth/verify-email"
+              className="mt-4 mr-4 inline-block text-sm font-medium text-[var(--sc-brand)] hover:underline"
+            >
+              Request a new verification email
+            </a>
+          ) : null}
           <a
             href="/auth/signin"
             className="mt-4 inline-block text-sm font-medium text-[var(--sc-brand)] hover:underline"

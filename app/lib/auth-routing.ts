@@ -134,6 +134,9 @@ export function messageForAuthFailureReason(reason: string | null | undefined): 
   if (reason === 'otp_expired' || reason === 'otp_disabled') {
     return 'This link is invalid or has already been used. Request a new invitation or password reset.';
   }
+  if (reason === 'pkce_verifier_missing' || reason === 'code_exchange_failed') {
+    return 'This verification link could not be completed in this browser. Sign in with your email and password, or request a new verification email.';
+  }
   if (reason === 'missing_params') {
     return 'No session found. Open the link from your email again, or return to sign in.';
   }
@@ -141,6 +144,17 @@ export function messageForAuthFailureReason(reason: string | null | undefined): 
     return 'This sign-in link could not be completed. Request a new one, or return to sign in.';
   }
   return 'No session found. Open the link from your email again, or return to sign in.';
+}
+
+function isPkceVerifierMissingError(error: { message?: string; code?: string } | null | undefined): boolean {
+  if (!error) return false;
+  const code = String(error.code || '').toLowerCase();
+  const message = String(error.message || '').toLowerCase();
+  return (
+    code === 'pkce_code_verifier_not_found' ||
+    message.includes('pkce code verifier not found') ||
+    message.includes('code verifier not found')
+  );
 }
 
 export function isAcceptInvitationDestination(path: string | null | undefined): boolean {
@@ -288,7 +302,28 @@ export type AuthObtainFailureReason =
   | 'otp_failed'
   | 'missing_params'
   | 'stale_session_cleared'
-  | 'no_session';
+  | 'no_session'
+  | 'pkce_verifier_missing'
+  | 'code_exchange_failed';
+
+/** Classify callback failure for context-appropriate error CTAs (not password-reset by default). */
+export type AuthCallbackFailureKind = 'recovery' | 'signup' | 'invite' | 'generic';
+
+export function getAuthCallbackFailureKind(
+  search = typeof window !== 'undefined' ? window.location.search : '',
+  hash = typeof window !== 'undefined' ? window.location.hash : '',
+): AuthCallbackFailureKind {
+  const query = new URLSearchParams(search);
+  const hashParams = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+  const type = String(query.get('type') || hashParams.get('type') || '').toLowerCase();
+  if (type === 'recovery') return 'recovery';
+  if (type === 'invite') return 'invite';
+  if (type === 'signup' || type === 'email') return 'signup';
+  // Production signup confirmation often arrives as ?code= without type.
+  if (query.get('code') || hashParams.get('code')) return 'signup';
+  if (query.get('token_hash') || hashParams.get('token_hash')) return 'generic';
+  return 'generic';
+}
 
 export type AuthObtainResult = {
   accessToken: string | null;
@@ -404,6 +439,10 @@ export async function resolveInboundSupabaseSession(options?: {
         userPresent: Boolean(data.session.user?.id),
       });
     }
+    // Code exchange failures are terminal — do not mask as generic no_session.
+    if (existingUserId) {
+      await client.auth.signOut({ scope: 'local' });
+    }
     if (error) {
       const normalized = normalizeAuthErrorCode(error);
       if (normalized === 'otp_expired' || normalized === 'otp_disabled') {
@@ -413,7 +452,24 @@ export async function resolveInboundSupabaseSession(options?: {
           errorCode: normalized,
         });
       }
+      if (isPkceVerifierMissingError(error)) {
+        return finish({
+          accessToken: null,
+          failureReason: 'pkce_verifier_missing',
+          errorCode: 'pkce_code_verifier_not_found',
+        });
+      }
+      return finish({
+        accessToken: null,
+        failureReason: 'code_exchange_failed',
+        errorCode: String(error.code || normalized || 'code_exchange_failed').toLowerCase() || 'code_exchange_failed',
+      });
     }
+    return finish({
+      accessToken: null,
+      failureReason: 'code_exchange_failed',
+      errorCode: 'code_exchange_failed',
+    });
   }
 
   const refreshTokenFromHash = hashParams.get('refresh_token') || '';

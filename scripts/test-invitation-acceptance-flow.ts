@@ -3,6 +3,7 @@ import {
   getSafeAuthNextPath,
   getAuthCallbackDestination,
   getAuthCallbackErrorMessage,
+  getAuthCallbackFailureKind,
   hasInboundSupabaseAuthParams,
   isAcceptInvitationDestination,
   isAuthTokenHashContinueGate,
@@ -43,6 +44,7 @@ function mockClient({
   existing = null,
   exchanged = null,
   exchangeError = null,
+  exchangeErrorCode = null,
   verified = null,
   hashSession = null,
   inboundEvents = [],
@@ -50,6 +52,7 @@ function mockClient({
   existing?: SessionLike
   exchanged?: SessionLike
   exchangeError?: string | null
+  exchangeErrorCode?: string | null
   verified?: SessionLike
   hashSession?: SessionLike
   inboundEvents?: Array<[string, SessionLike]>
@@ -60,7 +63,12 @@ function mockClient({
     auth: {
       getSession: async () => ({ data: { session } }),
       exchangeCodeForSession: async () => {
-        if (exchangeError) return { data: { session: null }, error: { message: exchangeError } }
+        if (exchangeError) {
+          return {
+            data: { session: null },
+            error: { message: exchangeError, code: exchangeErrorCode || undefined },
+          }
+        }
         if (exchanged) session = exchanged
         return { data: { session: exchanged }, error: exchanged ? null : { message: 'exchange_failed' } }
       },
@@ -320,6 +328,62 @@ async function main() {
 
   assert.equal(parseAcceptInvitationPath('/auth/accept-invitation'), null)
   assert.equal(getSafeAuthNextPath('/auth/accept-invitation'), '/auth/accept-invitation')
+
+  // Phase 15C.2A — code exchange without verifier must not mask as generic no_session
+  {
+    const detailed = await resolveInboundSupabaseSession({
+      client: mockClient({
+        exchangeError: 'PKCE code verifier not found in storage',
+        exchangeErrorCode: 'pkce_code_verifier_not_found',
+      }),
+      search: '?code=fresh-signup-code',
+      hash: '',
+    })
+    assert.equal(detailed.accessToken, null)
+    assert.equal(detailed.failureReason, 'pkce_verifier_missing')
+    assert.equal(detailed.errorCode, 'pkce_code_verifier_not_found')
+    assert.equal(detailed.hasCode, true)
+  }
+
+  // Signup hash/token callback (implicit confirmation) still succeeds
+  {
+    const confirmed = { access_token: 'signup-token', user: { id: 'owner-id', email: 'owner@example.com' } }
+    const detailed = await resolveInboundSupabaseSession({
+      client: mockClient({ hashSession: confirmed }),
+      search: '',
+      hash: '#access_token=signup-token&refresh_token=refresh&type=signup',
+    })
+    assert.equal(detailed.accessToken, 'signup-token')
+    assert.equal(detailed.sessionPresent, true)
+  }
+
+  // Recovery token_hash still succeeds
+  {
+    const recovered = { access_token: 'recovery-token', user: { id: 'owner-id' } }
+    const detailed = await resolveInboundSupabaseSession({
+      client: mockClient({ verified: recovered }),
+      search: '?token_hash=hashed&type=recovery',
+      hash: '',
+    })
+    assert.equal(detailed.accessToken, 'recovery-token')
+    assert.equal(detailed.verifyOtpSuccess, true)
+  }
+
+  assert.equal(getAuthCallbackFailureKind('?code=abc', ''), 'signup')
+  assert.equal(getAuthCallbackFailureKind('?type=recovery', ''), 'recovery')
+  assert.equal(getAuthCallbackFailureKind('?type=invite', ''), 'invite')
+  assert.equal(getAuthCallbackFailureKind('?type=signup', ''), 'signup')
+  assert.equal(getAuthCallbackFailureKind('', ''), 'generic')
+  assert.equal(
+    messageForAuthFailureReason('pkce_verifier_missing').includes('verification'),
+    true,
+  )
+  assert.equal(
+    messageForAuthFailureReason('pkce_verifier_missing').toLowerCase().includes('reset'),
+    false,
+  )
+  // Signup failure UX must not default to password-reset CTA kind
+  assert.notEqual(getAuthCallbackFailureKind('?code=abc', ''), 'recovery')
 
   console.log('invitation_acceptance_flow: ok')
 }
